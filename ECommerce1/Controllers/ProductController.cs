@@ -5,6 +5,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using static ECommerce1.Models.ViewModels.ProductsViewModel;
 
 namespace ECommerce1.Controllers
@@ -232,8 +233,8 @@ namespace ECommerce1.Controllers
         {
             var resultValid = await ProductsValidator.ValidateAsync(product);
 
-            string? id = HttpContext.User.Identity?.Name;
-            Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(p => p.Email == id);
+            string? id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(p => p.AuthId.ToString() == id);
             if (seller == null)
             {
                 return BadRequest("No such seller exists");
@@ -285,7 +286,7 @@ namespace ECommerce1.Controllers
         {
             Product? prod = await resourceDbContext.Products.Include(p => p.Seller).FirstOrDefaultAsync(p => p.Id.ToString() == guid);
 
-            if(User.IsInRole("Seller") && User.Identity.Name != prod.Seller.Email)
+            if(User.IsInRole("Seller") && User.FindFirstValue(ClaimTypes.NameIdentifier) != prod.Seller.AuthId)
             {
                 return BadRequest();
             }
@@ -314,7 +315,7 @@ namespace ECommerce1.Controllers
         {
             Product? product = await resourceDbContext.Products.Include(p => p.Seller).FirstOrDefaultAsync(p => p.Id.ToString() == guid);
 
-            if (User.IsInRole("Seller") && User.Identity.Name != product.Seller.Email)
+            if (User.IsInRole("Seller") && User.FindFirstValue(ClaimTypes.NameIdentifier) != product.Seller.AuthId)
             {
                 return BadRequest();
             }
