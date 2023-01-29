@@ -41,7 +41,8 @@ services.AddControllers().AddJsonOptions(x =>
 services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 services.AddEndpointsApiExplorer();
 services.AddSwagger();
-services.AddJwtAuthentication(config["Secret"], new List<string>() { "User", "Seller", "Admin" });
+// services.AddJwtAuthentication(config["Secret"], new List<string>() { "User", "Seller", "Admin" });
+services.AddJwtAuthentication("3c66ae61-d405-4d24-8622-096087df7d22", new List<string>() { "User", "Seller", "Admin" });
 services.AddScoped<IValidator<UserCredentials>, UserRegistrationValidator>();
 services.AddScoped<IValidator<StaffCredentials>, StaffRegistrationValidator>();
 services.AddScoped<IValidator<SellerCredentials>, SellerRegistrationValidator>();

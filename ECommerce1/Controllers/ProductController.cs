@@ -43,7 +43,7 @@ namespace ECommerce1.Controllers
         }
 
         [HttpGet("title/{title}")]
-        public async Task<ActionResult<ProductsViewModel>> ByTitle(string title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
+        public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
         {
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
                 .Where(p => EF.Functions.Like(p.Name, $"%{title}%"))
@@ -85,7 +85,7 @@ namespace ECommerce1.Controllers
         }
 
         [HttpGet("seller/{guid}")]
-        public async Task<ActionResult<ProductsViewModel>> ByUserId(string guid, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
+        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
         {
             Seller? user = await resourceDbContext.Sellers
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
