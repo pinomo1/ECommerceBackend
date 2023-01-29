@@ -19,6 +19,11 @@ namespace ECommerce1.Controllers
             this.configuration = configuration;
         }
 
+
+        /// <summary>
+        /// Get all your own addresses (as a user)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("get_own")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> GetAddresses()
@@ -28,6 +33,11 @@ namespace ECommerce1.Controllers
             return Ok(addresses);
         }
 
+        /// <summary>
+        /// Add address to address list
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
         [HttpPost("add")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> AddAddress(Address address)
@@ -42,6 +52,11 @@ namespace ECommerce1.Controllers
             return Ok(address);
         }
 
+        /// <summary>
+        /// Delete address from address list
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("delete/{id}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> DeleteAddress(string id)
@@ -57,6 +72,11 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Edit existing address
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
         [HttpPut("edit")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> EditAddress(Address address)

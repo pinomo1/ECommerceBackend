@@ -17,12 +17,21 @@ namespace ECommerce1.Controllers
             this.resourceDbContext = resourceDbContext;
         }
 
+        /// <summary>
+        /// Get all countries
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("get")]
         public async Task<IEnumerable<Country>> GetAsync()
         {
             return await resourceDbContext.Countries.ToListAsync();
         }
 
+        /// <summary>
+        /// Add new country as admin
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         [HttpPost("add")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddAsync(string name)
@@ -41,6 +50,13 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+
+        /// <summary>
+        /// Rename country as admin
+        /// </summary>
+        /// <param name="id">Country's id</param>
+        /// <param name="name">New name</param>
+        /// <returns></returns>
         [HttpPatch("rename")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RenameAsync(string id, string name)
@@ -59,6 +75,12 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+
+        /// <summary>
+        /// Delete country as admin
+        /// </summary>
+        /// <param name="id">Country's id</param>
+        /// <returns></returns>
         [HttpDelete("delete")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAsync(string id)

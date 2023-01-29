@@ -19,6 +19,10 @@ namespace ECommerce1.Controllers
             this.configuration = configuration;
         }
 
+        /// <summary>
+        /// Get all items in cart
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("get_own")]
         [Authorize(Roles="User")]
         public async Task<IActionResult> GetCart()
@@ -28,6 +32,11 @@ namespace ECommerce1.Controllers
             return Ok(cartItems);
         }
 
+        /// <summary>
+        /// Add item to cart
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
         [HttpPost("add/{guid}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> AddToCart(string guid)
@@ -53,6 +62,12 @@ namespace ECommerce1.Controllers
             return Ok(item);
         }
 
+
+        /// <summary>
+        /// Remove item from cart
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
         [HttpDelete("delete/{id}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> RemoveFromCart(string guid)

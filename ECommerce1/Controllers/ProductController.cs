@@ -27,6 +27,12 @@ namespace ECommerce1.Controllers
             BlobWorker = blobWorker;
         }
 
+
+        /// <summary>
+        /// Gets product by its id
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
         [HttpGet("{guid}")]
         public async Task<ActionResult<Product>> GetProduct(string guid)
         {
@@ -42,6 +48,14 @@ namespace ECommerce1.Controllers
             return Ok(product);
         }
 
+        /// <summary>
+        /// Gets list of products with matching title
+        /// </summary>
+        /// <param name="title">Title</param>
+        /// <param name="page">Pagination: current page (first by default)</param>
+        /// <param name="onPage">Pagination: number of products on page</param>
+        /// <param name="sorting">Sorting method</param>
+        /// <returns></returns>
         [HttpGet("title/{title}")]
         public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
         {
@@ -84,6 +98,14 @@ namespace ECommerce1.Controllers
             return Ok(viewModel);
         }
 
+        /// <summary>
+        /// Gets list of products by seller's id
+        /// </summary>
+        /// <param name="guid">Seller's id</param>
+        /// <param name="page">Pagination: current page (first by default)</param>
+        /// <param name="onPage">Pagination: number of products on page</param>
+        /// <param name="sorting">Sorting method</param>
+        /// <returns></returns>
         [HttpGet("seller/{guid}")]
         public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
         {
@@ -133,6 +155,14 @@ namespace ECommerce1.Controllers
             return Ok(viewModel);
         }
 
+        /// <summary>
+        /// Gets list of products by category's id
+        /// </summary>
+        /// <param name="guid">Category's id</param>
+        /// <param name="page">Pagination: current page (first by default)</param>
+        /// <param name="onPage">Pagination: number of products on page</param>
+        /// <param name="sorting">Sorting method</param>
+        /// <returns></returns>
         [HttpGet("category/{guid}")]
         public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
         {
@@ -226,7 +256,12 @@ namespace ECommerce1.Controllers
 
             return orderedProducts.Skip((page - 1) * onPage).Take(onPage);
         }
-
+        
+        /// <summary>
+        /// Add product, must be logged in as a seller
+        /// </summary>
+        /// <param name="product"></param>
+        /// <returns></returns>
         [HttpPost("add")]
         [Authorize(Roles = "Seller")]
         public async Task<IActionResult> AddMainCategory([FromForm] AddProductViewModel product)
@@ -280,6 +315,12 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Edit specific product, muse be seller of that product or admin
+        /// </summary>
+        /// <param name="guid">Id of a product</param>
+        /// <param name="product"></param>
+        /// <returns></returns>
         [HttpPut("edit/{guid}")]
         [Authorize(Roles = "Admin,Seller")]
         public async Task<IActionResult> EditAsync(string guid, [FromForm] AddProductViewModel product)
@@ -309,6 +350,11 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Delete specific product, must be seller of that product or admin
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
         [HttpDelete("delete/{guid}")]
         [Authorize(Roles = "Admin,Seller")]
         public async Task<IActionResult> DeleteAsync(string guid)

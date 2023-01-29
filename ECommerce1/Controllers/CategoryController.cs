@@ -18,6 +18,11 @@ namespace ECommerce1.Controllers
             this.resourceDbContext = resourceDbContext;
         }
 
+        /// <summary>
+        /// Adds main category (main category is a category that has no parent category)
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
         [HttpPost("add/main")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddMainCategory(AddCategoryViewModel category)
@@ -43,6 +48,11 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Adds sub category (sub category is a category that has parent category)
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
         [HttpPost("add/sub")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddSubCategory(AddCategoryViewModel category)
@@ -72,6 +82,10 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Returns all main categories (categories that have no parent category) (example of usage: main page)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IEnumerable<Category>> GetMainCategories()
         {
@@ -79,6 +93,11 @@ namespace ECommerce1.Controllers
             return categories;
         }
 
+        /// <summary>
+        /// Returns category by id (if category allows products, redirects to products controller, else redirects to sub categories controller)
+        /// </summary>
+        /// <param name="guid">Parent category's id</param>
+        /// <returns></returns>
         [HttpGet("{guid}")]
         public async Task<IActionResult> GetCategory(string guid)
         {
@@ -91,6 +110,11 @@ namespace ECommerce1.Controllers
             return category.AllowProducts ? RedirectToAction("ByCategoryId", "Product", new { guid }) : RedirectToAction("GetSubCategories", "Category", new { guid });
         }
 
+        /// <summary>
+        /// Returns sub categories of category with id = guid
+        /// </summary>
+        /// <param name="guid">Parent category's id</param>
+        /// <returns></returns>
         [HttpGet("sub/{guid}")]
         public async Task<ActionResult<Category>> GetSubCategories(string guid)
         {
@@ -104,6 +128,11 @@ namespace ECommerce1.Controllers
             return Ok(category);
         }
 
+        /// <summary>
+        /// Deletes category with id = guid
+        /// </summary>
+        /// <param name="guid">Category's id</param>
+        /// <returns></returns>
         [HttpDelete("delete/{guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCategory(string guid)
@@ -119,6 +148,13 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+
+        /// <summary>
+        /// Edits category with id = guid
+        /// </summary>
+        /// <param name="guid">Category's id</param>
+        /// <param name="category"></param>
+        /// <returns></returns>
         [HttpPut("edit/{guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditCategory(string guid, AddCategoryViewModel category)

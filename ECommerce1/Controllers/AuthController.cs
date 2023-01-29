@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ECommerce1.Controllers
 {
@@ -56,6 +57,11 @@ namespace ECommerce1.Controllers
             this.logVal = _logVal;
         }
 
+        /// <summary>
+        /// Login
+        /// </summary>
+        /// <param name="loginDto"></param>
+        /// <returns></returns>
         [HttpPost("login")]
         public async Task<ActionResult<AuthenticationResponse>> LoginAsync(LoginCredentials loginDto)
         {
@@ -91,6 +97,11 @@ namespace ECommerce1.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Registrate as a user
+        /// </summary>
+        /// <param name="registrationDto"></param>
+        /// <returns></returns>
         [HttpPost("userreg")]
         public async Task<ActionResult<AuthenticationResponse>> UserRegistrationAsync(UserCredentials registrationDto)
         {
@@ -168,6 +179,11 @@ namespace ECommerce1.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Registrate as a staff/admin
+        /// </summary>
+        /// <param name="registrationDto"></param>
+        /// <returns></returns>
         [HttpPost("staffreg")]
         public async Task<ActionResult<AuthenticationResponse>> StaffRegistrationAsync(StaffCredentials registrationDto)
         {
@@ -243,6 +259,12 @@ namespace ECommerce1.Controllers
             return Ok(response);
         }
 
+
+        /// <summary>
+        /// Registrate as a seller
+        /// </summary>
+        /// <param name="registrationDto"></param>
+        /// <returns></returns>
         [HttpPost("sellerreg")]
         public async Task<ActionResult<AuthenticationResponse>> SellerRegistrationAsync(SellerCredentials registrationDto)
         {
@@ -319,6 +341,12 @@ namespace ECommerce1.Controllers
             return Ok(response);
         }
 
+
+        /// <summary>
+        /// Get new access token using refresh token
+        /// </summary>
+        /// <param name="oldRefreshToken"></param>
+        /// <returns></returns>
         [HttpGet("refresh/{oldRefreshToken}")]
         public async Task<ActionResult<AuthenticationResponse>> RefreshAsync(string oldRefreshToken)
         {
@@ -353,6 +381,11 @@ namespace ECommerce1.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Logout user
+        /// </summary>
+        /// <param name="refreshToken"></param>
+        /// <returns></returns>
         [HttpGet("logout/{refreshToken}")]
         public async Task<IActionResult> LogoutAsync(string refreshToken)
         {
@@ -365,6 +398,28 @@ namespace ECommerce1.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Logout all user sessions
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("logoutall")]
+        public async Task<IActionResult> LogoutAllAsync()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var tokens = accountDbContext.RefreshTokens.Where(t => t.AppUserId == userId);
+            if (tokens != null)
+            {
+                accountDbContext.RefreshTokens.RemoveRange(tokens);
+                await accountDbContext.SaveChangesAsync();
+            }
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Delete a user (only admin can do that)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("delete/{username}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAsync(string id)

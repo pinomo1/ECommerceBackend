@@ -1,0 +1,948 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ECommerce1</name>
+    </assembly>
+    <members>
+        <member name="M:ECommerce1.Controllers.AddressController.GetAddresses">
+            <summary>
+            Get all your own addresses (as a user)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AddressController.AddAddress(ECommerce1.Models.Address)">
+            <summary>
+            Add address to address list
+            </summary>
+            <param name="address"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AddressController.DeleteAddress(System.String)">
+            <summary>
+            Delete address from address list
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AddressController.EditAddress(ECommerce1.Models.Address)">
+            <summary>
+            Edit existing address
+            </summary>
+            <param name="address"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.LoginAsync(ECommerce1.Models.ViewModels.LoginCredentials)">
+            <summary>
+            Login
+            </summary>
+            <param name="loginDto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.UserRegistrationAsync(ECommerce1.Models.ViewModels.UserCredentials)">
+            <summary>
+            Registrate as a user
+            </summary>
+            <param name="registrationDto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.StaffRegistrationAsync(ECommerce1.Models.ViewModels.StaffCredentials)">
+            <summary>
+            Registrate as a staff/admin
+            </summary>
+            <param name="registrationDto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.SellerRegistrationAsync(ECommerce1.Models.ViewModels.SellerCredentials)">
+            <summary>
+            Registrate as a seller
+            </summary>
+            <param name="registrationDto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.RefreshAsync(System.String)">
+            <summary>
+            Get new access token using refresh token
+            </summary>
+            <param name="oldRefreshToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.LogoutAsync(System.String)">
+            <summary>
+            Logout user
+            </summary>
+            <param name="refreshToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.LogoutAllAsync">
+            <summary>
+            Logout all user sessions
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.DeleteAsync(System.String)">
+            <summary>
+            Delete a user (only admin can do that)
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CartController.GetCart">
+            <summary>
+            Get all items in cart
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CartController.AddToCart(System.String)">
+            <summary>
+            Add item to cart
+            </summary>
+            <param name="guid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CartController.RemoveFromCart(System.String)">
+            <summary>
+            Remove item from cart
+            </summary>
+            <param name="guid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CategoryController.AddMainCategory(ECommerce1.Models.ViewModels.AddCategoryViewModel)">
+            <summary>
+            Adds main category (main category is a category that has no parent category)
+            </summary>
+            <param name="category"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CategoryController.AddSubCategory(ECommerce1.Models.ViewModels.AddCategoryViewModel)">
+            <summary>
+            Adds sub category (sub category is a category that has parent category)
+            </summary>
+            <param name="category"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CategoryController.GetMainCategories">
+            <summary>
+            Returns all main categories (categories that have no parent category) (example of usage: main page)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CategoryController.GetCategory(System.String)">
+            <summary>
+            Returns category by id (if category allows products, redirects to products controller, else redirects to sub categories controller)
+            </summary>
+            <param name="guid">Parent category's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CategoryController.GetSubCategories(System.String)">
+            <summary>
+            Returns sub categories of category with id = guid
+            </summary>
+            <param name="guid">Parent category's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CategoryController.DeleteCategory(System.String)">
+            <summary>
+            Deletes category with id = guid
+            </summary>
+            <param name="guid">Category's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CategoryController.EditCategory(System.String,ECommerce1.Models.ViewModels.AddCategoryViewModel)">
+            <summary>
+            Edits category with id = guid
+            </summary>
+            <param name="guid">Category's id</param>
+            <param name="category"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CityController.GetAsync">
+            <summary>
+            Get all cities
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CityController.GetByCountryAsync(System.String)">
+            <summary>
+            Get all cities by country id
+            </summary>
+            <param name="id">Country's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CityController.AddAsync(System.String,System.String)">
+            <summary>
+            Add city as admin given country id
+            </summary>
+            <param name="countryId"></param>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CityController.RenameAsync(System.String,System.String)">
+            <summary>
+            Rename city as Admin
+            </summary>
+            <param name="id">City's id</param>
+            <param name="name">New name</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CityController.DeleteAsync(System.String)">
+            <summary>
+            Delete city by id as Admin
+            </summary>
+            <param name="id">City's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CountryController.GetAsync">
+            <summary>
+            Get all countries
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CountryController.AddAsync(System.String)">
+            <summary>
+            Add new country as admin
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CountryController.RenameAsync(System.String,System.String)">
+            <summary>
+            Rename country as admin
+            </summary>
+            <param name="id">Country's id</param>
+            <param name="name">New name</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CountryController.DeleteAsync(System.String)">
+            <summary>
+            Delete country as admin
+            </summary>
+            <param name="id">Country's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProductController.GetProduct(System.String)">
+            <summary>
+            Gets product by its id
+            </summary>
+            <param name="guid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProductController.ByTitle(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting)">
+            <summary>
+            Gets list of products with matching title
+            </summary>
+            <param name="title">Title</param>
+            <param name="page">Pagination: current page (first by default)</param>
+            <param name="onPage">Pagination: number of products on page</param>
+            <param name="sorting">Sorting method</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProductController.BySellerId(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting)">
+            <summary>
+            Gets list of products by seller's id
+            </summary>
+            <param name="guid">Seller's id</param>
+            <param name="page">Pagination: current page (first by default)</param>
+            <param name="onPage">Pagination: number of products on page</param>
+            <param name="sorting">Sorting method</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProductController.ByCategoryId(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting)">
+            <summary>
+            Gets list of products by category's id
+            </summary>
+            <param name="guid">Category's id</param>
+            <param name="page">Pagination: current page (first by default)</param>
+            <param name="onPage">Pagination: number of products on page</param>
+            <param name="sorting">Sorting method</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProductController.AddMainCategory(ECommerce1.Models.ViewModels.AddProductViewModel)">
+            <summary>
+            Add product, must be logged in as a seller
+            </summary>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProductController.EditAsync(System.String,ECommerce1.Models.ViewModels.AddProductViewModel)">
+            <summary>
+            Edit specific product, muse be seller of that product or admin
+            </summary>
+            <param name="guid">Id of a product</param>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProductController.DeleteAsync(System.String)">
+            <summary>
+            Delete specific product, must be seller of that product or admin
+            </summary>
+            <param name="guid"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ECommerce1.Models.Address">
+            <summary>
+            The address of a user
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Address.City">
+            <summary>
+            The city of the address
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Address.User">
+            <summary>
+            The user that owns this address
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Address.First">
+            <summary>
+            The first line of the address
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Address.Second">
+            <summary>
+            The second line of the address
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Address.Zip">
+            <summary>
+            The zip code of the address
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.AItemUser.User">
+            <summary>
+            The user who owns this item
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.AItemUser.Product">
+            <summary>
+            The product that this item is for
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.AModel.Id">
+            <summary>
+            The unique identifier for this model.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.APhoto.Url">
+            <summary>
+            The URL of the photo.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.AUser.AuthId">
+            <summary>
+            Id in accounts database
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.AUser.Email">
+            <summary>
+            Email of the user
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.AUser.PhoneNumber">
+            <summary>
+            Phone number of the user
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.AuthUser">
+            <summary>
+            This class is used to represent a user in the accounts database.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.CartItem">
+            <summary>
+            This class represents a cart item.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.Category">
+            <summary>
+            This class represents a category
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Category.ParentCategory">
+            <summary>
+            The parent category if any
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Category.Name">
+            <summary>
+            The name of the category
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Category.AllowProducts">
+            <summary>
+            Type of the category, there are 2:
+            1) true - category that stores products
+            2) false - category that stores other categories
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Category.Products">
+            <summary>
+            The products that are in this category if AllowProducts is true
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Category.ChildCategories">
+            <summary>
+            The child categories of this category if AllowProducts is false
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.City">
+            <summary>
+            City class
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.City.Name">
+            <summary>
+            Name of the city
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.City.Country">
+            <summary>
+            Country this city belongs to
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.City.Addresses">
+            <summary>
+            Addresses of this city
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.Country">
+            <summary>
+            Country class
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Country.Name">
+            <summary>
+            Country name
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Country.Cities">
+            <summary>
+            Cities of this country
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.Order">
+            <summary>
+            (Mail) Order class
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Order.AddressCopy">
+            <summary>
+            Copy of the full address instead of address object
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.Product">
+            <summary>
+            Product model
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.Name">
+            <summary>
+            Product name
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.CreationTime">
+            <summary>
+            Product creation time
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.Description">
+            <summary>
+            Product description
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.Price">
+            <summary>
+            Product price
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.Category">
+            <summary>
+            Product category
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.Seller">
+            <summary>
+            Product seller
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.ProductPhotos">
+            <summary>
+            Product photos
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.Reviews">
+            <summary>
+            Product reviews
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.CartItems">
+            <summary>
+            Can be used to determine which users have added this product to their cart
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.Orders">
+            <summary>
+            Can be used to determine which users have ordered this product
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ProductPhoto">
+            <summary>
+            This class represents a photo of a product.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ProductPhoto.Product">
+            <summary>
+            The product this photo belongs to.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ProductPreview">
+            <summary>
+            This class is used to display a product in a list of products.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ProductPreview.Name">
+            <summary>
+            The name of the product.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ProductPreview.Price">
+            <summary>
+            The price of the product.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ProductPreview.PhotoUrl">
+            <summary>
+            The URL of the preview photo of the product.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.Profile">
+            <summary>
+            This class represents a buyer's profile.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.FirstName">
+            <summary>
+            The first name/name of the buyer.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.MiddleName">
+            <summary>
+            The middle name/patronym of the buyer if any.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.LastName">
+            <summary>
+            The last name/family name/surname of the buyer.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.Addresses">
+            <summary>
+            Address list of the buyer.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.CartItems">
+            <summary>
+            Items that are in cart of the buyer.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.Orders">
+            <summary>
+            Order list of the buyer.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.Reviews">
+            <summary>
+            Review list of the buyer.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.RefreshToken">
+            <summary>
+            The refresh token is used to refresh the access token
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.RefreshToken.Token">
+            <summary>
+            The token that will be used to refresh the access token
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.RefreshToken.AppUserId">
+            <summary>
+            The user id of the user that the token belongs to in the accounts database
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.RefreshToken.ExpiresAt">
+            <summary>
+            The date and time that the token expires
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.RefreshToken.AuthUser">
+            <summary>
+            The user that the token belongs to
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.Review">
+            <summary>
+            A review of an item by a user.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Review.ReviewText">
+            <summary>
+            The text of the review.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Review.Quality">
+            <summary>
+            The quality of the item, on a scale of 1 to 5.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Review.Photos">
+            <summary>
+            List of photos associated with the review.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ReviewPhoto">
+            <summary>
+            A review of an item by a user.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ReviewPhoto.Review">
+            <summary>
+            The review this photo is associated with.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.Seller">
+            <summary>
+            Seller is a type of user that can sell products.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Seller.CompanyName">
+            <summary>
+            The name of the company that the seller represents.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Seller.WebsiteUrl">
+            <summary>
+            The website of the company that the seller represents.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Seller.ProfilePhotoUrl">
+            <summary>
+            The URL of the profile photo of the seller.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Seller.Products">
+            <summary>
+            The products that the seller has for sale.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.Staff">
+            <summary>
+            Class staff (admin/moderator/tech support)
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Staff.DisplayName">
+            <summary>
+            Staff's display name
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.AddCategoryViewModel">
+            <summary>
+            View model for adding a category
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddCategoryViewModel.ParentCategoryId">
+            <summary>
+            The parent category id (if is subcategory)
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddCategoryViewModel.Name">
+            <summary>
+            The name of the category
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddCategoryViewModel.AllowProducts">
+            <summary>
+            Refer to Category model
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.AddProductViewModel">
+            <summary>
+            This class is used to add a product to the database.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddProductViewModel.Name">
+            <summary>
+            The name of the product.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddProductViewModel.Description">
+            <summary>
+            The description of the product.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddProductViewModel.Price">
+            <summary>
+            The price of the product.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddProductViewModel.Photos">
+            <summary>
+            Photos of the product.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddProductViewModel.CategoryId">
+            <summary>
+            Id of a category this item is going to be added to
+            </summary>
+        </member>
+        <member name="F:ECommerce1.Models.ViewModels.ARegistrationCredentials._email">
+            <summary>
+            The email address of the user.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ARegistrationCredentials.Email">
+            <summary>
+            The email address of the user.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ARegistrationCredentials.Password">
+            <summary>
+            The password of the user.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ARegistrationCredentials.PasswordConfirmation">
+            <summary>
+            The password of the user.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ARegistrationCredentials.PhoneNumber">
+            <summary>
+            The phone number of the user.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.AuthenticationResponse">
+            <summary>
+            This class is used to return the authentication response to the client.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AuthenticationResponse.AccessToken">
+            <summary>
+            The access token.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AuthenticationResponse.RefreshToken">
+            <summary>
+            The refresh token used to get a new access token.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.GetCategoryViewModel">
+            <summary>
+            View model used to display the category and its subcategories.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.GetCategoryViewModel.Id">
+            <summary>
+            The category id.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.GetCategoryViewModel.Name">
+            <summary>
+            The category name.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.GetCategoryViewModel.AllowProducts">
+            <summary>
+            Why is this here? I don't know. I think it's a mistake. Ignore this field
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.GetCategoryViewModel.ChildCategories">
+            <summary>
+            The subcategories of this category.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.GetSubCategoryViewModel">
+            <summary>
+            View model used to display the subcategory in the list of categories
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.GetSubCategoryViewModel.Id">
+            <summary>
+            The subcategory id.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.GetSubCategoryViewModel.Name">
+            <summary>
+            The subcategory name.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.GetSubCategoryViewModel.AllowProducts">
+            <summary>
+            Determine whether the subcategory allows products or categories (refer to Category model).
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.LoginCredentials">
+            <summary>
+            This class is used to hold the login credentials of a user.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.LoginCredentials.Email">
+            <summary>
+            The email of the user.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.LoginCredentials.Password">
+            <summary>
+            The password of the user.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.ProductsViewModel">
+            <summary>
+            The base class for all the view models that are used to display a list of products.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsViewModel.Products">
+            <summary>
+            The products to be displayed on the page.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsViewModel.TotalProductCount">
+            <summary>
+            The total number of products in the database by given query.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsViewModel.OnPageProductCount">
+            <summary>
+            The number of products to be displayed on the page.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsViewModel.TotalPageCount">
+            <summary>
+            The total number of pages.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsViewModel.CurrentPage">
+            <summary>
+            The current page.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting">
+            <summary>
+            The sorting method.
+            1 - Older first
+            2 - Newer first
+            3 - Cheaper first
+            4 - Expensive first
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.ProductsViewModelByCategory">
+            <summary>
+            The view model used to display a list of products by category.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsViewModelByCategory.Category">
+            <summary>
+            The category of the products.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.ProductsViewModelBySeller">
+            <summary>
+            The view model used to display a list of products by seller.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsViewModelBySeller.Seller">
+            <summary>
+            The seller of the products.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.ProductsViewModelByTitle">
+            <summary>
+            The view model used to display a list of products by title.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsViewModelByTitle.Title">
+            <summary>
+            The title of the products.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.ProductsProductViewModel">
+            <summary>
+            The view model used to display a product in the list.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.Id">
+            <summary>
+            The product id.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.Name">
+            <summary>
+            The product name.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.CreationTime">
+            <summary>
+            The product creation time.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.Description">
+            <summary>
+            The product description.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.Price">
+            <summary>
+            The product price.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.FirstPhotoUrl">
+            <summary>
+            Preview photo's URL
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.SellerCredentials">
+            <summary>
+            The seller's credentials for registration.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.SellerCredentials.CompanyName">
+            <summary>
+            The company name.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.SellerCredentials.WebsiteUrl">
+            <summary>
+            The website URL.
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.StaffCredentials">
+            <summary>
+            Staff credentials for registration
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.StaffCredentials.DisplayName">
+            <summary>
+            Staff's display name
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.UserCredentials">
+            <summary>
+            The user's credentials for registration.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.UserCredentials.FirstName">
+            <summary>
+            The user's first name.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.UserCredentials.MiddleName">
+            <summary>
+            The user's middle name.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.UserCredentials.LastName">
+            <summary>
+            The user's last name.
+            </summary>
+        </member>
+    </members>
+</doc>

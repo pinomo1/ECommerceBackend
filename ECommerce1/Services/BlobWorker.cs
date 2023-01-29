@@ -27,7 +27,7 @@ namespace ECommerce1.Services
                 try
                 {
                     List<string> references = new List<string>();
-                    string containerPublicationPhoto = Configuration["BlobContainers:Publications"];
+                    string containerPublicationPhoto = Configuration["ConnectionStrings:BlobStorage"];
                     var containerClientPhoto = BlobServiceClient.GetBlobContainerClient(containerPublicationPhoto);
                     string newName;
                     for (int i = 0; i < files.Length; i++)
@@ -42,7 +42,7 @@ namespace ECommerce1.Services
                         {
                             await containerClientPhoto.UploadBlobAsync(newName, stream);
                         }
-                        references.Add($"{Configuration["BlobUrl"]}/{containerPublicationPhoto}/{newName}");
+                        references.Add($"{Configuration["Links:Files:Pictures"]}/{containerPublicationPhoto}/{newName}");
                     }
                     if (references.Count < 2)
                     {
@@ -60,7 +60,7 @@ namespace ECommerce1.Services
         }
         public async Task RemovePublications(string[] references)
         {
-            var containerClient = BlobServiceClient.GetBlobContainerClient(Configuration["BlobContainers:Publications"]);
+            var containerClient = BlobServiceClient.GetBlobContainerClient(Configuration["ConnectionStrings:BlobStorage"]);
             foreach (var reference in references)
             {
                 if (!String.IsNullOrWhiteSpace(reference))
