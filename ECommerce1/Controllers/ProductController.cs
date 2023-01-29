@@ -55,12 +55,14 @@ namespace ECommerce1.Controllers
         /// <param name="page">Pagination: current page (first by default)</param>
         /// <param name="onPage">Pagination: number of products on page</param>
         /// <param name="sorting">Sorting method</param>
+        /// <param name="fromPrice">Minimum price</param>
+        /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
         [HttpGet("title/{title}")]
-        public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
+        public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
         {
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => EF.Functions.Like(p.Name, $"%{title}%"))
+                .Where(p => EF.Functions.Like(p.Name, $"%{title}%") && p.Price >= fromPrice && p.Price <= toPrice)
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Id,
@@ -105,9 +107,11 @@ namespace ECommerce1.Controllers
         /// <param name="page">Pagination: current page (first by default)</param>
         /// <param name="onPage">Pagination: number of products on page</param>
         /// <param name="sorting">Sorting method</param>
+        /// <param name="fromPrice">Minimum price</param>
+        /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
         [HttpGet("seller/{guid}")]
-        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
+        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
         {
             Seller? user = await resourceDbContext.Sellers
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
@@ -117,7 +121,7 @@ namespace ECommerce1.Controllers
             }
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => p.Seller.Id.ToString() == guid)
+                .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice)
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Id,
@@ -162,9 +166,11 @@ namespace ECommerce1.Controllers
         /// <param name="page">Pagination: current page (first by default)</param>
         /// <param name="onPage">Pagination: number of products on page</param>
         /// <param name="sorting">Sorting method</param>
+        /// <param name="fromPrice">Minimum price</param>
+        /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
         [HttpGet("category/{guid}")]
-        public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
+        public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
         {
             Category? category = await resourceDbContext.Categories
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
@@ -174,7 +180,7 @@ namespace ECommerce1.Controllers
             }
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => p.Category.Id.ToString() == guid)
+                .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice)
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Id,

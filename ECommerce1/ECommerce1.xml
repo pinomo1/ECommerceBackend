@@ -226,7 +226,7 @@
             <param name="guid"></param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.ProductController.ByTitle(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting)">
+        <member name="M:ECommerce1.Controllers.ProductController.ByTitle(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32)">
             <summary>
             Gets list of products with matching title
             </summary>
@@ -234,9 +234,11 @@
             <param name="page">Pagination: current page (first by default)</param>
             <param name="onPage">Pagination: number of products on page</param>
             <param name="sorting">Sorting method</param>
+            <param name="fromPrice">Minimum price</param>
+            <param name="toPrice">Maximum price</param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.ProductController.BySellerId(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting)">
+        <member name="M:ECommerce1.Controllers.ProductController.BySellerId(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32)">
             <summary>
             Gets list of products by seller's id
             </summary>
@@ -244,9 +246,11 @@
             <param name="page">Pagination: current page (first by default)</param>
             <param name="onPage">Pagination: number of products on page</param>
             <param name="sorting">Sorting method</param>
+            <param name="fromPrice">Minimum price</param>
+            <param name="toPrice">Maximum price</param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.ProductController.ByCategoryId(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting)">
+        <member name="M:ECommerce1.Controllers.ProductController.ByCategoryId(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32)">
             <summary>
             Gets list of products by category's id
             </summary>
@@ -254,6 +258,8 @@
             <param name="page">Pagination: current page (first by default)</param>
             <param name="onPage">Pagination: number of products on page</param>
             <param name="sorting">Sorting method</param>
+            <param name="fromPrice">Minimum price</param>
+            <param name="toPrice">Maximum price</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.AddMainCategory(ECommerce1.Models.ViewModels.AddProductViewModel)">
