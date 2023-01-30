@@ -89,7 +89,7 @@ namespace ECommerce1.Controllers
         [HttpGet]
         public async Task<IEnumerable<Category>> GetMainCategories()
         {
-            var categories = await resourceDbContext.Categories.Where(c => c.ParentCategory == null).ToListAsync();
+            var categories = await resourceDbContext.Categories.Where(c => c.ParentCategory == null).Include(c => c.ChildCategories).ToListAsync();
             return categories;
         }
 

@@ -13,7 +13,7 @@ namespace ECommerce1.Models.Validators
 
             RuleFor(c => c.Password)
                 .ValidCheckString("Password", 8, 256)
-                .Matches(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$").WithMessage("Password must contain at least 1 letter and 1 digit!");
+                .Matches(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d#?!@$%^&*-_]{8,}$").WithMessage("Password must contain at least 1 letter and 1 digit!");
 
             RuleFor(c => c.PasswordConfirmation)
                 .Equal(c => c.Password).WithMessage("Passwords do not match!");
