@@ -219,6 +219,12 @@
             <param name="id">Country's id</param>
             <returns></returns>
         </member>
+        <member name="M:ECommerce1.Controllers.ProductController.GetSortingEnum">
+            <summary>
+            Returns elements of ProductSorting enum
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:ECommerce1.Controllers.ProductController.GetProduct(System.String)">
             <summary>
             Gets product by its id
@@ -238,11 +244,12 @@
             <param name="toPrice">Maximum price</param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.ProductController.BySellerId(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32)">
+        <member name="M:ECommerce1.Controllers.ProductController.BySellerId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32)">
             <summary>
             Gets list of products by seller's id
             </summary>
             <param name="guid">Seller's id</param>
+            <param name="title">Additional title of a product</param>
             <param name="page">Pagination: current page (first by default)</param>
             <param name="onPage">Pagination: number of products on page</param>
             <param name="sorting">Sorting method</param>
@@ -250,11 +257,12 @@
             <param name="toPrice">Maximum price</param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.ProductController.ByCategoryId(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32)">
+        <member name="M:ECommerce1.Controllers.ProductController.ByCategoryId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32)">
             <summary>
             Gets list of products by category's id
             </summary>
             <param name="guid">Category's id</param>
+            <param name="title">Additional title of a product</param>
             <param name="page">Pagination: current page (first by default)</param>
             <param name="onPage">Pagination: number of products on page</param>
             <param name="sorting">Sorting method</param>
@@ -434,6 +442,11 @@
         <member name="P:ECommerce1.Models.Order.AddressCopy">
             <summary>
             Copy of the full address instead of address object
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Order.OrderTime">
+            <summary>
+            Time of order
             </summary>
         </member>
         <member name="T:ECommerce1.Models.Product">

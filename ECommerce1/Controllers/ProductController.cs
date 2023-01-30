@@ -27,6 +27,16 @@ namespace ECommerce1.Controllers
             BlobWorker = blobWorker;
         }
 
+        /// <summary>
+        /// Returns elements of ProductSorting enum
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("sorting")]
+        public async Task<ActionResult<IList<string>>> GetSortingEnum()
+        {
+            IDictionary<int, string> names = Enum.GetNames(typeof(ProductSorting)).ToList().Select((s, i) => new { s, i }).ToDictionary(x => x.i + 1, x => x.s);
+            return Ok(names);
+        }
 
         /// <summary>
         /// Gets product by its id
@@ -59,7 +69,7 @@ namespace ECommerce1.Controllers
         /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
         [HttpGet("title/{title}")]
-        public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
+        public async Task<ActionResult<ProductsViewModel>> ByTitle(string title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
         {
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
                 .Where(p => EF.Functions.Like(p.Name, $"%{title}%") && p.Price >= fromPrice && p.Price <= toPrice)
@@ -104,6 +114,7 @@ namespace ECommerce1.Controllers
         /// Gets list of products by seller's id
         /// </summary>
         /// <param name="guid">Seller's id</param>
+        /// <param name="title">Additional title of a product</param>
         /// <param name="page">Pagination: current page (first by default)</param>
         /// <param name="onPage">Pagination: number of products on page</param>
         /// <param name="sorting">Sorting method</param>
@@ -111,17 +122,18 @@ namespace ECommerce1.Controllers
         /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
         [HttpGet("seller/{guid}")]
-        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
+        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
         {
             Seller? user = await resourceDbContext.Sellers
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
+
             if (user == null)
             {
                 return NotFound("No such seller exists");
             }
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice)
+                .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && EF.Functions.Like(p.Name, $"%{title}%"))
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Id,
@@ -163,6 +175,7 @@ namespace ECommerce1.Controllers
         /// Gets list of products by category's id
         /// </summary>
         /// <param name="guid">Category's id</param>
+        /// <param name="title">Additional title of a product</param>
         /// <param name="page">Pagination: current page (first by default)</param>
         /// <param name="onPage">Pagination: number of products on page</param>
         /// <param name="sorting">Sorting method</param>
@@ -170,7 +183,7 @@ namespace ECommerce1.Controllers
         /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
         [HttpGet("category/{guid}")]
-        public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
+        public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
         {
             Category? category = await resourceDbContext.Categories
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
@@ -180,7 +193,7 @@ namespace ECommerce1.Controllers
             }
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice)
+                .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && EF.Functions.Like(p.Name, $"%{title}%"))
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Id,
@@ -333,15 +346,16 @@ namespace ECommerce1.Controllers
         {
             Product? prod = await resourceDbContext.Products.Include(p => p.Seller).FirstOrDefaultAsync(p => p.Id.ToString() == guid);
 
-            if(User.IsInRole("Seller") && User.FindFirstValue(ClaimTypes.NameIdentifier) != prod.Seller.AuthId)
-            {
-                return BadRequest();
-            }
-
             if (prod == null)
             {
                 return BadRequest("No product with such id exists");
             }
+
+            if (User.IsInRole("Seller") && User.FindFirstValue(ClaimTypes.NameIdentifier) != prod.Seller.AuthId)
+            {
+                return BadRequest();
+            }
+
             Category? category = await resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Id.ToString() == product.CategoryId);
             if (category == null)
             {
@@ -356,6 +370,32 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+        [HttpGet("statistics/{guid}")]
+        [Authorize(Roles = "Seller")]
+        public async Task<IActionResult> StatisticsAsync(string guid)
+        {
+            Product? product = await resourceDbContext.Products.Include(p => p.Seller).FirstOrDefaultAsync(p => p.Id.ToString() == guid);
+
+            if (product == null)
+            {
+                return BadRequest("No product with such id exists");
+            }
+
+            if (User.FindFirstValue(ClaimTypes.NameIdentifier) != product.Seller.AuthId)
+            {
+                return BadRequest();
+            }
+
+            Dictionary<int, int> SellingDict = new();
+
+            for (int i = 0; i < 14; i++)
+            {
+                SellingDict[i] = resourceDbContext.Orders.Count(x => x.OrderTime >= DateTime.Today.AddDays(-i - 1) && x.OrderTime <= DateTime.Today.AddDays(-i));
+            }
+
+            return Ok(SellingDict);
+        }
+
         /// <summary>
         /// Delete specific product, must be seller of that product or admin
         /// </summary>
@@ -367,15 +407,16 @@ namespace ECommerce1.Controllers
         {
             Product? product = await resourceDbContext.Products.Include(p => p.Seller).FirstOrDefaultAsync(p => p.Id.ToString() == guid);
 
+            if (product == null)
+            {
+                return BadRequest("No product with such id exists");
+            }
+
             if (User.IsInRole("Seller") && User.FindFirstValue(ClaimTypes.NameIdentifier) != product.Seller.AuthId)
             {
                 return BadRequest();
             }
 
-            if (product == null)
-            {
-                return BadRequest("No product with such id exists");
-            }
             resourceDbContext.Products.Remove(product);
             await resourceDbContext.SaveChangesAsync();
             return Ok();

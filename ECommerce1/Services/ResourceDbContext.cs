@@ -336,6 +336,9 @@ namespace ECommerce1.Services
                 .HasColumnType("nvarchar(256)")
                 .HasMaxLength(256)
                 .IsRequired();
+
+                e.Property(e => e.OrderTime)
+                .HasDefaultValueSql("getdate()");
             });
 
             builder.Entity<Review>(e =>
