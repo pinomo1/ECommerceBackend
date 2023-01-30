@@ -118,7 +118,7 @@ namespace ECommerce1.Controllers
         }
 
         /// <summary>
-        /// Get all categories potomu chto Dima tak skazal
+        /// Get all categories
         /// </summary>
         /// <returns></returns>
         [HttpGet("getall")]
