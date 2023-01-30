@@ -25,22 +25,17 @@ namespace ECommerce1.Controllers
         /// <returns></returns>
         [HttpPost("add/main")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddMainCategory(AddCategoryViewModel category)
+        public async Task<IActionResult> AddMainCategory(string category)
         {
-            Category? parentCategoty = await this.resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Id == category.ParentCategoryId);
-            if(category.ParentCategoryId != null)
-            {
-                return RedirectToAction("AddSubCategory", "Category", new { category });
-            }
-            Category? foundCategory = await resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Name.ToLower().Trim() == category.Name.ToLower().Trim());
+            Category? foundCategory = await resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Name.ToLower().Trim() == category.ToLower().Trim());
             if(foundCategory != null)
             {
                 return BadRequest("Category with such name already exists");
             }
             Category newCategory = new()
             {
-                AllowProducts = category.AllowProducts,
-                Name = category.Name,
+                AllowProducts = false,
+                Name = category,
                 ParentCategory = null
             };
             await resourceDbContext.Categories.AddAsync(newCategory);
@@ -108,6 +103,29 @@ namespace ECommerce1.Controllers
                 return NotFound("No such category exists");
             }
             return category.AllowProducts ? RedirectToAction("ByCategoryId", "Product", new { guid }) : RedirectToAction("GetSubCategories", "Category", new { guid });
+        }
+
+        /// <summary>
+        /// Returns list of categories by title (example of usage: search)
+        /// </summary>
+        /// <param name="title"></param>
+        /// <returns></returns>
+        [HttpGet("title/{title}")]
+        public async Task<IActionResult> GetCategoriesByTitle(string title)
+        {
+            var categories = await resourceDbContext.Categories.Where(p => EF.Functions.Like(p.Name, $"%{title}%")).ToListAsync();
+            return Ok(categories);
+        }
+
+        /// <summary>
+        /// Get all categories potomu chto Dima tak skazal
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getall")]
+        public async Task<IActionResult> GetAllCategories()
+        {
+            var categories = await resourceDbContext.Categories.ToListAsync();
+            return Ok(categories);
         }
 
         /// <summary>
