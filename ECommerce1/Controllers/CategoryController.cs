@@ -124,8 +124,26 @@ namespace ECommerce1.Controllers
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllCategories()
         {
-            var categories = await resourceDbContext.Categories.ToListAsync();
-            return Ok(categories);
+
+            AllCategoriesResponse allCategoriesResponse = new AllCategoriesResponse();
+
+            allCategoriesResponse.MainCategories = resourceDbContext.Categories.Where(c => c.AllowProducts == false).Select(c => new CategoryResponse
+            {
+                Id = c.Id,
+                ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
+                Name = c.Name,
+            })
+                .ToArray<CategoryResponse>();
+
+            allCategoriesResponse.SubCategories = resourceDbContext.Categories.Where(c => c.AllowProducts == true).Select(c => new CategoryResponse
+            {
+                Id = c.Id,
+                ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
+                Name = c.Name,
+            })
+                .ToArray<CategoryResponse>();
+
+            return Ok(allCategoriesResponse);
         }
 
         /// <summary>
