@@ -28,7 +28,7 @@ namespace ECommerce1.Controllers
         public async Task<IActionResult> GetCart()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).ToListAsync();
+            List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ToListAsync();
             return Ok(cartItems);
         }
 
@@ -47,7 +47,7 @@ namespace ECommerce1.Controllers
                 return BadRequest("No such product");
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId.ToString() == userId);
+            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
             if(user == null)
             {
                 return BadRequest("User not found");
@@ -59,7 +59,7 @@ namespace ECommerce1.Controllers
             };
             await resourceDbContext.CartItems.AddAsync(item);
             await resourceDbContext.SaveChangesAsync();
-            return Ok(item);
+            return Ok(item.Id);
         }
 
 
@@ -78,7 +78,7 @@ namespace ECommerce1.Controllers
                 return NotFound("No such product");
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId.ToString() == userId);
+            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
             if(userId != cartItem.User.AuthId)
             {
                 return BadRequest("You are not authorized to remove this item");
