@@ -953,6 +953,11 @@
             Preview photo's URL
             </summary>
         </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.OrderCount">
+            <summary>
+            Count of orders
+            </summary>
+        </member>
         <member name="T:ECommerce1.Models.ViewModels.SellerCredentials">
             <summary>
             The seller's credentials for registration.

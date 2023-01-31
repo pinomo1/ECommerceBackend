@@ -69,7 +69,7 @@ namespace ECommerce1.Controllers
         /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
         [HttpGet("title/{title}")]
-        public async Task<ActionResult<ProductsViewModel>> ByTitle(string title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
+        public async Task<ActionResult<ProductsViewModel>> ByTitle(string title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000)
         {
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
                 .Where(p => EF.Functions.Like(p.Name, $"%{title}%") && p.Price >= fromPrice && p.Price <= toPrice)
@@ -80,7 +80,8 @@ namespace ECommerce1.Controllers
                     Description = p.Description,
                     FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
                     Name = p.Name,
-                    Price = p.Price
+                    Price = p.Price,
+                    OrderCount = p.Orders.Count
                 });
 
             int totalCount = unorderedProducts.Count();
@@ -128,7 +129,7 @@ namespace ECommerce1.Controllers
         /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
         [HttpGet("seller/{guid}")]
-        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
+        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000)
         {
             Seller? user = await resourceDbContext.Sellers
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
@@ -147,7 +148,8 @@ namespace ECommerce1.Controllers
                     Description = p.Description,
                     FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
                     Name = p.Name,
-                    Price = p.Price
+                    Price = p.Price,
+                    OrderCount = p.Orders.Count
                 });
 
             int totalCount = unorderedProducts.Count();
@@ -195,7 +197,7 @@ namespace ECommerce1.Controllers
         /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
         [HttpGet("category/{guid}")]
-        public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst, int fromPrice = 0, int toPrice = 100000)
+        public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000)
         {
             Category? category = await resourceDbContext.Categories
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
@@ -213,7 +215,8 @@ namespace ECommerce1.Controllers
                     Description = p.Description,
                     FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
                     Name = p.Name,
-                    Price = p.Price
+                    Price = p.Price,
+                    OrderCount = p.Orders.Count
                 });
 
             int totalCount = unorderedProducts.Count();
@@ -289,8 +292,12 @@ namespace ECommerce1.Controllers
                 case ProductSorting.ExpensiveFirst:
                     orderedProducts = unorderedProducts.OrderByDescending(p => p.Price);
                     break;
+                case ProductSorting.PopularFirst:
+                    orderedProducts = unorderedProducts.OrderByDescending(p => p.OrderCount);
+                    break;
                 default:
-                    throw new Exception();
+                    orderedProducts = unorderedProducts.OrderByDescending(p => p.OrderCount);
+                    break;
             }
 
             return new ProductPreparation(minPrice, maxPrice, orderedProducts.Skip((page - 1) * onPage).Take(onPage));
