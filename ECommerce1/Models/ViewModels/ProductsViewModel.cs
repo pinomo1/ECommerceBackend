@@ -46,7 +46,8 @@
             OlderFirst = 1,
             NewerFirst,
             CheaperFirst,
-            ExpensiveFirst
+            ExpensiveFirst,
+            PopularFirst
         }
     }
 
@@ -112,5 +113,9 @@
         /// Preview photo's URL
         /// </summary>
         public string? FirstPhotoUrl { get; set; } 
+        /// <summary>
+        /// Count of orders
+        /// </summary>
+        public int OrderCount { get; set; }
     }
 }
