@@ -10,7 +10,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.AddressController.AddAddress(ECommerce1.Models.Address)">
+        <member name="M:ECommerce1.Controllers.AddressController.AddAddress(ECommerce1.Models.ViewModels.AddAddressViewModel)">
             <summary>
             Add address to address list
             </summary>
@@ -24,7 +24,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.AddressController.EditAddress(ECommerce1.Models.Address)">
+        <member name="M:ECommerce1.Controllers.AddressController.EditAddress(System.String,ECommerce1.Models.ViewModels.AddAddressViewModel)">
             <summary>
             Edit existing address
             </summary>
@@ -689,6 +689,31 @@
             Staff's display name
             </summary>
         </member>
+        <member name="T:ECommerce1.Models.ViewModels.AddAddressViewModel">
+            <summary>
+            This class is used to add an address to the database.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddAddressViewModel.CityId">
+            <summary>
+            The id of the city of this address
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddAddressViewModel.First">
+            <summary>
+            The first line of the address
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddAddressViewModel.Second">
+            <summary>
+            The second line of the address
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddAddressViewModel.Zip">
+            <summary>
+            The zip code of the address
+            </summary>
+        </member>
         <member name="T:ECommerce1.Models.ViewModels.AddCategoryViewModel">
             <summary>
             View model for adding a category
@@ -737,6 +762,31 @@
         <member name="P:ECommerce1.Models.ViewModels.AddProductViewModel.CategoryId">
             <summary>
             Id of a category this item is going to be added to
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.ViewModels.AddReviewViewModel">
+            <summary>
+            This class is used to add a review to the database.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddReviewViewModel.ProductId">
+            <summary>
+            The id of the product that the review is for.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddReviewViewModel.Text">
+            <summary>
+            The text of the review.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddReviewViewModel.Rating">
+            <summary>
+            Rating 1-5
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.AddReviewViewModel.Photos">
+            <summary>
+            Photos of the review
             </summary>
         </member>
         <member name="F:ECommerce1.Models.ViewModels.ARegistrationCredentials._email">

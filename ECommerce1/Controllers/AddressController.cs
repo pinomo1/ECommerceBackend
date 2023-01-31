@@ -1,4 +1,5 @@
 ﻿using ECommerce1.Models;
+using ECommerce1.Models.ViewModels;
 using ECommerce1.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,16 +41,27 @@ namespace ECommerce1.Controllers
         /// <returns></returns>
         [HttpPost("add")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> AddAddress(Address address)
+        public async Task<IActionResult> AddAddress(AddAddressViewModel address)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(u => u.AuthId == userId);
             if (user == null)
                 return BadRequest("User not found");
-            address.User = user;
-            await resourceDbContext.Addresses.AddAsync(address);
+            City? city = await resourceDbContext.Cities.FirstOrDefaultAsync(c => c.Id.ToString() == address.CityId);
+            if (city == null)
+                return BadRequest("City not found");
+
+            Address newAddress = new()
+            {
+                City = city,
+                User = user,
+                First = address.First,
+                Second = address.Second,
+                Zip = address.Zip
+            };
+            await resourceDbContext.Addresses.AddAsync(newAddress);
             await resourceDbContext.SaveChangesAsync();
-            return Ok(address);
+            return Ok(newAddress.Id);
         }
 
         /// <summary>
@@ -79,20 +91,24 @@ namespace ECommerce1.Controllers
         /// <returns></returns>
         [HttpPut("edit")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> EditAddress(Address address)
+        public async Task<IActionResult> EditAddress(string addressId, AddAddressViewModel address)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Address? oldAddress = await resourceDbContext.Addresses.FirstOrDefaultAsync(a => a.Id == address.Id);
+            Address? oldAddress = await resourceDbContext.Addresses.FirstOrDefaultAsync(a => a.Id.ToString() == addressId);
             if (oldAddress == null)
                 return BadRequest("Address not found");
             if (oldAddress.User.AuthId != userId)
                 return BadRequest("You are not authorized to edit this address");
+            City? city = await resourceDbContext.Cities.FirstOrDefaultAsync(c => c.Id.ToString() == address.CityId);
+            if (city == null)
+                return BadRequest("City not found");
+
             oldAddress.First = address.First;
             oldAddress.Second = address.Second;
-            oldAddress.City = address.City;
+            oldAddress.City = city;
             oldAddress.Zip = address.Zip;
             await resourceDbContext.SaveChangesAsync();
-            return Ok(oldAddress);
+            return Ok(oldAddress.Id);
         }
     }
 }
