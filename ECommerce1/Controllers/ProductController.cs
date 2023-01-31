@@ -325,7 +325,7 @@ namespace ECommerce1.Controllers
             var resultValid = await ProductsValidator.ValidateAsync(product);
 
             string? id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(p => p.AuthId.ToString() == id);
+            Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(p => p.AuthId == id);
             if (seller == null)
             {
                 return BadRequest("No such seller exists");
