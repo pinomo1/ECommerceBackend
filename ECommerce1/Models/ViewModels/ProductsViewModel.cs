@@ -25,6 +25,14 @@
         /// The current page.
         /// </summary>
         public int CurrentPage { get; set; }
+        /// <summary>
+        /// Minimal price of the products.
+        /// </summary>
+        public decimal MinPrice { get; set; }
+        /// <summary>
+        /// Maximal price of the products.
+        /// </summary>
+        public decimal MaxPrice { get; set; }
 
         /// <summary>
         /// The sorting method.

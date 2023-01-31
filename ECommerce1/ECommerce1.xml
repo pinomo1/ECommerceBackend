@@ -106,7 +106,7 @@
             <param name="guid"></param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.CategoryController.AddMainCategory(ECommerce1.Models.ViewModels.AddCategoryViewModel)">
+        <member name="M:ECommerce1.Controllers.CategoryController.AddMainCategory(System.String)">
             <summary>
             Adds main category (main category is a category that has no parent category)
             </summary>
@@ -131,6 +131,19 @@
             Returns category by id (if category allows products, redirects to products controller, else redirects to sub categories controller)
             </summary>
             <param name="guid">Parent category's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CategoryController.GetCategoriesByTitle(System.String)">
+            <summary>
+            Returns list of categories by title (example of usage: search)
+            </summary>
+            <param name="title"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CategoryController.GetAllCategories">
+            <summary>
+            Get all categories potomu chto Dima tak skazal
+            </summary>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.CategoryController.GetSubCategories(System.String)">
@@ -270,6 +283,11 @@
             <param name="toPrice">Maximum price</param>
             <returns></returns>
         </member>
+        <member name="T:ECommerce1.Controllers.ProductController.ProductPreparation">
+            <summary>
+            Class for preparing products
+            </summary>
+        </member>
         <member name="M:ECommerce1.Controllers.ProductController.AddMainCategory(ECommerce1.Models.ViewModels.AddProductViewModel)">
             <summary>
             Add product, must be logged in as a seller
@@ -283,6 +301,13 @@
             </summary>
             <param name="guid">Id of a product</param>
             <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProductController.StatisticsAsync(System.String)">
+            <summary>
+            Statistics of a product for seller's page
+            </summary>
+            <param name="guid">Product's id</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.DeleteAsync(System.String)">
@@ -842,6 +867,16 @@
         <member name="P:ECommerce1.Models.ViewModels.ProductsViewModel.CurrentPage">
             <summary>
             The current page.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsViewModel.MinPrice">
+            <summary>
+            Minimal price of the products.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsViewModel.MaxPrice">
+            <summary>
+            Maximal price of the products.
             </summary>
         </member>
         <member name="T:ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting">

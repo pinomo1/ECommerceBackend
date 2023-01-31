@@ -245,7 +245,7 @@ namespace ECommerce1.Services
 
                 e.Property(e => e.ProfilePhotoUrl)
                 .HasColumnType("nvarchar(max)")
-                .IsRequired();
+                .IsRequired().HasDefaultValue("/images/default.png");
 
                 e.Property(e => e.WebsiteUrl)
                 .HasColumnType("nvarchar(max)")

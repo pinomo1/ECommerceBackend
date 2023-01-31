@@ -87,10 +87,14 @@ namespace ECommerce1.Controllers
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
 
             IEnumerable<ProductsProductViewModel> products;
+            decimal minPrice, maxPrice;
 
             try
             {
-                products = await PrepareProducts(unorderedProducts, page, onPage, sorting);
+                var preparation = await PrepareProducts(unorderedProducts, page, onPage, sorting);
+                products = preparation.Products;
+                minPrice = preparation.MinPrice;
+                maxPrice = preparation.MaxPrice;
             }
             catch (Exception)
             {
@@ -104,7 +108,9 @@ namespace ECommerce1.Controllers
                 TotalProductCount = totalCount,
                 TotalPageCount = totalPages,
                 OnPageProductCount = onPage,
-                CurrentPage = page
+                CurrentPage = page,
+                MinPrice = minPrice,
+                MaxPrice = maxPrice
             };
 
             return Ok(viewModel);
@@ -148,10 +154,14 @@ namespace ECommerce1.Controllers
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
 
             IEnumerable<ProductsProductViewModel> products;
+            decimal minPrice, maxPrice;
 
             try
             {
-                products = await PrepareProducts(unorderedProducts, page, onPage, sorting);
+                var preparation = await PrepareProducts(unorderedProducts, page, onPage, sorting);
+                products = preparation.Products;
+                minPrice = preparation.MinPrice;
+                maxPrice = preparation.MaxPrice;
             }
             catch (Exception)
             {
@@ -165,7 +175,9 @@ namespace ECommerce1.Controllers
                 TotalProductCount = totalCount,
                 TotalPageCount = totalPages,
                 OnPageProductCount = onPage,
-                CurrentPage = page
+                CurrentPage = page,
+                MinPrice = minPrice,
+                MaxPrice = maxPrice
             };
 
             return Ok(viewModel);
@@ -208,10 +220,14 @@ namespace ECommerce1.Controllers
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
 
             IEnumerable<ProductsProductViewModel> products;
+            decimal minPrice, maxPrice;
 
             try
             {
-                products = await PrepareProducts(unorderedProducts, page, onPage, sorting);
+                var preparation = await PrepareProducts(unorderedProducts, page, onPage, sorting);
+                products = preparation.Products;
+                minPrice = preparation.MinPrice;
+                maxPrice = preparation.MaxPrice;
             }
             catch (Exception)
             {
@@ -225,17 +241,21 @@ namespace ECommerce1.Controllers
                 TotalProductCount = totalCount,
                 TotalPageCount = totalPages,
                 OnPageProductCount = onPage,
-                CurrentPage = page
+                CurrentPage = page,
+                MinPrice = minPrice,
+                MaxPrice = maxPrice
             };
 
             return Ok(viewModel);
         }
 
         [NonAction]
-        private async Task<IEnumerable<ProductsProductViewModel>> PrepareProducts(IQueryable<ProductsProductViewModel> unorderedProducts, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
+        private async Task<ProductPreparation> PrepareProducts(IQueryable<ProductsProductViewModel> unorderedProducts, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
         {
             int totalCount = unorderedProducts.Count();
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
+            decimal maxPrice = await unorderedProducts.MaxAsync(p => p.Price);
+            decimal minPrice = await unorderedProducts.MinAsync(p => p.Price);
             if (page > totalPages)
             {
                 page = totalPages;
@@ -273,9 +293,26 @@ namespace ECommerce1.Controllers
                     throw new Exception();
             }
 
-            return orderedProducts.Skip((page - 1) * onPage).Take(onPage);
+            return new ProductPreparation(minPrice, maxPrice, orderedProducts.Skip((page - 1) * onPage).Take(onPage));
         }
-        
+
+        /// <summary>
+        /// Class for preparing products
+        /// </summary>
+        class ProductPreparation
+        {
+            public decimal MinPrice { get; set; }
+            public decimal MaxPrice { get; set; }
+            public IEnumerable<ProductsProductViewModel> Products { get; set; }
+
+            public ProductPreparation(decimal min, decimal max, IEnumerable<ProductsProductViewModel> prods)
+            {
+                MinPrice = min;
+                MaxPrice = max;
+                Products = prods;
+            }
+        }
+
         /// <summary>
         /// Add product, must be logged in as a seller
         /// </summary>
@@ -370,6 +407,11 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Statistics of a product for seller's page
+        /// </summary>
+        /// <param name="guid">Product's id</param>
+        /// <returns></returns>
         [HttpGet("statistics/{guid}")]
         [Authorize(Roles = "Seller")]
         public async Task<IActionResult> StatisticsAsync(string guid)
