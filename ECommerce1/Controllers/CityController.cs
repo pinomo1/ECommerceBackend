@@ -74,7 +74,7 @@ namespace ECommerce1.Controllers
             };
             await resourceDbContext.Cities.AddAsync(city);
             await resourceDbContext.SaveChangesAsync();
-            return Ok();
+            return Ok(city.Id);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace ECommerce1.Controllers
             }
             city.Name = name;
             await resourceDbContext.SaveChangesAsync();
-            return Ok();
+            return Ok(city.Id);
         }
         
         /// <summary>
