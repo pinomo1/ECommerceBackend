@@ -142,7 +142,7 @@
         </member>
         <member name="M:ECommerce1.Controllers.CategoryController.GetAllCategories">
             <summary>
-            Get all categories potomu chto Dima tak skazal
+            Get all categories
             </summary>
             <returns></returns>
         </member>

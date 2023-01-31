@@ -368,7 +368,7 @@ namespace ECommerce1.Controllers
             };
             await resourceDbContext.Products.AddAsync(prod);
             await resourceDbContext.SaveChangesAsync();
-            return Ok();
+            return Ok(prod.Id);
         }
 
         /// <summary>
@@ -404,7 +404,7 @@ namespace ECommerce1.Controllers
             prod.Price = product.Price;
             prod.Category = category;
             await resourceDbContext.SaveChangesAsync();
-            return Ok();
+            return Ok(prod.Id);
         }
 
         /// <summary>

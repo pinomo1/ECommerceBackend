@@ -40,7 +40,7 @@ namespace ECommerce1.Controllers
             };
             await resourceDbContext.Categories.AddAsync(newCategory);
             await resourceDbContext.SaveChangesAsync();
-            return Ok();
+            return Ok(newCategory.Id);
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace ECommerce1.Controllers
             };
             await resourceDbContext.Categories.AddAsync(newCategory);
             await resourceDbContext.SaveChangesAsync();
-            return Ok();
+            return Ok(newCategory.Id);
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace ECommerce1.Controllers
             foundCategory.Name = category.Name;
             foundCategory.AllowProducts = category.AllowProducts;
             await resourceDbContext.SaveChangesAsync();
-            return Ok();
+            return Ok(foundCategory.Id);
         }
     }
 }

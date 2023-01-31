@@ -47,7 +47,7 @@ namespace ECommerce1.Controllers
             Country country = new() { Name = name };
             await resourceDbContext.Countries.AddAsync(country);
             await resourceDbContext.SaveChangesAsync();
-            return Ok();
+            return Ok(country.Id);
         }
 
 
@@ -72,7 +72,7 @@ namespace ECommerce1.Controllers
             }
             country.Name = name;
             await resourceDbContext.SaveChangesAsync();
-            return Ok();
+            return Ok(country.Id);
         }
 
 
