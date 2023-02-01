@@ -5,9 +5,12 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace ECommerce1.Controllers
 {
@@ -31,6 +34,8 @@ namespace ECommerce1.Controllers
         public readonly IValidator<StaffCredentials> staffRegVal;
         public readonly IValidator<LoginCredentials> logVal;
 
+        public readonly IEmailSender emailSender;
+
         public AuthController(UserManager<AuthUser> _userManager,
             RoleManager<IdentityRole> _roleManager,
             TokenGenerator _tokenGenerator,
@@ -41,7 +46,8 @@ namespace ECommerce1.Controllers
             IValidator<SellerCredentials> _selRegVal,
             IValidator<UserCredentials> _userRegVal,
             IValidator<StaffCredentials> _staffRegVal,
-            IValidator<LoginCredentials> _logVal
+            IValidator<LoginCredentials> _logVal,
+            IEmailSender _emailSender
             )
         {
             this.userManager = _userManager;
@@ -55,6 +61,7 @@ namespace ECommerce1.Controllers
             this.userRegVal = _userRegVal;
             this.staffRegVal = _staffRegVal;
             this.logVal = _logVal;
+            this.emailSender = _emailSender;
         }
 
         /// <summary>
@@ -76,7 +83,8 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest();
             }
-            if (!await userManager.CheckPasswordAsync(user, loginDto.Password)) return BadRequest();
+            if (!await userManager.CheckPasswordAsync(user, loginDto.Password)) return BadRequest("Invalid password");
+            if (!await userManager.IsEmailConfirmedAsync(user)) return BadRequest("Email is not confirmed");
             string role = (await userManager.GetRolesAsync(user))[0];
             var accessToken = tokenGenerator.GenerateAccessToken(user, role);
             var refreshToken = tokenGenerator.GenerateRefreshToken();
@@ -163,6 +171,8 @@ namespace ECommerce1.Controllers
             string? accessToken = tokenGenerator.GenerateAccessToken(user, role);
             string? refreshToken = tokenGenerator.GenerateRefreshToken();
 
+            await SendEmailAsync(authUser);
+
             accountDbContext.RefreshTokens.Add(new RefreshToken
             {
                 Token = refreshToken,
@@ -177,6 +187,181 @@ namespace ECommerce1.Controllers
                 RefreshToken = refreshToken
             };
             return Ok(response);
+        }
+
+        /// <summary>
+        /// Resend email confirmation
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <returns></returns>
+        [HttpGet("resendemail")]
+        public async Task<IActionResult> ResendEmailAsync(string email)
+        {
+            AuthUser? user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            if (await userManager.IsEmailConfirmedAsync(user))
+            {
+                return BadRequest("Email is already confirmed");
+            }
+            await SendEmailAsync(user);
+            return Ok();
+        }
+        
+        /// <summary>
+        /// Send email
+        /// </summary>
+        /// <param name="user">AuthUser</param>
+        /// <returns></returns>
+        [NonAction]
+        public async Task<IActionResult> SendEmailAsync(AuthUser user)
+        {
+            string code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+            await emailSender.SendEmailAsync(user.Email, "Confirm your email",
+                $"Confirm your email by clicking on the link: {configuration["Links:Site"]}api/auth/confirmemail?userId={user.Id}&code={HttpUtility.UrlEncode(code)}");
+            return Ok();
+        }
+
+        /// <summary>
+        /// Confirm email address
+        /// </summary>
+        /// <param name="userId">Auth user's id</param>
+        /// <param name="code">Generated code</param>
+        /// <returns></returns>
+        [HttpGet("confirmemail")]
+        public async Task<IActionResult> ConfirmEmailAsync(string userId, string code)
+        {
+            if (userId == null || code == null)
+            {
+                return BadRequest();
+            }
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            var result = await userManager.ConfirmEmailAsync(user, code);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        /// <summary>
+        /// Send link to email to change email
+        /// </summary>
+        /// <param name="oldEmail"></param>
+        /// <param name="newEmail"></param>
+        /// <returns></returns>
+        [HttpGet("changemail")]
+        public async Task<IActionResult> ChangeEmailAsync(string oldEmail, string newEmail)
+        {
+            if (!Regex.IsMatch(newEmail, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z"))
+            {
+                return BadRequest();
+            }
+            AuthUser? user = await userManager.FindByEmailAsync(oldEmail);
+            if(user == null)
+            {
+                return BadRequest();
+            }
+
+            string code = await userManager.GenerateChangeEmailTokenAsync(user, newEmail);
+            await emailSender.SendEmailAsync(user.Email, "Confirm your email change",
+                $"Confirm your email change by clicking on the link: {configuration["Links:Site"]}api/auth/mailchanged?userId={user.Id}&newmail={HttpUtility.UrlEncode(newEmail)}&code={HttpUtility.UrlEncode(code)}");
+            return Ok();
+        }
+
+        /// <summary>
+        /// Change email given link from email
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="newmail"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpGet("mailchanged")]
+        public async Task<IActionResult> MailChangeAsync(string userId, string newmail, string code)
+        {
+            if (!Regex.IsMatch(newmail, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z"))
+            {
+                return BadRequest();
+            }
+            if (userId == null || code == null)
+            {
+                return BadRequest();
+            }
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            await userManager.ChangeEmailAsync(user, newmail, code);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Send link to email to change phone number
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="phone"></param>
+        /// <returns></returns>
+        [HttpGet("changephone")]
+        public async Task<IActionResult> ChangePhoneAsync(string email, string phone)
+        {
+            if (!Regex.IsMatch(phone, "@\"^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$\""))
+            {
+                return BadRequest();
+            }
+            AuthUser? user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            string code = await userManager.GenerateChangePhoneNumberTokenAsync(user, phone);
+            await emailSender.SendEmailAsync(user.Email, "Confirm your phone number change",
+                $"Confirm your phone number change by clicking on the link: {configuration["Links:Site"]}api/auth/phonechanged?userId={user.Id}&phone={HttpUtility.UrlEncode(phone)}&code={HttpUtility.UrlEncode(code)}");
+            return Ok();
+        }
+
+        /// <summary>
+        /// Change phone number given link from email
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="phone"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpGet("phonechanged")]
+        public async Task<IActionResult> PhoneChangeAsync(string userId, string phone, string code)
+        {
+            if(!Regex.IsMatch(phone, "@\"^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$\""))
+            {
+                return BadRequest();
+            }
+
+            if (userId == null || code == null)
+            {
+                return BadRequest();
+            }
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            await userManager.ChangePhoneNumberAsync(user, phone, code);
+            return Ok();
         }
 
         /// <summary>
@@ -242,6 +427,8 @@ namespace ECommerce1.Controllers
             string role = (await userManager.GetRolesAsync(user))[0];
             string? accessToken = tokenGenerator.GenerateAccessToken(user, role);
             string? refreshToken = tokenGenerator.GenerateRefreshToken();
+
+            await SendEmailAsync(authUser);
 
             accountDbContext.RefreshTokens.Add(new RefreshToken
             {
@@ -324,6 +511,8 @@ namespace ECommerce1.Controllers
             string role = (await userManager.GetRolesAsync(user))[0];
             string? accessToken = tokenGenerator.GenerateAccessToken(user, role);
             string? refreshToken = tokenGenerator.GenerateRefreshToken();
+
+            await SendEmailAsync(authUser);
 
             accountDbContext.RefreshTokens.Add(new RefreshToken
             {
@@ -421,7 +610,7 @@ namespace ECommerce1.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("delete/{username}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> DeleteAsync(string id)
         {
             AuthUser authUser = await userManager.FindByIdAsync(id);
@@ -430,6 +619,10 @@ namespace ECommerce1.Controllers
             Staff? staff = await resourceDbContext.Staffs.FirstOrDefaultAsync(s => s.AuthId == id);
             if (authUser != null)
             {
+                if(User.IsInRole("User") && User.FindFirstValue(ClaimTypes.NameIdentifier) != authUser.Id)
+                {
+                    return BadRequest();
+                }
                 await userManager.DeleteAsync(authUser);
             }
             if(profile != null)

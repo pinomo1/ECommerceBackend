@@ -28,6 +28,7 @@
             <summary>
             Edit existing address
             </summary>
+            <param name="addressId"></param>
             <param name="address"></param>
             <returns></returns>
         </member>
@@ -43,6 +44,62 @@
             Registrate as a user
             </summary>
             <param name="registrationDto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.ResendEmailAsync(System.String)">
+            <summary>
+            Resend email confirmation
+            </summary>
+            <param name="email">email</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.SendEmailAsync(ECommerce1.Models.AuthUser)">
+            <summary>
+            Send email
+            </summary>
+            <param name="user">AuthUser</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.ConfirmEmailAsync(System.String,System.String)">
+            <summary>
+            Confirm email address
+            </summary>
+            <param name="userId">Auth user's id</param>
+            <param name="code">Generated code</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.ChangeEmailAsync(System.String,System.String)">
+            <summary>
+            Send link to email to change email
+            </summary>
+            <param name="oldEmail"></param>
+            <param name="newEmail"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.MailChangeAsync(System.String,System.String,System.String)">
+            <summary>
+            Change email given link from email
+            </summary>
+            <param name="userId"></param>
+            <param name="newmail"></param>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.ChangePhoneAsync(System.String,System.String)">
+            <summary>
+            Send link to email to change phone number
+            </summary>
+            <param name="email"></param>
+            <param name="phone"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.PhoneChangeAsync(System.String,System.String,System.String)">
+            <summary>
+            Change phone number given link from email
+            </summary>
+            <param name="userId"></param>
+            <param name="phone"></param>
+            <param name="code"></param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.AuthController.StaffRegistrationAsync(ECommerce1.Models.ViewModels.StaffCredentials)">
