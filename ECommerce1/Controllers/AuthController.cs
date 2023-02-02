@@ -68,9 +68,10 @@ namespace ECommerce1.Controllers
         /// Login
         /// </summary>
         /// <param name="loginDto"></param>
+        /// <param name="rememberMe"></param>
         /// <returns></returns>
         [HttpPost("login")]
-        public async Task<ActionResult<AuthenticationResponse>> LoginAsync(LoginCredentials loginDto)
+        public async Task<ActionResult<AuthenticationResponse>> LoginAsync(LoginCredentials loginDto, bool rememberMe = true)
         {
             ValidationResult result = await logVal.ValidateAsync(loginDto);
             if (!result.IsValid)
@@ -95,7 +96,7 @@ namespace ECommerce1.Controllers
             accountDbContext.RefreshTokens.Add(new RefreshToken
             {
                 Token = refreshToken,
-                ExpiresAt = DateTime.Now.Add(tokenGenerator.Options.RefreshExpiration),
+                ExpiresAt = DateTime.Now.Add(rememberMe ? tokenGenerator.Options.RefreshExpiration : tokenGenerator.Options.RefreshExpirationShort),
                 AppUserId = user.Id
             });
             await accountDbContext.SaveChangesAsync();

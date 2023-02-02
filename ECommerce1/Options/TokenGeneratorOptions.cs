@@ -5,5 +5,6 @@
         public string Secret { get; set; }
         public TimeSpan AccessExpiration { get; set; }
         public TimeSpan RefreshExpiration { get; set; }
+        public TimeSpan RefreshExpirationShort { get; set; }
     }
 }

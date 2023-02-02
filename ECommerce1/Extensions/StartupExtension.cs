@@ -54,6 +54,7 @@ namespace ECommerce1.Extensions
                 options.Secret = secret;
                 options.AccessExpiration = TimeSpan.FromHours(2);
                 options.RefreshExpiration = TimeSpan.FromDays(30);
+                options.RefreshExpirationShort = TimeSpan.FromDays(1);
             });
 
             services.Configure<RoleGeneratorOptions>(options =>
