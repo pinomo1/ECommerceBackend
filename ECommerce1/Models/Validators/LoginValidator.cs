@@ -10,9 +10,11 @@ namespace ECommerce1.Models.Validators
             RuleFor(c => c.Email)
                 .ValidCheckString(min: 3, max: 320);
 
+            /*
             RuleFor(c => c.Password)
                 .ValidCheckString("Password", 8, 256)
                 .Matches(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d#?!@$%^&*-_]{8,}$").WithMessage("Password must contain at least 1 letter and 1 digit!");
+            */
         }
     }
 }

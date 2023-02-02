@@ -7,10 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 // TODO: Password change
-// TODO: Password reset
 // TODO: Order controller
 // TODO: Review controller
-// TODO: Sellers controller to change photo
 
 namespace ECommerce1.Controllers
 {

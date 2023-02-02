@@ -20,6 +20,37 @@ namespace ECommerce1.Services
             Configuration = configuration;
         }
 
+        public async Task<string> AddPublicationPhoto(IFormFile? file)
+        {
+            if(file != null)
+            {
+                try
+                {
+                    string reference = String.Empty;
+                    string containerPublicationPhoto = "uploads";
+                    var containerClientPhoto = BlobServiceClient.GetBlobContainerClient(containerPublicationPhoto);
+                    string newName;
+                        if (file == null)
+                        {
+                            return String.Empty;
+                        }
+                        newName = Guid.NewGuid().ToString() +
+                                DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString() + Path.GetExtension(file!.FileName);
+                        using (Stream stream = file!.OpenReadStream())
+                        {
+                            await containerClientPhoto.UploadBlobAsync(newName, stream);
+                        }
+                        reference = $"{Configuration["Links:Files:Pictures"]}{newName}";
+                    return reference;
+                }
+                catch (Exception)
+                {
+                    return String.Empty;
+                }
+            }
+            return String.Empty;
+        }
+
         public async Task<IEnumerable<string>> AddPublicationPhotos(IFormFile?[] files)
         {
             if (files != null)

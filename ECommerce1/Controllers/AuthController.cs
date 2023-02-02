@@ -84,7 +84,11 @@ namespace ECommerce1.Controllers
                 return BadRequest();
             }
             if (!await userManager.CheckPasswordAsync(user, loginDto.Password)) return BadRequest("Invalid password");
-            if (!await userManager.IsEmailConfirmedAsync(user)) return BadRequest("Email is not confirmed");
+            if (!await userManager.IsEmailConfirmedAsync(user))
+            {
+                await ResendEmailAsync(loginDto.Email);
+                return BadRequest("Email is not confirmed");
+            }
             string role = (await userManager.GetRolesAsync(user))[0];
             var accessToken = tokenGenerator.GenerateAccessToken(user, role);
             var refreshToken = tokenGenerator.GenerateRefreshToken();
@@ -103,6 +107,24 @@ namespace ECommerce1.Controllers
             };
 
             return Ok(response);
+        }
+
+        [HttpPost("changepassword")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(string newPassword)
+        {
+            var user = await userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (user == null)
+            {
+                return BadRequest("User not found");
+            }
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await userManager.ResetPasswordAsync(user, token, newPassword);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+            return Ok();
         }
 
         /// <summary>
