@@ -77,7 +77,7 @@ namespace ECommerce1.Controllers
             ValidationResult result = await logVal.ValidateAsync(loginDto);
             if (!result.IsValid)
             {
-                return BadRequest(result.Errors);
+                return BadRequest(new { error_message = result.Errors[0] });
             }
 
             var user = await userManager.FindByEmailAsync(loginDto.Email);
@@ -131,7 +131,7 @@ namespace ECommerce1.Controllers
             ValidationResult result = await userRegVal.ValidateAsync(registrationDto);
             if (!result.IsValid)
             {
-                return BadRequest(result.Errors);
+                return BadRequest(new { error_message = result.Errors[0] });
             }
             if(await userManager.FindByEmailAsync(registrationDto.Email) != null)
             {
@@ -494,7 +494,7 @@ namespace ECommerce1.Controllers
             ValidationResult result = await staffRegVal.ValidateAsync(registrationDto);
             if (!result.IsValid)
             {
-                return BadRequest(result.Errors);
+                return BadRequest(new { error_message = result.Errors[0] });
             }
             if (await userManager.FindByEmailAsync(registrationDto.Email) != null)
             {
@@ -570,7 +570,7 @@ namespace ECommerce1.Controllers
             ValidationResult result = await selRegVal.ValidateAsync(registrationDto);
             if (!result.IsValid)
             {
-                return BadRequest(result.Errors);
+                return BadRequest(new { error_message = result.Errors[0] });
             }
             if (await userManager.FindByEmailAsync(registrationDto.Email) != null)
             {
