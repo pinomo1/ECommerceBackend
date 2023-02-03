@@ -85,12 +85,12 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new
                 {
-                    error_message = "No such user exists"
+                    error_message = "Invalid username or password"
                 });
             }
             if (!await userManager.CheckPasswordAsync(user, loginDto.Password)) return BadRequest(new
             {
-                error_message = "Invalid password"
+                error_message = "Invalid username or password"
             });
             if (!await userManager.IsEmailConfirmedAsync(user))
             {
