@@ -111,24 +111,6 @@ namespace ECommerce1.Controllers
             return Ok(response);
         }
 
-        [HttpPost("changepassword")]
-        [Authorize]
-        public async Task<IActionResult> ChangePassword(string newPassword)
-        {
-            var user = await userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
-            var token = await userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await userManager.ResetPasswordAsync(user, token, newPassword);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-            return Ok();
-        }
-
         /// <summary>
         /// Registrate as a user
         /// </summary>
@@ -200,6 +182,8 @@ namespace ECommerce1.Controllers
         /// <param name="oldPassword"></param>
         /// <param name="newPassword"></param>
         /// <returns></returns>
+        [HttpPost("changepassword")]
+        [Authorize]
         public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword)
         {
             AuthUser? user = await userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));

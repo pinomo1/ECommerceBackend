@@ -32,11 +32,12 @@
             <param name="address"></param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.AuthController.LoginAsync(ECommerce1.Models.ViewModels.LoginCredentials)">
+        <member name="M:ECommerce1.Controllers.AuthController.LoginAsync(ECommerce1.Models.ViewModels.LoginCredentials,System.Boolean)">
             <summary>
             Login
             </summary>
             <param name="loginDto"></param>
+            <param name="rememberMe"></param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.AuthController.UserRegistrationAsync(ECommerce1.Models.ViewModels.UserCredentials)">
@@ -44,6 +45,14 @@
             Registrate as a user
             </summary>
             <param name="registrationDto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.AuthController.ChangePassword(System.String,System.String)">
+            <summary>
+            Change password
+            </summary>
+            <param name="oldPassword"></param>
+            <param name="newPassword"></param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.AuthController.ResendEmailAsync(System.String)">
