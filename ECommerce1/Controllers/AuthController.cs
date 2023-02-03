@@ -83,13 +83,22 @@ namespace ECommerce1.Controllers
             var user = await userManager.FindByEmailAsync(loginDto.Email);
             if (user == null)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "No such user exists"
+                });
             }
-            if (!await userManager.CheckPasswordAsync(user, loginDto.Password)) return BadRequest("Invalid password");
+            if (!await userManager.CheckPasswordAsync(user, loginDto.Password)) return BadRequest(new
+            {
+                error_message = "Invalid password"
+            });
             if (!await userManager.IsEmailConfirmedAsync(user))
             {
                 await ResendEmailAsync(loginDto.Email);
-                return BadRequest("Email is not confirmed");
+                return BadRequest(new
+                {
+                    error_message = "Email is not confirmed"
+                });
             }
             string role = (await userManager.GetRolesAsync(user))[0];
             var accessToken = tokenGenerator.GenerateAccessToken(user, role);
@@ -126,11 +135,11 @@ namespace ECommerce1.Controllers
             }
             if(await userManager.FindByEmailAsync(registrationDto.Email) != null)
             {
-                return BadRequest("User with such e-mail address does already exist");
+                return BadRequest(new { error_message = "User with such e-mail address does already exist" });
             }
             if(userManager.Users.Any(u => u.PhoneNumber == registrationDto.PhoneNumber))
             {
-                return BadRequest("User with such phone number does already exist");
+                return BadRequest(new { error_message = "User with such phone number does already exist" });
             }
 
             AuthUser? user = new()
@@ -158,7 +167,10 @@ namespace ECommerce1.Controllers
             if (!addRole.Succeeded)
             {
                 await userManager.DeleteAsync(authUser);
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Unidentified error"
+                });
             }
 
             Profile profile = new()
@@ -192,17 +204,29 @@ namespace ECommerce1.Controllers
             AuthUser? user = await userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (user == null)
             {
-                return BadRequest("User not found");
+                return BadRequest(new
+                {
+                    error_message = "User not found"
+                });
             }
             if (!await userManager.CheckPasswordAsync(user, oldPassword))
             {
-                return BadRequest("Invalid password");
+                return BadRequest(new
+                {
+                    error_message = "Invalid password"
+                });
             }
             if (oldPassword == newPassword)
             {
-                return BadRequest("New password must be different from old one");
+                return BadRequest(new
+                {
+                    error_message = "New password must be different from old one"
+                });
             }
-            if (!await userManager.CheckPasswordAsync(user, oldPassword)) return BadRequest("Invalid password");
+            if (!await userManager.CheckPasswordAsync(user, oldPassword)) return BadRequest(new
+            {
+                error_message = "Invalid password"
+            });
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
             var result = await userManager.ResetPasswordAsync(user, token, newPassword);
             if (!result.Succeeded)
@@ -223,11 +247,17 @@ namespace ECommerce1.Controllers
             AuthUser? user = await userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not logged in"
+                });
             }
             if (await userManager.IsEmailConfirmedAsync(user))
             {
-                return BadRequest("Email is already confirmed");
+                return BadRequest(new
+                {
+                    error_message = "Email is already confirmed"
+                });
             }
             await SendEmailAsync(user);
             return Ok();
@@ -258,13 +288,19 @@ namespace ECommerce1.Controllers
         {
             if (userId == null || code == null)
             {
-                return BadRequest("Somethin is null");
+                return BadRequest(new
+                {
+                    error_message = "Somethin is null"
+                });
             }
 
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return BadRequest("No user found");
+                return BadRequest(new
+                {
+                    error_message = "No user found"
+                });
             }
 
             var result = await userManager.ConfirmEmailAsync(user, code);
@@ -274,7 +310,10 @@ namespace ECommerce1.Controllers
             }
             else
             {
-                return BadRequest("Counldn't confirm email");
+                return BadRequest(new
+                {
+                    error_message = "Counldn't confirm email"
+                });
             }
         }
 
@@ -289,12 +328,18 @@ namespace ECommerce1.Controllers
         {
             if (!Regex.IsMatch(newEmail, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z"))
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not email"
+                });
             }
             AuthUser? user = await userManager.FindByEmailAsync(oldEmail);
             if(user == null)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not logged in"
+                });
             }
 
             string code = await userManager.GenerateChangeEmailTokenAsync(user, newEmail);
@@ -315,17 +360,26 @@ namespace ECommerce1.Controllers
         {
             if (!Regex.IsMatch(newmail, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z"))
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not email"
+                });
             }
             if (userId == null || code == null)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Wrong URL"
+                });
             }
 
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not logged in"
+                });
             }
 
             await userManager.ChangeEmailAsync(user, newmail, code);
@@ -335,7 +389,10 @@ namespace ECommerce1.Controllers
             aUser ??= await resourceDbContext.Staffs.FirstOrDefaultAsync(x => x.AuthId == user.Id);
             if (aUser == null)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not logged in"
+                });
             }
 
             aUser.Email = newmail;
@@ -355,12 +412,18 @@ namespace ECommerce1.Controllers
         {
             if (!Regex.IsMatch(phone, "@\"^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$\""))
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not a phone number"
+                });
             }
             AuthUser? user = await userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not logged in"
+                });
             }
 
             string code = await userManager.GenerateChangePhoneNumberTokenAsync(user, phone);
@@ -381,18 +444,27 @@ namespace ECommerce1.Controllers
         {
             if(!Regex.IsMatch(phone, "@\"^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$\""))
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not a phone number"
+                });
             }
 
             if (userId == null || code == null)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Bad URL"
+                });
             }
 
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not logged in"
+                });
             }
 
             await userManager.ChangePhoneNumberAsync(user, phone, code);
@@ -426,11 +498,17 @@ namespace ECommerce1.Controllers
             }
             if (await userManager.FindByEmailAsync(registrationDto.Email) != null)
             {
-                return BadRequest("User with such e-mail address does already exist");
+                return BadRequest(new
+                {
+                    error_message = "User with such e-mail address does already exist"
+                });
             }
             if (userManager.Users.Any(u => u.PhoneNumber == registrationDto.PhoneNumber))
             {
-                return BadRequest("User with such phone number does already exist");
+                return BadRequest(new
+                {
+                    error_message = "User with such phone number does already exist"
+                });
             }
 
             AuthUser? user = new()
@@ -458,7 +536,10 @@ namespace ECommerce1.Controllers
             if (!addRole.Succeeded)
             {
                 await userManager.DeleteAsync(authUser);
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Unexpected error"
+                });
             }
 
             Staff profile = new()
@@ -493,11 +574,17 @@ namespace ECommerce1.Controllers
             }
             if (await userManager.FindByEmailAsync(registrationDto.Email) != null)
             {
-                return BadRequest("User with such e-mail address does already exist");
+                return BadRequest(new
+                {
+                    error_message = "User with such e-mail address does already exist"
+                });
             }
             if (userManager.Users.Any(u => u.PhoneNumber == registrationDto.PhoneNumber))
             {
-                return BadRequest("User with such phone number does already exist");
+                return BadRequest(new
+                {
+                    error_message = "User with such phone number does already exist"
+                });
             }
 
             AuthUser? user = new()
@@ -525,7 +612,10 @@ namespace ECommerce1.Controllers
             if (!addRole.Succeeded)
             {
                 await userManager.DeleteAsync(authUser);
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Unecpected error"
+                });
             }
 
             Seller profile = new()
@@ -557,12 +647,18 @@ namespace ECommerce1.Controllers
             RefreshToken? token = await accountDbContext.RefreshTokens.FindAsync(oldRefreshToken);
 
             if (token == null)
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Invalid refresh token"
+                });
 
             accountDbContext.RefreshTokens.Remove(token);
 
             if (token.ExpiresAt < DateTime.Now)
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Refresh token expired"
+                });
 
             AuthUser? user = await userManager.FindByIdAsync(token.AppUserId);
             string role = (await userManager.GetRolesAsync(user))[0];
@@ -636,13 +732,19 @@ namespace ECommerce1.Controllers
             {
                 if(User.IsInRole("User") && User.FindFirstValue(ClaimTypes.NameIdentifier) != authUser.Id)
                 {
-                    return BadRequest();
+                    return BadRequest(new
+                    {
+                        error_message = "You can only delete your own account"
+                    });
                 }
                 await userManager.DeleteAsync(authUser);
             }
             else
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "No such account"
+                });
             }
             if(profile != null)
             {
