@@ -39,7 +39,7 @@ namespace ECommerce1.Controllers
         }
 
         [HttpPost("postpfp")]
-        [Authorize("Seller")]
+        [Authorize(Roles ="Seller")]
         public async Task<IActionResult> PostProfilePicture(IFormFile? picture)
         {
             Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(s => s.AuthId == User.FindFirstValue(ClaimTypes.NameIdentifier));

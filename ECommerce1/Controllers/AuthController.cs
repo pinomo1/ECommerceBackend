@@ -171,6 +171,9 @@ namespace ECommerce1.Controllers
                 LastName = registrationDto.LastName,
             };
 
+            await resourceDbContext.Profiles.AddAsync(profile);
+            await resourceDbContext.SaveChangesAsync();
+            
             await SendEmailAsync(authUser);
             
             return Ok("Finalize registration by confirming email");
@@ -240,7 +243,7 @@ namespace ECommerce1.Controllers
         {
             string code = await userManager.GenerateEmailConfirmationTokenAsync(user);
             await emailSender.SendEmailAsync(user.Email, "Confirm your email",
-                $"Confirm your email change by clicking on the link: <button onclick=\"location.href=\'{configuration["Links:Site"]}api/auth/confirmemail?userId={user.Id}&code={HttpUtility.UrlEncode(code)}\'\">Confirm your email</button>");
+                $"Confirm your email change by clicking on the link: <a href=\"{configuration["Links:Site"]}api/auth/confirmemail?userId={user.Id}&code={HttpUtility.UrlEncode(code)}\">Confirm your email</a>");
             return Ok();
         }
 
@@ -255,13 +258,13 @@ namespace ECommerce1.Controllers
         {
             if (userId == null || code == null)
             {
-                return BadRequest();
+                return BadRequest("Somethin is null");
             }
 
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return BadRequest();
+                return BadRequest("No user found");
             }
 
             var result = await userManager.ConfirmEmailAsync(user, code);
@@ -271,7 +274,7 @@ namespace ECommerce1.Controllers
             }
             else
             {
-                return BadRequest();
+                return BadRequest("Counldn't confirm email");
             }
         }
 
@@ -296,7 +299,7 @@ namespace ECommerce1.Controllers
 
             string code = await userManager.GenerateChangeEmailTokenAsync(user, newEmail);
             await emailSender.SendEmailAsync(user.Email, "Confirm your email change",
-                $"Confirm your email change by clicking on the link: <button onclick=\"location.href=\'{configuration["Links:Site"]}api/auth/mailchanged?userId={user.Id}&newmail={HttpUtility.UrlEncode(newEmail)}&code={HttpUtility.UrlEncode(code)}\'\">Confirm email</button>");
+                $"Confirm your email change by clicking on the link: <a href=\"{configuration["Links:Site"]}api/auth/mailchanged?userId={user.Id}&newmail={HttpUtility.UrlEncode(newEmail)}&code={HttpUtility.UrlEncode(code)}\">Confirm email</button>");
             return Ok();
         }
 
@@ -362,7 +365,7 @@ namespace ECommerce1.Controllers
 
             string code = await userManager.GenerateChangePhoneNumberTokenAsync(user, phone);
             await emailSender.SendEmailAsync(user.Email, "Confirm your phone number change",
-                $"Confirm your phone number change by clicking on the link: <button onclick=\"location.href=\'{configuration["Links:Site"]}api/auth/phonechanged?userId={user.Id}&phone={HttpUtility.UrlEncode(phone)}&code={HttpUtility.UrlEncode(code)}\'\">Confirm phone number</button>");
+                $"Confirm your phone number change by clicking on the link: <a href=\"{configuration["Links:Site"]}api/auth/phonechanged?userId={user.Id}&phone={HttpUtility.UrlEncode(phone)}&code={HttpUtility.UrlEncode(code)}\">Confirm phone number</button>");
             return Ok();
         }
 
@@ -466,7 +469,7 @@ namespace ECommerce1.Controllers
                 DisplayName = registrationDto.DisplayName
             };
 
-            resourceDbContext.Staffs.Add(profile);
+            await resourceDbContext.Staffs.AddAsync(profile);
             await resourceDbContext.SaveChangesAsync();
 
             await SendEmailAsync(authUser);
@@ -534,7 +537,7 @@ namespace ECommerce1.Controllers
                 WebsiteUrl = registrationDto.WebsiteUrl
             };
 
-            resourceDbContext.Sellers.Add(profile);
+            await resourceDbContext.Sellers.AddAsync(profile);
             await resourceDbContext.SaveChangesAsync();
 
             await SendEmailAsync(authUser);
@@ -621,7 +624,7 @@ namespace ECommerce1.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("delete/{username}")]
+        [HttpDelete("delete/{id}")]
         [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> DeleteAsync(string id)
         {
@@ -636,6 +639,10 @@ namespace ECommerce1.Controllers
                     return BadRequest();
                 }
                 await userManager.DeleteAsync(authUser);
+            }
+            else
+            {
+                return BadRequest();
             }
             if(profile != null)
             {

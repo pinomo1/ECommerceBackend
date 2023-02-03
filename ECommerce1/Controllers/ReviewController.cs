@@ -108,7 +108,7 @@ namespace ECommerce1.Controllers
         }
 
         [HttpDelete("delete")]
-        [Authorize("User,Admin")]
+        [Authorize(Roles ="User,Admin")]
         public async Task<IActionResult> DeleteAsync(string guid)
         {
             Review? review = await resourceDbContext.Reviews.Include(p => p.User).FirstOrDefaultAsync(p => p.Id.ToString() == guid);

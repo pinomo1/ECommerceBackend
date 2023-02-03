@@ -22,11 +22,11 @@ namespace ECommerce1.Controllers
         }
 
         [HttpGet("returnMyInfo")]
-        [Authorize("User")]
+        [Authorize(Roles ="User")]
         public async Task<IActionResult> ReturnMyInfo()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(u => u.AuthId.ToString() == userId);
+            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(u => u.AuthId == userId);
             if (user == null)
             {
                 return BadRequest();
