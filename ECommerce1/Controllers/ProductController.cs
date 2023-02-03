@@ -35,7 +35,21 @@ namespace ECommerce1.Controllers
         public async Task<ActionResult<IList<string>>> GetSortingEnum()
         {
             IDictionary<int, string> names = Enum.GetNames(typeof(ProductSorting)).ToList().Select((s, i) => new { s, i }).ToDictionary(x => x.i + 1, x => x.s);
-            return Ok(names);
+            
+            List<TempStruct111> tsList = new();
+
+            foreach (var item in names)
+            {
+                tsList.Add(new() { Key = item.Key, Value = item.Value });
+            }
+
+            return Ok(tsList);
+        }
+
+        public struct TempStruct111
+        {
+            public int Key { get; set; }
+            public string Value { get; set; }
         }
 
         /// <summary>
