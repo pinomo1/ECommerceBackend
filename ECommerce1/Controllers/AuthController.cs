@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -188,28 +189,40 @@ namespace ECommerce1.Controllers
                 LastName = registrationDto.LastName,
             };
 
-            resourceDbContext.Profiles.Add(profile);
-            await resourceDbContext.SaveChangesAsync();
-            string role = (await userManager.GetRolesAsync(user))[0];
-            string? accessToken = tokenGenerator.GenerateAccessToken(user, role);
-            string? refreshToken = tokenGenerator.GenerateRefreshToken();
-
             await SendEmailAsync(authUser);
+            
+            return Ok("Finalize registration by confirming email");
+        }
 
-            accountDbContext.RefreshTokens.Add(new RefreshToken
+        /// <summary>
+        /// Change password
+        /// </summary>
+        /// <param name="oldPassword"></param>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword)
+        {
+            AuthUser? user = await userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (user == null)
             {
-                Token = refreshToken,
-                ExpiresAt = DateTime.Now.Add(tokenGenerator.Options.RefreshExpiration),
-                AppUserId = user.Id
-            });
-            accountDbContext.SaveChanges();
-
-            var response = new AuthenticationResponse
+                return BadRequest("User not found");
+            }
+            if (!await userManager.CheckPasswordAsync(user, oldPassword))
             {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            };
-            return Ok(response);
+                return BadRequest("Invalid password");
+            }
+            if (oldPassword == newPassword)
+            {
+                return BadRequest("New password must be different from old one");
+            }
+            if (!await userManager.CheckPasswordAsync(user, oldPassword)) return BadRequest("Invalid password");
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await userManager.ResetPasswordAsync(user, token, newPassword);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+            return Ok();
         }
 
         /// <summary>
@@ -243,7 +256,7 @@ namespace ECommerce1.Controllers
         {
             string code = await userManager.GenerateEmailConfirmationTokenAsync(user);
             await emailSender.SendEmailAsync(user.Email, "Confirm your email",
-                $"Confirm your email by clicking on the link: {configuration["Links:Site"]}api/auth/confirmemail?userId={user.Id}&code={HttpUtility.UrlEncode(code)}");
+                $"Confirm your email change by clicking on the link: <button onclick=\"location.href=\'{configuration["Links:Site"]}api/auth/confirmemail?userId={user.Id}&code={HttpUtility.UrlEncode(code)}\'\">Confirm your email</button>");
             return Ok();
         }
 
@@ -299,7 +312,7 @@ namespace ECommerce1.Controllers
 
             string code = await userManager.GenerateChangeEmailTokenAsync(user, newEmail);
             await emailSender.SendEmailAsync(user.Email, "Confirm your email change",
-                $"Confirm your email change by clicking on the link: {configuration["Links:Site"]}api/auth/mailchanged?userId={user.Id}&newmail={HttpUtility.UrlEncode(newEmail)}&code={HttpUtility.UrlEncode(code)}");
+                $"Confirm your email change by clicking on the link: <button onclick=\"location.href=\'{configuration["Links:Site"]}api/auth/mailchanged?userId={user.Id}&newmail={HttpUtility.UrlEncode(newEmail)}&code={HttpUtility.UrlEncode(code)}\'\">Confirm email</button>");
             return Ok();
         }
 
@@ -329,6 +342,18 @@ namespace ECommerce1.Controllers
             }
 
             await userManager.ChangeEmailAsync(user, newmail, code);
+
+            AUser? aUser = await resourceDbContext.Profiles.FirstOrDefaultAsync(x => x.AuthId == user.Id);
+            aUser ??= await resourceDbContext.Sellers.FirstOrDefaultAsync(x => x.AuthId == user.Id);
+            aUser ??= await resourceDbContext.Staffs.FirstOrDefaultAsync(x => x.AuthId == user.Id);
+            if (aUser == null)
+            {
+                return BadRequest();
+            }
+
+            aUser.Email = newmail;
+            await resourceDbContext.SaveChangesAsync();
+
             return Ok();
         }
 
@@ -353,7 +378,7 @@ namespace ECommerce1.Controllers
 
             string code = await userManager.GenerateChangePhoneNumberTokenAsync(user, phone);
             await emailSender.SendEmailAsync(user.Email, "Confirm your phone number change",
-                $"Confirm your phone number change by clicking on the link: {configuration["Links:Site"]}api/auth/phonechanged?userId={user.Id}&phone={HttpUtility.UrlEncode(phone)}&code={HttpUtility.UrlEncode(code)}");
+                $"Confirm your phone number change by clicking on the link: <button onclick=\"location.href=\'{configuration["Links:Site"]}api/auth/phonechanged?userId={user.Id}&phone={HttpUtility.UrlEncode(phone)}&code={HttpUtility.UrlEncode(code)}\'\">Confirm phone number</button>");
             return Ok();
         }
 
@@ -384,6 +409,18 @@ namespace ECommerce1.Controllers
             }
 
             await userManager.ChangePhoneNumberAsync(user, phone, code);
+
+            AUser? aUser = await resourceDbContext.Profiles.FirstOrDefaultAsync(x => x.AuthId == user.Id);
+            aUser ??= await resourceDbContext.Sellers.FirstOrDefaultAsync(x => x.AuthId == user.Id);
+            aUser ??= await resourceDbContext.Staffs.FirstOrDefaultAsync(x => x.AuthId == user.Id);
+            if (aUser == null)
+            {
+                return BadRequest();
+            }
+
+            aUser.PhoneNumber = phone;
+            await resourceDbContext.SaveChangesAsync();
+
             return Ok();
         }
 
@@ -447,26 +484,10 @@ namespace ECommerce1.Controllers
 
             resourceDbContext.Staffs.Add(profile);
             await resourceDbContext.SaveChangesAsync();
-            string role = (await userManager.GetRolesAsync(user))[0];
-            string? accessToken = tokenGenerator.GenerateAccessToken(user, role);
-            string? refreshToken = tokenGenerator.GenerateRefreshToken();
 
             await SendEmailAsync(authUser);
-
-            accountDbContext.RefreshTokens.Add(new RefreshToken
-            {
-                Token = refreshToken,
-                ExpiresAt = DateTime.Now.Add(tokenGenerator.Options.RefreshExpiration),
-                AppUserId = user.Id
-            });
-            accountDbContext.SaveChanges();
-
-            var response = new AuthenticationResponse
-            {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            };
-            return Ok(response);
+            
+            return Ok("Finalize registration by confirming email");
         }
 
 
@@ -531,26 +552,10 @@ namespace ECommerce1.Controllers
 
             resourceDbContext.Sellers.Add(profile);
             await resourceDbContext.SaveChangesAsync();
-            string role = (await userManager.GetRolesAsync(user))[0];
-            string? accessToken = tokenGenerator.GenerateAccessToken(user, role);
-            string? refreshToken = tokenGenerator.GenerateRefreshToken();
 
             await SendEmailAsync(authUser);
-
-            accountDbContext.RefreshTokens.Add(new RefreshToken
-            {
-                Token = refreshToken,
-                ExpiresAt = DateTime.Now.Add(tokenGenerator.Options.RefreshExpiration),
-                AppUserId = user.Id
-            });
-            accountDbContext.SaveChanges();
-
-            var response = new AuthenticationResponse
-            {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            };
-            return Ok(response);
+            
+            return Ok("Finalize registration by confirming email");
         }
 
 

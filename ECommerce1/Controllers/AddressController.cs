@@ -6,10 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-// TODO: Password change
-// TODO: Order controller
-// TODO: Review controller
-
 namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
