@@ -25,7 +25,7 @@ namespace ECommerce1.Models.Validators
                 .ValidCheckString("Company name", 3, 64);
             RuleFor(c => c.WebsiteUrl)
                 .ValidCheckString("Company site", 4, 1024)
-                .Matches(@"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)").WithMessage("Not valid URL");
+                .Matches(@"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,16}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)").WithMessage("Not valid URL");
         }
     }
 }

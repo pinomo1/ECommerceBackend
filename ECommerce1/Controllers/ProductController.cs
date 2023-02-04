@@ -83,7 +83,7 @@ namespace ECommerce1.Controllers
         /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
         [HttpGet("title/{title}")]
-        public async Task<ActionResult<ProductsViewModel>> ByTitle(string title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000)
+        public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000)
         {
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
                 .Where(p => EF.Functions.Like(p.Name, $"%{title}%") && p.Price >= fromPrice && p.Price <= toPrice)
