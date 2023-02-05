@@ -67,7 +67,7 @@ namespace ECommerce1.Controllers
 
             if(product == null)
             {
-                return NotFound("No such product exists");
+                return NotFound(new { error_message = "No such product exists" } );
             }
             return Ok(product);
         }
@@ -113,7 +113,7 @@ namespace ECommerce1.Controllers
             }
             catch (Exception)
             {
-                return NotFound("Sorting error occurred!");
+                return NotFound(new { error_message = "Sorting error occurred!" });
             }
 
             ProductsViewModelByTitle viewModel = new()
@@ -150,7 +150,7 @@ namespace ECommerce1.Controllers
 
             if (user == null)
             {
-                return NotFound("No such seller exists");
+                return NotFound(new { error_message = "No such seller exists" });
             }
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
@@ -181,7 +181,10 @@ namespace ECommerce1.Controllers
             }
             catch (Exception)
             {
-                return NotFound("Sorting error occurred!");
+                return NotFound(new
+                {
+                    error_message = "Sorting error occurred!"
+                });
             }
 
             ProductsViewModelBySeller viewModel = new()
@@ -217,7 +220,10 @@ namespace ECommerce1.Controllers
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
             if (category == null)
             {
-                return NotFound("No such category exists");
+                return NotFound(new
+                {
+                    error_message = "No such category exists"
+                });
             }
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
@@ -248,7 +254,10 @@ namespace ECommerce1.Controllers
             }
             catch (Exception)
             {
-                return NotFound("Sorting error occurred!");
+                return NotFound(new
+                {
+                    error_message = "Sorting error occurred!"
+                });
             }
 
             ProductsViewModelByCategory viewModel = new()
@@ -349,23 +358,28 @@ namespace ECommerce1.Controllers
             Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(p => p.AuthId == id);
             if (seller == null)
             {
-                return BadRequest("No such seller exists");
+                return BadRequest(new { errror_message = "No such seller exists" });
             }
             Category? category = await resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Id.ToString() == product.CategoryId);
             if(category == null)
             {
-                return BadRequest("No such category exists");
+                return BadRequest(new
+                {
+                    error_message = "No such category exists"
+                });
             }
             if (category.AllowProducts == false)
             {
-                return BadRequest("This category does not allow products");
+                return BadRequest(new
+                {
+                    error_message = "This category does not allow products"
+                });
             }
 
             IEnumerable<string> references = await BlobWorker.AddPublicationPhotos(product.Photos);
             if (references.Count() == 0)
             {
-                this.ModelState.AddModelError("Error", "Photos has not been uploaded");
-                return BadRequest(this.ModelState);
+                return BadRequest(new { error_message = "Photos has not been uploaded" });
             }
             
             List<ProductPhoto> productPhotos = new();
@@ -406,18 +420,24 @@ namespace ECommerce1.Controllers
 
             if (prod == null)
             {
-                return BadRequest("No product with such id exists");
+                return BadRequest(new
+                {
+                    error_message = "No product with such id exists"
+                });
             }
 
             if (User.IsInRole("Seller") && User.FindFirstValue(ClaimTypes.NameIdentifier) != prod.Seller.AuthId)
             {
-                return BadRequest();
+                return BadRequest( new {error_message = "Not your product"});
             }
 
             Category? category = await resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Id.ToString() == product.CategoryId);
             if (category == null)
             {
-                return BadRequest("No such category exists");
+                return BadRequest(new
+                {
+                    error_message = "No such category exists"
+                });
             }
             
             prod.Name = product.Name;
@@ -441,12 +461,15 @@ namespace ECommerce1.Controllers
 
             if (product == null)
             {
-                return BadRequest("No product with such id exists");
+                return BadRequest(new
+                {
+                    error_message = "No product with such id exists"
+                });
             }
 
             if (User.FindFirstValue(ClaimTypes.NameIdentifier) != product.Seller.AuthId)
             {
-                return BadRequest();
+                return BadRequest(new {error_message = "Not your product"});
             }
 
             Dictionary<int, int> SellingDict = new();
@@ -472,12 +495,15 @@ namespace ECommerce1.Controllers
 
             if (product == null)
             {
-                return BadRequest("No product with such id exists");
+                return BadRequest(new
+                {
+                    error_message = "No product with such id exists"
+                });
             }
 
             if (User.IsInRole("Seller") && User.FindFirstValue(ClaimTypes.NameIdentifier) != product.Seller.AuthId)
             {
-                return BadRequest();
+                return BadRequest(new {error_message = "Not your product"});
             }
 
             resourceDbContext.Products.Remove(product);

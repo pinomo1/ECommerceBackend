@@ -38,7 +38,10 @@ namespace ECommerce1.Controllers
             Country? country = resourceDbContext.Countries.FirstOrDefault(c => c.Id.ToString().ToLower().Trim() == id.ToLower().Trim());
             if(country == null)
             {
-                return BadRequest("Country doesn't exists");
+                return BadRequest(new
+                {
+                    error_message = "Country doesn't exists"
+                });
             }
             return await resourceDbContext.Cities.Include(c => c.Country).Where(c => c.Country.Id.ToString().ToLower().Trim() == id.ToLower().Trim()).ToListAsync();
         }
@@ -56,16 +59,25 @@ namespace ECommerce1.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return BadRequest("Bad name");
+                return BadRequest(new
+                {
+                    error_message = "Bad name"
+                });
             }
             if(resourceDbContext.Cities.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim() && c.Country.Id.ToString() == countryId) != null)
             {
-                return BadRequest("City already exists");
+                return BadRequest(new
+                {
+                    error_message = "City already exists"
+                });
             }
             Country? country = resourceDbContext.Countries.FirstOrDefault(c => c.Id.ToString().ToLower().Trim() == countryId.ToLower().Trim());
             if (country == null)
             {
-                return BadRequest("Country doesn't exists");
+                return BadRequest(new
+                {
+                    error_message = "Country doesn't exists"
+                });
             }
             City city = new()
             {
@@ -89,12 +101,18 @@ namespace ECommerce1.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return BadRequest("Bad name");
+                return BadRequest(new
+                {
+                    error_message = "Bad name"
+                });
             }
             City? city = resourceDbContext.Cities.FirstOrDefault(c => c.Id.ToString().ToLower().Trim() == id.ToLower().Trim());
             if (city == null)
             {
-                return BadRequest("City doesn't exists");
+                return BadRequest(new
+                {
+                    error_message = "City doesn't exists"
+                });
             }
             city.Name = name;
             await resourceDbContext.SaveChangesAsync();
@@ -113,7 +131,10 @@ namespace ECommerce1.Controllers
             City? city = resourceDbContext.Cities.FirstOrDefault(c => c.Id.ToString().ToLower().Trim() == id.ToLower().Trim());
             if(city == null)
             {
-                return BadRequest("No such city");
+                return BadRequest(new
+                {
+                    error_message = "No such city"
+                });
             }
             resourceDbContext.Cities.Remove(city);
             await resourceDbContext.SaveChangesAsync();

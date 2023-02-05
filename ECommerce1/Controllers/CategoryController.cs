@@ -30,7 +30,10 @@ namespace ECommerce1.Controllers
             Category? foundCategory = await resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Name.ToLower().Trim() == category.ToLower().Trim());
             if(foundCategory != null)
             {
-                return BadRequest("Category with such name already exists");
+                return BadRequest(new
+                {
+                    error_message = "Category with such name already exists"
+                });
             }
             Category newCategory = new()
             {
@@ -54,17 +57,23 @@ namespace ECommerce1.Controllers
         {
             if (category.ParentCategoryId == null)
             {
-                return BadRequest();
+                return BadRequest(new {error_message = "No parent category with such id was found"});
             }
             Category? parentCategory = await resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Id.ToString() == category.ParentCategoryId.ToString());
             if (parentCategory  == null)
             {
-                return BadRequest("No parent category with such id was found");
+                return BadRequest(new
+                {
+                    error_message = "No parent category with such id was found"
+                });
             }
             Category? foundCategory = await resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Name.ToLower().Trim() == category.Name.ToLower().Trim());
             if (foundCategory != null)
             {
-                return BadRequest("Category with such name already exists");
+                return BadRequest(new
+                {
+                    error_message = "Category with such name already exists"
+                });
             }
             Category newCategory = new()
             {

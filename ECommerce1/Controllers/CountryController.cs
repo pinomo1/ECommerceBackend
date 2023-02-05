@@ -38,11 +38,17 @@ namespace ECommerce1.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return BadRequest("Bad name");
+                return BadRequest(new
+                {
+                    error_message = "Bad name"
+                });
             }
             if (resourceDbContext.Countries.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim()) != null)
             {
-                return BadRequest("Country already exists");
+                return BadRequest(new
+                {
+                    error_message = "Country already exists"
+                });
             }
             Country country = new() { Name = name };
             await resourceDbContext.Countries.AddAsync(country);
@@ -63,12 +69,18 @@ namespace ECommerce1.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return BadRequest("Bad name");
+                return BadRequest(new
+                {
+                    error_message = "Bad name"
+                });
             }
             Country? country = resourceDbContext.Countries.FirstOrDefault(c => c.Id.ToString().ToLower().Trim() == id.ToLower().Trim());
             if (country == null)
             {
-                return BadRequest("Country doesn't exists");
+                return BadRequest(new
+                {
+                    error_message = "Country doesn't exists"
+                });
             }
             country.Name = name;
             await resourceDbContext.SaveChangesAsync();
@@ -88,7 +100,10 @@ namespace ECommerce1.Controllers
             Country? country = resourceDbContext.Countries.FirstOrDefault(c => c.Id.ToString().ToLower().Trim() == id.ToLower().Trim());
             if (country == null)
             {
-                return BadRequest("No such country");
+                return BadRequest(new
+                {
+                    error_message = "No such country"
+                });
             }
             resourceDbContext.Countries.Remove(country);
             await resourceDbContext.SaveChangesAsync();

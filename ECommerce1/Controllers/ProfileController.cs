@@ -29,7 +29,7 @@ namespace ECommerce1.Controllers
             Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(u => u.AuthId == userId);
             if (user == null)
             {
-                return BadRequest();
+                return BadRequest(new { error_message = "Not logged in" });
             }
             return Ok(user);
         }

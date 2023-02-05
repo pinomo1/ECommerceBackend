@@ -46,10 +46,16 @@ namespace ECommerce1.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(u => u.AuthId == userId);
             if (user == null)
-                return BadRequest("User not found");
+                return BadRequest(new
+                {
+                    error_message = "User not found"
+                });
             City? city = await resourceDbContext.Cities.FirstOrDefaultAsync(c => c.Id.ToString() == address.CityId);
             if (city == null)
-                return BadRequest("City not found");
+                return BadRequest(new
+                {
+                    error_message = "City not found"
+                });
 
             Address newAddress = new()
             {
@@ -76,9 +82,15 @@ namespace ECommerce1.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Address? address = await resourceDbContext.Addresses.FirstOrDefaultAsync(a => a.Id.ToString() == id);
             if (address == null)
-                return BadRequest("Address not found");
+                return BadRequest(new
+                {
+                    error_message = "Address not found"
+                });
             if (address.User.AuthId != userId)
-                return BadRequest("You are not authorized to delete this address");
+                return BadRequest(new
+                {
+                    error_message = "You are not authorized to delete this address"
+                });
             resourceDbContext.Addresses.Remove(address);
             await resourceDbContext.SaveChangesAsync();
             return Ok();
@@ -97,12 +109,21 @@ namespace ECommerce1.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Address? oldAddress = await resourceDbContext.Addresses.FirstOrDefaultAsync(a => a.Id.ToString() == addressId);
             if (oldAddress == null)
-                return BadRequest("Address not found");
+                return BadRequest(new
+                {
+                    error_message = "Address not found"
+                });
             if (oldAddress.User.AuthId != userId)
-                return BadRequest("You are not authorized to edit this address");
+                return BadRequest(new
+                {
+                    error_message = "You are not authorized to edit this address"
+                });
             City? city = await resourceDbContext.Cities.FirstOrDefaultAsync(c => c.Id.ToString() == address.CityId);
             if (city == null)
-                return BadRequest("City not found");
+                return BadRequest(new
+                {
+                    error_message = "City not found"
+                });
 
             oldAddress.First = address.First;
             oldAddress.Second = address.Second;

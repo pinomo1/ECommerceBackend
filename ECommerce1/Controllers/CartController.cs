@@ -25,7 +25,7 @@ namespace ECommerce1.Controllers
         /// <returns></returns>
         [HttpGet("get_own")]
         [Authorize(Roles="User")]
-        public async Task<IActionResult> GetCart()
+        public async Task<ActionResult<IList<CartItem>>> GetCart()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ToListAsync();
@@ -44,13 +44,13 @@ namespace ECommerce1.Controllers
             Product? product = await resourceDbContext.Products.FirstOrDefaultAsync(p => p.Id.ToString() == guid);
             if(product == null)
             {
-                return BadRequest("No such product");
+                return BadRequest(new { error_message = "No such product" });
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
             if(user == null)
             {
-                return BadRequest("User not found");
+                return BadRequest(new { error_message = "User not found" });
             }
             CartItem item = new()
             {
@@ -75,13 +75,16 @@ namespace ECommerce1.Controllers
             CartItem? cartItem = await resourceDbContext.CartItems.FirstOrDefaultAsync(p => p.Id.ToString() == guid);
             if (cartItem == null)
             {
-                return NotFound("No such product");
+                return NotFound(new { error_message = "No such product" });
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
             if(userId != cartItem.User.AuthId)
             {
-                return BadRequest("You are not authorized to remove this item");
+                return BadRequest(new
+                {
+                    error_message = "You are not authorized to remove this item"
+                });
             }
             resourceDbContext.CartItems.Remove(cartItem);
             await resourceDbContext.SaveChangesAsync();

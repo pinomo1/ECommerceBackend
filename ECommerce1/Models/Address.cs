@@ -25,5 +25,10 @@
         /// The zip code of the address
         /// </summary>
         public string Zip { get; set; }
+
+        public string Normalize()
+        {
+            return $"{First}\n{Second}\n{City.Name}, {City.Country.Name}\n{Zip}";
+        }
     }
 }

@@ -31,7 +31,10 @@ namespace ECommerce1.Controllers
         {
             if(title.Length < 4)
             {
-                return BadRequest("Name is too shot");
+                return BadRequest(new
+                {
+                    error_message = "Name is too shot"
+                });
             }
             IList<Seller> sellers = await resourceDbContext.Sellers
                 .Where(s => EF.Functions.Like(s.CompanyName, $"%{title}%")).ToListAsync();
@@ -45,12 +48,18 @@ namespace ECommerce1.Controllers
             Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(s => s.AuthId == User.FindFirstValue(ClaimTypes.NameIdentifier));
             if(seller == null)
             {
-                return BadRequest("Not authorized");
+                return BadRequest(new
+                {
+                    error_message = "Not authorized"
+                });
             }
             string reference = await BlobWorker.AddPublicationPhoto(picture);
             if(reference == String.Empty)
             {
-                return BadRequest("Bad photo");
+                return BadRequest(new
+                {
+                    error_message = "Bad photo"
+                });
             }
             seller.ProfilePhotoUrl = reference;
             await resourceDbContext.SaveChangesAsync();

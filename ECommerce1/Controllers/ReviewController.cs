@@ -37,7 +37,7 @@ namespace ECommerce1.Controllers
 
             if (product == null)
             {
-                return NotFound();
+                return NotFound(new { error_message = "No such product exists" });
             }
 
             var reviews = product.Reviews
@@ -70,17 +70,20 @@ namespace ECommerce1.Controllers
             Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == id);
             if (user == null)
             {
-                return BadRequest("No such user exists");
+                return BadRequest(new { error_message = "No such user exists" });
             }
             Product? product = await resourceDbContext.Products.FirstOrDefaultAsync(c => c.Id.ToString() == review.ProductId);
             if(product == null)
             {
-                return BadRequest("No such product exists");
+                return BadRequest(new { error_message = "No such product exists" });
             }
             Review? review1 = await resourceDbContext.Reviews.FirstOrDefaultAsync(r => r.User.AuthId == id);
             if(review1 != null)
             {
-                return BadRequest("You have already submitted a review for this product");
+                return BadRequest(new
+                {
+                    error_message = "You have already submitted a review for this product"
+                });
             }
 
             IEnumerable<string> references = await BlobWorker.AddPublicationPhotos(review.Photos);
@@ -114,11 +117,17 @@ namespace ECommerce1.Controllers
             Review? review = await resourceDbContext.Reviews.Include(p => p.User).FirstOrDefaultAsync(p => p.Id.ToString() == guid);
             if (review == null)
             {
-                return BadRequest("No review with such id exists");
+                return BadRequest(new
+                {
+                    error_message = "No review with such id exists"
+                });
             }
             if (User.IsInRole("User") && User.FindFirstValue(ClaimTypes.NameIdentifier) != review.User.AuthId)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    error_message = "Not you"
+                });
             }
 
             resourceDbContext.Reviews.Remove(review);
