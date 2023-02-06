@@ -82,7 +82,7 @@ namespace ECommerce1.Controllers
         /// <param name="fromPrice">Minimum price</param>
         /// <param name="toPrice">Maximum price</param>
         /// <returns></returns>
-        [HttpGet("title/{title}")]
+        [HttpGet("title")]
         public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000)
         {
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
