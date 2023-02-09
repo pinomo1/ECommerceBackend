@@ -26,7 +26,16 @@ namespace ECommerce1.Controllers
         public async Task<ActionResult<IList<Order>>> GetOrders()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<Order> cartItems = await resourceDbContext.Orders.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ToListAsync();
+            List<Order> cartItems = await resourceDbContext.Orders.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).ToListAsync();
+            return Ok(cartItems);
+        }
+
+        [HttpGet("getOwnSeller")]
+        [Authorize(Roles = "Seller")]
+        public async Task<ActionResult<IList<Order>>> GetOrdersSeller()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<Order> cartItems = await resourceDbContext.Orders.Where(ci => ci.Product.Seller.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).ToListAsync();
             return Ok(cartItems);
         }
 

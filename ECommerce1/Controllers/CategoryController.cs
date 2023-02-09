@@ -141,6 +141,7 @@ namespace ECommerce1.Controllers
                 Id = c.Id,
                 ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
                 Name = c.Name,
+                AllowProducts = c.AllowProducts
             })
                 .ToArray<CategoryResponse>();
 
@@ -149,6 +150,7 @@ namespace ECommerce1.Controllers
                 Id = c.Id,
                 ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
                 Name = c.Name,
+                AllowProducts = c.AllowProducts
             })
                 .ToArray<CategoryResponse>();
 
