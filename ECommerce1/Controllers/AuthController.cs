@@ -233,7 +233,7 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(result.Errors);
             }
-            return RedirectToPage("opersucc.html");
+            return Redirect("/opersucc.html");
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace ECommerce1.Controllers
             var result = await userManager.ConfirmEmailAsync(user, code);
             if (result.Succeeded)
             {
-                return RedirectToPage("opersucc.html");
+                return Redirect("/opersucc.html");
             }
             else
             {
@@ -398,7 +398,7 @@ namespace ECommerce1.Controllers
             aUser.Email = newmail;
             await resourceDbContext.SaveChangesAsync();
 
-            return RedirectToPage("opersucc.html");
+            return Redirect("/opersucc.html");
         }
 
         /// <summary>
@@ -480,7 +480,7 @@ namespace ECommerce1.Controllers
             aUser.PhoneNumber = phone;
             await resourceDbContext.SaveChangesAsync();
 
-            return RedirectToPage("opersucc.html");
+            return Redirect("/opersucc.html");
         }
 
         /// <summary>
