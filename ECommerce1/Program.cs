@@ -8,6 +8,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -40,7 +41,9 @@ services.AddIdentity<AuthUser, IdentityRole>(options =>
 .AddTokenProvider<DataProtectorTokenProvider<AuthUser>>(TokenOptions.DefaultProvider);
 
 services.AddControllers().AddJsonOptions(x =>
-   x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+{
+    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+});
 services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 services.AddEndpointsApiExplorer();
 services.AddSwagger();
@@ -70,6 +73,11 @@ services.AddAzureClients(builder =>
 #endregion
 
 #region Configure
+services.Configure<ApiBehaviorOptions>(o =>
+{
+    o.SuppressModelStateInvalidFilter = true;
+});
+
 var app = builder.Build();
 
 app.UseCors((options) =>

@@ -77,7 +77,7 @@ namespace ECommerce1.Controllers
             ValidationResult result = await logVal.ValidateAsync(loginDto);
             if (!result.IsValid)
             {
-                return BadRequest(new { error_message = result.Errors[0] });
+                return BadRequest(new { error_message = result.Errors[0].ErrorMessage });
             }
 
             var user = await userManager.FindByEmailAsync(loginDto.Email);
@@ -131,7 +131,7 @@ namespace ECommerce1.Controllers
             ValidationResult result = await userRegVal.ValidateAsync(registrationDto);
             if (!result.IsValid)
             {
-                return BadRequest(new { error_message = result.Errors[0] });
+                return BadRequest(new { error_message = result.Errors[0].ErrorMessage });
             }
             if(await userManager.FindByEmailAsync(registrationDto.Email) != null)
             {
@@ -152,7 +152,7 @@ namespace ECommerce1.Controllers
             IdentityResult createResult = await userManager.CreateAsync(user, registrationDto.Password);
             if (!createResult.Succeeded)
             {
-                return BadRequest(createResult.Errors);
+                return BadRequest(new { error_message = createResult.Errors.ElementAt(0) });
             }
 
             AuthUser authUser = await userManager.FindByNameAsync(user.UserName);
@@ -494,7 +494,7 @@ namespace ECommerce1.Controllers
             ValidationResult result = await staffRegVal.ValidateAsync(registrationDto);
             if (!result.IsValid)
             {
-                return BadRequest(new { error_message = result.Errors[0] });
+                return BadRequest(new { error_message = result.Errors[0].ErrorMessage });
             }
             if (await userManager.FindByEmailAsync(registrationDto.Email) != null)
             {
@@ -521,7 +521,7 @@ namespace ECommerce1.Controllers
             IdentityResult createResult = await userManager.CreateAsync(user, registrationDto.Password);
             if (!createResult.Succeeded)
             {
-                return BadRequest(createResult.Errors);
+                return BadRequest(new { error_message = createResult.Errors.ElementAt(0) });
             }
 
             AuthUser authUser = await userManager.FindByNameAsync(user.UserName);
@@ -570,7 +570,7 @@ namespace ECommerce1.Controllers
             ValidationResult result = await selRegVal.ValidateAsync(registrationDto);
             if (!result.IsValid)
             {
-                return BadRequest(new { error_message = result.Errors[0] });
+                return BadRequest(new { error_message = result.Errors[0].ErrorMessage });
             }
             if (await userManager.FindByEmailAsync(registrationDto.Email) != null)
             {
@@ -597,7 +597,7 @@ namespace ECommerce1.Controllers
             IdentityResult createResult = await userManager.CreateAsync(user, registrationDto.Password);
             if (!createResult.Succeeded)
             {
-                return BadRequest(createResult.Errors);
+                return BadRequest(new { error_message = createResult.Errors.ElementAt(0) });
             }
 
             AuthUser authUser = await userManager.FindByNameAsync(user.UserName);
@@ -614,7 +614,7 @@ namespace ECommerce1.Controllers
                 await userManager.DeleteAsync(authUser);
                 return BadRequest(new
                 {
-                    error_message = "Unecpected error"
+                    error_message = "Unexpected error"
                 });
             }
 
