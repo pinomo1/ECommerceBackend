@@ -40,7 +40,8 @@ namespace ECommerce1.Controllers
 
             foreach (var item in names)
             {
-                tsList.Add(new() { Key = item.Key, Value = item.Value });
+                string val = item.Value.Replace("F", " f");
+                tsList.Add(new() { Key = item.Key, Value = val });
             }
 
             return Ok(tsList);
@@ -87,6 +88,7 @@ namespace ECommerce1.Controllers
         {
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
                 .Where(p => EF.Functions.Like(p.Name, $"%{title}%") && p.Price >= fromPrice && p.Price <= toPrice)
+                .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Id,
@@ -95,7 +97,8 @@ namespace ECommerce1.Controllers
                     FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
                     Name = p.Name,
                     Price = p.Price,
-                    OrderCount = p.Orders.Count
+                    OrderCount = p.Orders.Count,
+                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality)
                 });
 
             int totalCount = unorderedProducts.Count();
@@ -155,6 +158,7 @@ namespace ECommerce1.Controllers
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
                 .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && EF.Functions.Like(p.Name, $"%{title}%"))
+                .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Id,
@@ -163,7 +167,8 @@ namespace ECommerce1.Controllers
                     FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
                     Name = p.Name,
                     Price = p.Price,
-                    OrderCount = p.Orders.Count
+                    OrderCount = p.Orders.Count,
+                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality)
                 });
 
             int totalCount = unorderedProducts.Count();
@@ -226,8 +231,14 @@ namespace ECommerce1.Controllers
                 });
             }
 
+            if (!category.AllowProducts)
+            {
+                return RedirectToAction("GetSubCategories", "Category", new { guid });
+            }
+
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
                 .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && EF.Functions.Like(p.Name, $"%{title}%"))
+                .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Id,
@@ -236,7 +247,8 @@ namespace ECommerce1.Controllers
                     FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
                     Name = p.Name,
                     Price = p.Price,
-                    OrderCount = p.Orders.Count
+                    OrderCount = p.Orders.Count,
+                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality)
                 });
 
             int totalCount = unorderedProducts.Count();
@@ -280,8 +292,16 @@ namespace ECommerce1.Controllers
         {
             int totalCount = unorderedProducts.Count();
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
-            decimal maxPrice = await unorderedProducts.MaxAsync(p => p.Price);
-            decimal minPrice = await unorderedProducts.MinAsync(p => p.Price);
+            decimal maxPrice = 0, minPrice = 0;
+            try
+            {
+                maxPrice = await unorderedProducts.MaxAsync(p => p.Price);
+                minPrice = await unorderedProducts.MinAsync(p => p.Price);
+            }
+            catch (Exception)
+            {
+
+            }
             if (page > totalPages)
             {
                 page = totalPages;
@@ -299,30 +319,16 @@ namespace ECommerce1.Controllers
                 onPage = 5;
             }
 
-            IOrderedQueryable<ProductsProductViewModel> orderedProducts;
-
-            switch (sorting)
+            IOrderedQueryable<ProductsProductViewModel> orderedProducts = sorting switch
             {
-                case ProductSorting.OlderFirst:
-                    orderedProducts = unorderedProducts.OrderBy(p => p.CreationTime);
-                    break;
-                case ProductSorting.NewerFirst:
-                    orderedProducts = unorderedProducts.OrderByDescending(p => p.CreationTime);
-                    break;
-                case ProductSorting.CheaperFirst:
-                    orderedProducts = unorderedProducts.OrderBy(p => p.Price);
-                    break;
-                case ProductSorting.ExpensiveFirst:
-                    orderedProducts = unorderedProducts.OrderByDescending(p => p.Price);
-                    break;
-                case ProductSorting.PopularFirst:
-                    orderedProducts = unorderedProducts.OrderByDescending(p => p.OrderCount);
-                    break;
-                default:
-                    orderedProducts = unorderedProducts.OrderByDescending(p => p.OrderCount);
-                    break;
-            }
-
+                ProductSorting.OlderFirst => unorderedProducts.OrderBy(p => p.CreationTime),
+                ProductSorting.NewerFirst => unorderedProducts.OrderByDescending(p => p.CreationTime),
+                ProductSorting.CheaperFirst => unorderedProducts.OrderBy(p => p.Price),
+                ProductSorting.ExpensiveFirst => unorderedProducts.OrderByDescending(p => p.Price),
+                ProductSorting.PopularFirst => unorderedProducts.OrderByDescending(p => p.OrderCount),
+                ProductSorting.BestFirst => unorderedProducts.OrderByDescending(p => p.Rating),
+                _ => unorderedProducts.OrderByDescending(p => p.OrderCount),
+            };
             return new ProductPreparation(minPrice, maxPrice, orderedProducts.Skip((page - 1) * onPage).Take(onPage));
         }
 

@@ -7,6 +7,7 @@
         public int OnPageProductCount { get; set; }
         public int TotalPageCount { get; set; }
         public int CurrentPage { get; set; }
+        public double Rating { get; set; }
     }
 
     public class ReviewReviewsModel

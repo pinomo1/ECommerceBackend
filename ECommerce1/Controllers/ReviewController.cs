@@ -40,6 +40,8 @@ namespace ECommerce1.Controllers
                 return NotFound(new { error_message = "No such product exists" });
             }
 
+            double rating = product.Reviews.Count == 0 ? 0 : product.Reviews.Average(r => r.Quality);
+
             var reviews = product.Reviews
                 .Skip((page - 1) * onPage)
                 .Take(onPage)
@@ -58,7 +60,8 @@ namespace ECommerce1.Controllers
                 TotalProductCount = product.Reviews.Count,
                 OnPageProductCount = onPage,
                 CurrentPage = page,
-                TotalPageCount = (int)Math.Ceiling((double)product.Reviews.Count / onPage)
+                TotalPageCount = (int)Math.Ceiling((double)product.Reviews.Count / onPage),
+                Rating = rating
             };
         }
 

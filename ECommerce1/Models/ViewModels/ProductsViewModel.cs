@@ -43,11 +43,12 @@
         /// </summary>
         public enum ProductSorting
         {
-            OlderFirst = 1,
-            NewerFirst,
+            PopularFirst = 1,
+            BestFirst,
             CheaperFirst,
             ExpensiveFirst,
-            PopularFirst
+            NewerFirst,
+            OlderFirst
         }
     }
 
@@ -117,5 +118,9 @@
         /// Count of orders
         /// </summary>
         public int OrderCount { get; set; }
+        /// <summary>
+        /// Rating of product
+        /// </summary>
+        public double Rating { get; set; }
     }
 }
