@@ -22,14 +22,22 @@ namespace ECommerce1.Controllers
         }
 
         [HttpGet("returnMyInfo")]
-        [Authorize(Roles ="User")]
+        [Authorize()]
         public async Task<IActionResult> ReturnMyInfo()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(u => u.AuthId == userId);
+            AUser? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(u => u.AuthId == userId);
             if (user == null)
             {
-                return BadRequest(new { error_message = "Not logged in" });
+                user = await resourceDbContext.Sellers.FirstOrDefaultAsync(u => u.AuthId == userId);
+                if(user == null)
+                {
+                    user = await resourceDbContext.Staffs.FirstOrDefaultAsync(u => u.AuthId == userId);
+                    if(user == null)
+                    {
+                       return BadRequest(new { error_message = "Not logged in" });                        
+                    }
+                }
             }
             return Ok(user);
         }
