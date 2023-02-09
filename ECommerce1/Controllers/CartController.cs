@@ -1,4 +1,5 @@
 ﻿using ECommerce1.Models;
+using ECommerce1.Models.ViewModels;
 using ECommerce1.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,11 +26,22 @@ namespace ECommerce1.Controllers
         /// <returns></returns>
         [HttpGet("get_own")]
         [Authorize(Roles="User")]
-        public async Task<ActionResult<IList<CartItem>>> GetCart()
+        public async Task<ActionResult<IList<CartItemViewModel>>> GetCart()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ToListAsync();
-            return Ok(cartItems);
+            List<CartItemViewModel> cartItemViewModels = new();
+            // Group by product
+            foreach (var group in cartItems.GroupBy(ci => ci.Product))
+            {
+                cartItemViewModels.Add(new CartItemViewModel
+                {
+                    Product = group.Key,
+                    Quantity = group.Count()
+                });
+            }
+
+            return Ok(cartItemViewModels);
         }
 
         /// <summary>

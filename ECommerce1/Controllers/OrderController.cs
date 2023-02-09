@@ -61,7 +61,7 @@ namespace ECommerce1.Controllers
             }
             Order order = new()
             {
-                AddressCopy = address.Normalize(),
+                AddressCopy = address.Normalize(profile.PhoneNumber),
                 OrderTime = DateTime.Now,
                 Product = product,
                 User = profile
@@ -99,7 +99,7 @@ namespace ECommerce1.Controllers
             {
                 orders.Add(new()
                 {
-                    AddressCopy = address.Normalize(),
+                    AddressCopy = address.Normalize(profile.PhoneNumber),
                     OrderTime = DateTime.Now,
                     Product = item.Product,
                     User = profile

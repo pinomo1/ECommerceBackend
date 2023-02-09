@@ -895,6 +895,16 @@
             The refresh token used to get a new access token.
             </summary>
         </member>
+        <member name="P:ECommerce1.Models.ViewModels.CartItemViewModel.Product">
+            <summary>
+            The product that this item is for
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.CartItemViewModel.Quantity">
+            <summary>
+            The quantity of this product in the cart
+            </summary>
+        </member>
         <member name="T:ECommerce1.Models.ViewModels.GetCategoryViewModel">
             <summary>
             View model used to display the category and its subcategories.

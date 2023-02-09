@@ -30,5 +30,10 @@
         {
             return $"{First}\n{Second}\n{City.Name}, {City.Country.Name}\n{Zip}";
         }
+
+        public string Normalize(string number)
+        {
+            return Normalize() + $"\n{number}";
+        }
     }
 }
