@@ -14,6 +14,7 @@
     {
         public Guid Id { get; set; }
         public string BuyerName { get; set; }
+        public string Initials { get; set; }
         public int Quality { get; set; }
         public string ReviewText { get; set; }
         public IList<string> Photos { get; set; }

@@ -51,7 +51,8 @@ namespace ECommerce1.Controllers
                     Quality = r.Quality,
                     ReviewText = r.ReviewText,
                     Photos = r.Photos.Select(p => p.Url).ToList(),
-                    BuyerName = $"{r.User.FirstName} {r.User.LastName[0]}."
+                    BuyerName = $"{r.User.FirstName} {r.User.LastName[0]}.",
+                    Initials = $"{r.User.FirstName[0]}{r.User.LastName[0]}"
                 }).ToList();
 
             return new ReviewsViewModel
