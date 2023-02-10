@@ -540,6 +540,11 @@
             Time of order
             </summary>
         </member>
+        <member name="P:ECommerce1.Models.Order.OrderStatus">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:ECommerce1.Models.Product">
             <summary>
             Product model
