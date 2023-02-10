@@ -339,6 +339,9 @@ namespace ECommerce1.Services
 
                 e.Property(e => e.OrderTime)
                 .HasDefaultValueSql("getdate()");
+
+                e.Property(e => e.OrderStatus)
+                .HasDefaultValue(0);
             });
 
             builder.Entity<Review>(e =>

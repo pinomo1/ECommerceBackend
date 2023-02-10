@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using static ECommerce1.Controllers.ProductController;
 using static ECommerce1.Models.ViewModels.ProductsViewModel;
 
 namespace ECommerce1.Controllers
@@ -20,22 +21,46 @@ namespace ECommerce1.Controllers
         {
             this.resourceDbContext = resourceDbContext;
         }
+        
+
+        [HttpGet("states")]
+        public async Task<ActionResult<IList<string>>> GetStatesEnum()
+        {
+            IDictionary<int, string> names = Enum.GetNames(typeof(OrderStatus)).ToList().Select((s, i) => new { s, i }).ToDictionary(x => x.i + 1, x => x.s);
+
+            List<TempStruct111> tsList = new();
+
+            foreach (var item in names)
+            {
+                tsList.Add(new() { Key = item.Key, Value = item.Value });
+            }
+
+            return Ok(tsList);
+        }
 
         [HttpGet("getOwn")]
         [Authorize(Roles = "User")]
-        public async Task<ActionResult<IList<Order>>> GetOrders()
+        public async Task<ActionResult<IList<Order>>> GetOrders(int page = 1)
         {
+            if (page < 1)
+            {
+                return BadRequest(new { error_message = "Page must be > 1" });
+            }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<Order> cartItems = await resourceDbContext.Orders.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).ToListAsync();
+            List<Order> cartItems = await resourceDbContext.Orders.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).Skip((page-1) * 20).Take(20).ToListAsync();
             return Ok(cartItems);
         }
 
         [HttpGet("getOwnSeller")]
         [Authorize(Roles = "Seller")]
-        public async Task<ActionResult<IList<Order>>> GetOrdersSeller()
+        public async Task<ActionResult<IList<Order>>> GetOrdersSeller(int page = 1)
         {
+            if(page < 1)
+            {
+                return BadRequest(new { error_message = "Page must be > 1" });
+            }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<Order> cartItems = await resourceDbContext.Orders.Where(ci => ci.Product.Seller.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).ToListAsync();
+            List<Order> cartItems = await resourceDbContext.Orders.Where(ci => ci.Product.Seller.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).Skip((page-1)*20).Take(20).ToListAsync();
             return Ok(cartItems);
         }
 
@@ -111,6 +136,98 @@ namespace ECommerce1.Controllers
             await resourceDbContext.SaveChangesAsync();
 
             return Ok(orders.Select(o => new { id = o.Id }));
+        }
+
+        [HttpPatch("changeStatus")]
+        [Authorize(Roles = "User,Seller")]
+        public async Task<IActionResult> ChangeStatus(string orderGuid, int status)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Order? order = await resourceDbContext.Orders.Include(o => o.Product).FirstOrDefaultAsync(o => o.Id.ToString() == orderGuid);
+            if (order == null)
+            {
+                return BadRequest(new { error_message = "No such order was found" });
+            }
+            if (order.Product.Seller.AuthId != userId && order.User.AuthId != userId)
+            {
+                return BadRequest(new { error_message = "You are not allowed to change this order" });
+            }
+            if (status < 1 || status > 5)
+            {
+                return BadRequest(new { error_message = "No such status was found" });
+            }
+            OrderStatus orderStatus = (OrderStatus)status;
+            if (order.OrderStatus == (int)OrderStatus.Returned || order.OrderStatus == (int)OrderStatus.Cancelled || order.OrderStatus == (int)OrderStatus.Delivered)
+            {
+                return BadRequest(new { error_message = "You are not allowed to change this order" });
+            }
+            if (order.Product.Seller.AuthId == userId)
+            {
+                if(order.OrderStatus == (int)OrderStatus.Unverified)
+                {
+                    if(orderStatus == OrderStatus.Cancelled || orderStatus == OrderStatus.Delivering)
+                    {
+                        order.OrderStatus = status;
+                    }
+                    else
+                    {
+                        return BadRequest(new { error_message = "Change unverified order to cancelled or delivering" });
+                    }
+                }
+                else if(order.OrderStatus == (int)OrderStatus.Cancelling)
+                {
+                    if(orderStatus == OrderStatus.Cancelled)
+                    {
+                        order.OrderStatus = status;
+                    }
+                    else
+                    {
+                        return BadRequest(new { error_message = "Change cancelling order to cancelled" });
+                    }
+                }
+                else if(order.OrderStatus == (int)OrderStatus.Returning)
+                {
+                    if (orderStatus == OrderStatus.Returned)
+                    {
+                        order.OrderStatus = status;
+                    }
+                    else
+                    {
+                        return BadRequest(new { error_message = "Change returning order to returned" });
+                    }
+                }
+                else if(order.OrderStatus == (int)OrderStatus.Delivering)
+                {
+                    if (orderStatus == OrderStatus.Delivered)
+                    {
+                        order.OrderStatus = status;
+                    }
+                    else
+                    {
+                        return BadRequest(new { error_message = "Change returning order to returned" });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new { error_message = "You can't do that" });
+                }
+            }
+            else
+            {
+                if(order.OrderStatus == (int)OrderStatus.Delivering)
+                {
+                    if(orderStatus == OrderStatus.Returning || orderStatus == OrderStatus.Cancelling)
+                    {
+                        order.OrderStatus = status;
+                    }
+                    else
+                    {
+                        return BadRequest(new { error_message = "Change delivering order to returning or cancelling" });
+                    }
+                }
+            }
+            await resourceDbContext.SaveChangesAsync();
+            return Ok();
         }
     }
 }

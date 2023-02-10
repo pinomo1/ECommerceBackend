@@ -31,7 +31,6 @@ namespace ECommerce1.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ToListAsync();
             List<CartItemViewModel> cartItemViewModels = new();
-            // Group by product
             foreach (var group in cartItems.GroupBy(ci => ci.Product))
             {
                 cartItemViewModels.Add(new CartItemViewModel
@@ -84,7 +83,7 @@ namespace ECommerce1.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> RemoveFromCart(string guid)
         {
-            CartItem? cartItem = await resourceDbContext.CartItems.FirstOrDefaultAsync(p => p.Id.ToString() == guid);
+            CartItem? cartItem = await resourceDbContext.CartItems.FirstOrDefaultAsync(p => p.Product.Id.ToString() == guid);
             if (cartItem == null)
             {
                 return NotFound(new { error_message = "No such product" });
