@@ -169,7 +169,7 @@
             <summary>
             Remove item from cart
             </summary>
-            <param name="guid"></param>
+            <param name="guid">Product's ID, not CartItem's</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.CategoryController.AddMainCategory(System.String)">
@@ -296,6 +296,26 @@
             Delete country as admin
             </summary>
             <param name="id">Country's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.FavouritesController.GetFavourites">
+            <summary>
+            Get all favourite items
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.FavouritesController.AddToFavourites(System.String)">
+            <summary>
+            Add item to favourite list
+            </summary>
+            <param name="guid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.FavouritesController.RemoveFromFavourites(System.String)">
+            <summary>
+            Remove item from favourite list
+            </summary>
+            <param name="guid">Product's ID, not FavouriteItem's</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.GetSortingEnum">
@@ -600,6 +620,11 @@
             Can be used to determine which users have ordered this product
             </summary>
         </member>
+        <member name="P:ECommerce1.Models.Product.FavouriteItems">
+            <summary>
+            Can be used to determine which users have added this product to their favourites
+            </summary>
+        </member>
         <member name="T:ECommerce1.Models.ProductPhoto">
             <summary>
             This class represents a photo of a product.
@@ -668,6 +693,11 @@
         <member name="P:ECommerce1.Models.Profile.Reviews">
             <summary>
             Review list of the buyer.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.FavouriteItems">
+            <summary>
+            Favourite items of the buyer.
             </summary>
         </member>
         <member name="T:ECommerce1.Models.RefreshToken">

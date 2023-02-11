@@ -46,6 +46,10 @@
         /// Can be used to determine which users have ordered this product
         /// </summary>
         public IList<Order> Orders { get; set; }
+        /// <summary>
+        /// Can be used to determine which users have added this product to their favourites
+        /// </summary>
+        public IList<FavouriteItem> FavouriteItems { get; set; }
 
         public Product()
         {
@@ -53,6 +57,7 @@
             Reviews = new List<Review>();
             CartItems = new List<CartItem>();
             Orders = new List<Order>();
+            FavouriteItems = new List<FavouriteItem>();
         }
     }
 }

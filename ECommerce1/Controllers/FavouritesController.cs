@@ -10,94 +10,104 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CartController : ControllerBase
+    public class FavouritesController : ControllerBase
     {
         private readonly ResourceDbContext resourceDbContext;
         private readonly IConfiguration configuration;
-        public CartController(ResourceDbContext resourceDbContext, IConfiguration configuration)
+        public FavouritesController(ResourceDbContext resourceDbContext, IConfiguration configuration)
         {
             this.resourceDbContext = resourceDbContext;
             this.configuration = configuration;
         }
 
         /// <summary>
-        /// Get all items in cart
+        /// Get all favourite items
         /// </summary>
         /// <returns></returns>
         [HttpGet("get_own")]
-        [Authorize(Roles="User")]
-        public async Task<ActionResult<IList<CartItemViewModel>>> GetCart()
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult<IList<ProductsProductViewModel>>> GetFavourites()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ToListAsync();
-            List<CartItemViewModel> cartItemViewModels = new();
-            foreach (var group in cartItems.GroupBy(ci => ci.Product))
+            List<FavouriteItem> favItems = await resourceDbContext.FavouriteItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ToListAsync();
+            List<ProductsProductViewModel> favItemsViewModel = new();
+            foreach (var item in favItems)
             {
-                cartItemViewModels.Add(new CartItemViewModel
+                Product p = item.Product;
+                favItemsViewModel.Add(new ProductsProductViewModel
                 {
-                    Product = group.Key,
-                    Quantity = group.Count()
+                    Id = p.Id,
+                    CreationTime = p.CreationTime,
+                    Description = p.Description,
+                    FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
+                    Name = p.Name,
+                    Price = p.Price,
+                    OrderCount = p.Orders.Count,
+                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality)
                 });
             }
 
-            return Ok(cartItemViewModels);
+            return Ok(favItemsViewModel);
         }
 
         /// <summary>
-        /// Add item to cart
+        /// Add item to favourite list
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
         [HttpPost("add/{guid}")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> AddToCart(string guid)
+        public async Task<IActionResult> AddToFavourites(string guid)
         {
             Product? product = await resourceDbContext.Products.FirstOrDefaultAsync(p => p.Id.ToString() == guid);
-            if(product == null)
+            if (product == null)
             {
                 return BadRequest(new { error_message = "No such product" });
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
-            if(user == null)
+            if (user == null)
             {
                 return BadRequest(new { error_message = "User not found" });
             }
-            CartItem item = new()
+            if (await resourceDbContext.FavouriteItems.AnyAsync(ci => ci.User.AuthId == userId && ci.Product.Id == product.Id))
+            {
+                return BadRequest(new { error_message = "Item already in favourite list" });
+            }
+            FavouriteItem item = new()
             {
                 User = user,
                 Product = product
             };
-            await resourceDbContext.CartItems.AddAsync(item);
+            await resourceDbContext.FavouriteItems.AddAsync(item);
             await resourceDbContext.SaveChangesAsync();
             return Ok(item.Id);
         }
 
-
         /// <summary>
-        /// Remove item from cart
+        /// Remove item from favourite list
         /// </summary>
-        /// <param name="guid">Product's ID, not CartItem's</param>
+        /// <param name="guid">Product's ID, not FavouriteItem's</param>
         /// <returns></returns>
         [HttpDelete("delete/{id}")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> RemoveFromCart(string guid)
+        public async Task<IActionResult> RemoveFromFavourites(string guid)
         {
-            CartItem? cartItem = await resourceDbContext.CartItems.FirstOrDefaultAsync(p => p.Product.Id.ToString() == guid);
-            if (cartItem == null)
+            FavouriteItem? favouriteItem = await resourceDbContext.FavouriteItems.FirstOrDefaultAsync(p => p.Product.Id.ToString() == guid);
+            if (favouriteItem == null)
             {
                 return NotFound(new { error_message = "No such product" });
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
-            if(userId != cartItem.User.AuthId)
+            if (userId != favouriteItem.User.AuthId)
             {
                 return BadRequest(new
                 {
                     error_message = "You are not authorized to remove this item"
                 });
             }
-            resourceDbContext.CartItems.Remove(cartItem);
+            resourceDbContext.FavouriteItems.Remove(favouriteItem);
             await resourceDbContext.SaveChangesAsync();
             return Ok();
         }

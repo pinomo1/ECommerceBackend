@@ -10,7 +10,7 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AddressController : Controller
+    public class AddressController : ControllerBase
     {
         private readonly ResourceDbContext resourceDbContext;
         private readonly IConfiguration configuration;

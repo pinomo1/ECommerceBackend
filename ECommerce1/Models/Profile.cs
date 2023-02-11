@@ -33,6 +33,10 @@
         /// Review list of the buyer.
         /// </summary>
         public IList<Review> Reviews { get; set; }
+        /// <summary>
+        /// Favourite items of the buyer.
+        /// </summary>
+        public IList<FavouriteItem> FavouriteItems { get; set; }
 
         public Profile()
         {
@@ -40,6 +44,7 @@
             CartItems = new List<CartItem>();
             Orders = new List<Order>();
             Reviews = new List<Review>();
+            FavouriteItems = new List<FavouriteItem>();
         }
     }
 }

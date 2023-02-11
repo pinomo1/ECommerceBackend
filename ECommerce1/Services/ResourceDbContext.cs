@@ -10,6 +10,7 @@ namespace ECommerce1.Services
             Database.EnsureCreated();
         }
 
+        public DbSet<FavouriteItem> FavouriteItems { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductPhoto> ProductPhotos { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -314,6 +315,22 @@ namespace ECommerce1.Services
 
                 e.HasOne(e => e.Product)
                 .WithMany(e => e.CartItems)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<FavouriteItem>(e =>
+            {
+                e.Property(e => e.Id)
+               .IsRequired();
+
+                e.HasKey(e => e.Id);
+
+                e.HasOne(e => e.User)
+                .WithMany(e => e.FavouriteItems)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(e => e.Product)
+                .WithMany(e => e.FavouriteItems)
                 .OnDelete(DeleteBehavior.Cascade);
             });
 
