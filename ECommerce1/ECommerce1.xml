@@ -331,7 +331,7 @@
             <param name="guid"></param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.ProductController.ByTitle(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32)">
+        <member name="M:ECommerce1.Controllers.ProductController.ByTitle(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32,System.Boolean)">
             <summary>
             Gets list of products with matching title
             </summary>
@@ -341,9 +341,10 @@
             <param name="sorting">Sorting method</param>
             <param name="fromPrice">Minimum price</param>
             <param name="toPrice">Maximum price</param>
+            <param name="inStock"></param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.ProductController.BySellerId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32)">
+        <member name="M:ECommerce1.Controllers.ProductController.BySellerId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32,System.Boolean)">
             <summary>
             Gets list of products by seller's id
             </summary>
@@ -354,9 +355,10 @@
             <param name="sorting">Sorting method</param>
             <param name="fromPrice">Minimum price</param>
             <param name="toPrice">Maximum price</param>
+            <param name="inStock"></param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.ProductController.ByCategoryId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32)">
+        <member name="M:ECommerce1.Controllers.ProductController.ByCategoryId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32,System.Boolean)">
             <summary>
             Gets list of products by category's id
             </summary>
@@ -367,6 +369,7 @@
             <param name="sorting">Sorting method</param>
             <param name="fromPrice">Minimum price</param>
             <param name="toPrice">Maximum price</param>
+            <param name="inStock"></param>
             <returns></returns>
         </member>
         <member name="T:ECommerce1.Controllers.ProductController.ProductPreparation">
@@ -387,6 +390,22 @@
             </summary>
             <param name="guid">Id of a product</param>
             <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProductController.EditStockAsync(System.String,System.Boolean)">
+            <summary>
+            Edit stock of a product, must be seller of that product or admin
+            </summary>
+            <param name="guid"></param>
+            <param name="inStock"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProductController.EditPhotosAsync(System.String,Microsoft.AspNetCore.Http.IFormFile[])">
+            <summary>
+            Edit photos of a product, must be seller of that product or admin
+            </summary>
+            <param name="guid"></param>
+            <param name="photos"></param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.StatisticsAsync(System.String)">
@@ -588,6 +607,11 @@
         <member name="P:ECommerce1.Models.Product.Price">
             <summary>
             Product price
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.InStock">
+            <summary>
+            Whether in stock or not
             </summary>
         </member>
         <member name="P:ECommerce1.Models.Product.Category">
@@ -1122,6 +1146,11 @@
         <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.Rating">
             <summary>
             Rating of product
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.InStock">
+            <summary>
+            Whether in stock or not
             </summary>
         </member>
         <member name="T:ECommerce1.Models.ViewModels.SellerCredentials">

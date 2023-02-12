@@ -82,12 +82,13 @@ namespace ECommerce1.Controllers
         /// <param name="sorting">Sorting method</param>
         /// <param name="fromPrice">Minimum price</param>
         /// <param name="toPrice">Maximum price</param>
+        /// <param name="inStock"></param>
         /// <returns></returns>
         [HttpGet("title")]
-        public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000)
+        public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
         {
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => EF.Functions.Like(p.Name, $"%{title}%") && p.Price >= fromPrice && p.Price <= toPrice)
+                .Where(p => EF.Functions.Like(p.Name, $"%{title}%") && p.Price >= fromPrice && p.Price <= toPrice && inStock == true ? inStock == p.InStock : true)
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
@@ -144,9 +145,10 @@ namespace ECommerce1.Controllers
         /// <param name="sorting">Sorting method</param>
         /// <param name="fromPrice">Minimum price</param>
         /// <param name="toPrice">Maximum price</param>
+        /// <param name="inStock"></param>
         /// <returns></returns>
         [HttpGet("seller/{guid}")]
-        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000)
+        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
         {
             Seller? user = await resourceDbContext.Sellers
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
@@ -157,7 +159,7 @@ namespace ECommerce1.Controllers
             }
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && EF.Functions.Like(p.Name, $"%{title}%"))
+                .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && EF.Functions.Like(p.Name, $"%{title}%") && inStock == true ? inStock == p.InStock : true)
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
@@ -217,9 +219,10 @@ namespace ECommerce1.Controllers
         /// <param name="sorting">Sorting method</param>
         /// <param name="fromPrice">Minimum price</param>
         /// <param name="toPrice">Maximum price</param>
+        /// <param name="inStock"></param>
         /// <returns></returns>
         [HttpGet("category/{guid}")]
-        public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000)
+        public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
         {
             Category? category = await resourceDbContext.Categories
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
@@ -237,7 +240,7 @@ namespace ECommerce1.Controllers
             }
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && EF.Functions.Like(p.Name, $"%{title}%"))
+                .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && EF.Functions.Like(p.Name, $"%{title}%") && inStock == true ? inStock == p.InStock : true)
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
@@ -450,6 +453,82 @@ namespace ECommerce1.Controllers
             prod.Description = product.Description;
             prod.Price = product.Price;
             prod.Category = category;
+            await resourceDbContext.SaveChangesAsync();
+            return Ok(prod.Id);
+        }
+
+        /// <summary>
+        /// Edit stock of a product, must be seller of that product or admin
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="inStock"></param>
+        /// <returns></returns>
+        [HttpPatch("edit/{guid}/stock")]
+        public async Task<IActionResult> EditStockAsync(string guid, bool inStock)
+        {
+            Product? prod = await resourceDbContext.Products.Include(p => p.Seller).FirstOrDefaultAsync(p => p.Id.ToString() == guid);
+
+            if (prod == null)
+            {
+                return BadRequest(new
+                {
+                    error_message = "No product with such id exists"
+                });
+            }
+
+            if (User.IsInRole("Seller") && User.FindFirstValue(ClaimTypes.NameIdentifier) != prod.Seller.AuthId)
+            {
+                return BadRequest(new { error_message = "Not your product" });
+            }
+
+            prod.InStock = inStock;
+            await resourceDbContext.SaveChangesAsync();
+            return Ok(prod.Id);
+        }
+
+        /// <summary>
+        /// Edit photos of a product, must be seller of that product or admin
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="photos"></param>
+        /// <returns></returns>
+        [HttpPatch("edit/{guid}/photos")]
+        public async Task<IActionResult> EditPhotosAsync(string guid, [FromForm] IFormFile[] photos)
+        {
+            Product? prod = await resourceDbContext.Products.Include(p => p.Seller).FirstOrDefaultAsync(p => p.Id.ToString() == guid);
+
+            if (prod == null)
+            {
+                return BadRequest(new
+                {
+                    error_message = "No product with such id exists"
+                });
+            }
+
+            if (User.IsInRole("Seller") && User.FindFirstValue(ClaimTypes.NameIdentifier) != prod.Seller.AuthId)
+            {
+                return BadRequest(new { error_message = "Not your product" });
+            }
+
+            IEnumerable<string> references = await BlobWorker.AddPublicationPhotos(photos);
+            if (!references.Any())
+            {
+                return BadRequest(new { error_message = "Photos has not been uploaded" });
+            }
+            
+            string[] urls = prod.ProductPhotos.Select(p => p.Url).ToArray();
+            await BlobWorker.RemovePublications(urls);
+
+            List<ProductPhoto> productPhotos = new();
+            foreach (string reference in references)
+            {
+                productPhotos.Add(new ProductPhoto()
+                {
+                    Url = reference
+                });
+            }
+
+            prod.ProductPhotos = productPhotos;
             await resourceDbContext.SaveChangesAsync();
             return Ok(prod.Id);
         }

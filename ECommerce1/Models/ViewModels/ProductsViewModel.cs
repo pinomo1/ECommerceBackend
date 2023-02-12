@@ -122,5 +122,9 @@
         /// Rating of product
         /// </summary>
         public double Rating { get; set; }
+        /// <summary>
+        /// Whether in stock or not
+        /// </summary>
+        public bool? InStock { get; set; }
     }
 }

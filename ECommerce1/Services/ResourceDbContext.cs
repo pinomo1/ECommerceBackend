@@ -285,6 +285,9 @@ namespace ECommerce1.Services
                 .HasColumnType("money")
                 .IsRequired();
 
+                e.Property(e => e.InStock)
+                .HasDefaultValue(true);
+
                 e.HasOne(p => p.Category)
                 .WithMany(c => c.Products)
                 .IsRequired();
