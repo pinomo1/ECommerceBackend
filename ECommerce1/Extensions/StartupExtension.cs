@@ -18,7 +18,7 @@ namespace ECommerce1.Extensions
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "IT Step Images API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ECommerce App for ITStep API", Version = "v1" });
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
