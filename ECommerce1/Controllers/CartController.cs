@@ -1,6 +1,7 @@
 ﻿using ECommerce1.Models;
 using ECommerce1.Models.ViewModels;
 using ECommerce1.Services;
+using FluentValidation.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ namespace ECommerce1.Controllers
     [ApiController]
     public class CartController : ControllerBase
     {
+        private const int maxProductInCart = 99;
         private readonly ResourceDbContext resourceDbContext;
         private readonly IConfiguration configuration;
         public CartController(ResourceDbContext resourceDbContext, IConfiguration configuration)
@@ -66,9 +68,9 @@ namespace ECommerce1.Controllers
                 return BadRequest(new { error_message = "User not found" });
             }
             int inCartQuantityNow = await resourceDbContext.CartItems.CountAsync(ci => ci.Product.Id.ToString() == guid && ci.User.AuthId == userId);
-            if(quantity > 9)
+            if(quantity > maxProductInCart)
             {
-                return BadRequest(new { error_message = "Max quantity is 9" });
+                return BadRequest(new { error_message = $"Max quantity is {maxProductInCart}" });
             }
             if(quantity < 0)
             {
