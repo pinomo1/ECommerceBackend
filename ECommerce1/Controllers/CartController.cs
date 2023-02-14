@@ -23,6 +23,12 @@ namespace ECommerce1.Controllers
             this.configuration = configuration;
         }
 
+        [HttpGet("get_max")]
+        public async Task<IActionResult> GetMax()
+        {
+            return Ok(new { max = maxProductInCart });
+        }
+
         /// <summary>
         /// Get all items in cart
         /// </summary>
