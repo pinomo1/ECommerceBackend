@@ -93,12 +93,9 @@ namespace ECommerce1.Controllers
             else
             {
                 difference = -difference;
-                for (int i = 0; i < difference; i++)
-                {
-                    List<CartItem> cartItems = (List<CartItem>)resourceDbContext.CartItems.Where(ci => ci.Product.Id.ToString() == guid && ci.User.AuthId == userId);
-                    resourceDbContext.CartItems.RemoveRange(cartItems);
-                    await resourceDbContext.SaveChangesAsync();
-                }
+                List<CartItem> cartItems = (List<CartItem>)resourceDbContext.CartItems.Where(ci => ci.Product.Id.ToString() == guid && ci.User.AuthId == userId).Take(difference);
+                resourceDbContext.CartItems.RemoveRange(cartItems);
+                await resourceDbContext.SaveChangesAsync();
                 return Ok();
             }
         }
