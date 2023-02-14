@@ -55,7 +55,7 @@ namespace ECommerce1.Controllers
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
-        [HttpPost("add/{guid}")]
+        [HttpPost("add")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> AddToFavourites(string guid)
         {

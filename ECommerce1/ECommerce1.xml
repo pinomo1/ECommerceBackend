@@ -158,6 +158,14 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:ECommerce1.Controllers.CartController.ChangeQuantity(System.String,System.Int32)">
+            <summary>
+            Change quantity of specified product in cart
+            </summary>
+            <param name="guid">Product GUID</param>
+            <param name="quantity">Quantity desired in total</param>
+            <returns></returns>
+        </member>
         <member name="M:ECommerce1.Controllers.CartController.AddToCart(System.String)">
             <summary>
             Add item to cart

@@ -64,10 +64,14 @@ namespace ECommerce1.Controllers
             return Ok(cartItems);
         }
 
-        [HttpPost("addNow/{guid}")]
+        [HttpPost("addNow")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> AddOrderNow(string guid, string addressGuid)
+        public async Task<IActionResult> AddOrderNow(string guid, string addressGuid, int quantity = 1)
         {
+            if(quantity < 1)
+            {
+                return BadRequest(new { error_message = "Quantity must be at least 1" });
+            }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? profile = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
             if(profile == null)
@@ -84,18 +88,28 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "No such product was found" });
             }
-            Order order = new()
+            if(product.InStock == false)
             {
-                AddressCopy = address.Normalize(profile.PhoneNumber),
-                OrderTime = DateTime.Now,
-                Product = product,
-                User = profile
-            };
+                return BadRequest(new { error_message = "Product is not in stock" });
+            }
 
-            await resourceDbContext.Orders.AddAsync(order);
+            List<Order> orders = new();
+
+            for (int i = 0; i < quantity; i++)
+            {
+                Order order = new()
+                {
+                    AddressCopy = address.Normalize(profile.PhoneNumber),
+                    OrderTime = DateTime.Now,
+                    Product = product,
+                    User = profile
+                };
+            }
+
+            await resourceDbContext.Orders.AddRangeAsync(orders);
             await resourceDbContext.SaveChangesAsync();
 
-            return Ok(order.Id);
+            return Ok();
         }
 
         [HttpPost("addFromCart")]
@@ -122,6 +136,10 @@ namespace ECommerce1.Controllers
 
             foreach (var item in products)
             {
+                if(item.Product.InStock == false)
+                {
+                    return BadRequest(new { error_message = "One of the products is not in stock" });
+                }
                 orders.Add(new()
                 {
                     AddressCopy = address.Normalize(profile.PhoneNumber),
