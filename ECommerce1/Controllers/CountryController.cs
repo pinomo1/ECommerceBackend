@@ -30,7 +30,7 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Add new country as admin
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">Country's name</param>
         /// <returns></returns>
         [HttpPost("add")]
         [Authorize(Roles = "Admin")]

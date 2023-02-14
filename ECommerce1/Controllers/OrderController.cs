@@ -22,7 +22,10 @@ namespace ECommerce1.Controllers
             this.resourceDbContext = resourceDbContext;
         }
         
-
+        /// <summary>
+        /// Return order's states
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("states")]
         public async Task<ActionResult<IList<string>>> GetStatesEnum()
         {
@@ -38,6 +41,11 @@ namespace ECommerce1.Controllers
             return Ok(tsList);
         }
 
+        /// <summary>
+        /// Get own orders as a user
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [HttpGet("getOwn")]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<IList<Order>>> GetOrders(int page = 1)
@@ -51,6 +59,11 @@ namespace ECommerce1.Controllers
             return Ok(cartItems);
         }
 
+        /// <summary>
+        /// Get own orders as a seller
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [HttpGet("getOwnSeller")]
         [Authorize(Roles = "Seller")]
         public async Task<ActionResult<IList<Order>>> GetOrdersSeller(int page = 1)
@@ -64,6 +77,13 @@ namespace ECommerce1.Controllers
             return Ok(cartItems);
         }
 
+        /// <summary>
+        /// Add order instantly (without cart) as user
+        /// </summary>
+        /// <param name="guid">Pruduct ID</param>
+        /// <param name="addressGuid">Address ID</param>
+        /// <param name="quantity">Quantity</param>
+        /// <returns></returns>
         [HttpPost("addNow")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> AddOrderNow(string guid, string addressGuid, int quantity = 1)
@@ -71,6 +91,11 @@ namespace ECommerce1.Controllers
             if(quantity < 1)
             {
                 return BadRequest(new { error_message = "Quantity must be at least 1" });
+            }
+            if(quantity > 100)
+            {
+                // TODO: put max quantity in appsettings
+                return BadRequest(new { error_message = $"Max quantity is 100" });
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? profile = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
@@ -112,6 +137,11 @@ namespace ECommerce1.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Add everything in cart as orders
+        /// </summary>
+        /// <param name="addressGuid">Address ID</param>
+        /// <returns></returns>
         [HttpPost("addFromCart")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> AddFromCart(string addressGuid)
@@ -156,6 +186,12 @@ namespace ECommerce1.Controllers
             return Ok(orders.Select(o => new { id = o.Id }));
         }
 
+        /// <summary>
+        /// Change status of your order
+        /// </summary>
+        /// <param name="orderGuid">Order ID</param>
+        /// <param name="status">Order status/state ("states" URL or GetStatesEnum)</param>
+        /// <returns></returns>
         [HttpPatch("changeStatus")]
         [Authorize(Roles = "User,Seller")]
         public async Task<IActionResult> ChangeStatus(string orderGuid, int status)

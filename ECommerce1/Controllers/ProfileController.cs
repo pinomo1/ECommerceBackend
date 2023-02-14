@@ -21,6 +21,10 @@ namespace ECommerce1.Controllers
             this.configuration = configuration;
         }
 
+        /// <summary>
+        /// Return any authorized user's info
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("returnMyInfo")]
         [Authorize()]
         public async Task<IActionResult> ReturnMyInfo()

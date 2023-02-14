@@ -50,8 +50,8 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Add city as admin given country id
         /// </summary>
-        /// <param name="countryId"></param>
-        /// <param name="name"></param>
+        /// <param name="countryId">Country's ID</param>
+        /// <param name="name">City's name</param>
         /// <returns></returns>
         [HttpPost("add")]
         [Authorize(Roles = "Admin")]

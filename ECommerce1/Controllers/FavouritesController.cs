@@ -53,7 +53,7 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Add item to favourite list
         /// </summary>
-        /// <param name="guid"></param>
+        /// <param name="guid">Product's ID</param>
         /// <returns></returns>
         [HttpPost("add")]
         [Authorize(Roles = "User")]

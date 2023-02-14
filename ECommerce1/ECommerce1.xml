@@ -152,6 +152,12 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:ECommerce1.Controllers.CartController.GetMax">
+            <summary>
+            Return maximum quantity of certain product in the cart
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:ECommerce1.Controllers.CartController.GetCart">
             <summary>
             Get all items in cart
@@ -170,7 +176,7 @@
             <summary>
             Add item to cart
             </summary>
-            <param name="guid"></param>
+            <param name="guid">Product ID</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.CartController.RemoveFromCart(System.String)">
@@ -259,8 +265,8 @@
             <summary>
             Add city as admin given country id
             </summary>
-            <param name="countryId"></param>
-            <param name="name"></param>
+            <param name="countryId">Country's ID</param>
+            <param name="name">City's name</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.CityController.RenameAsync(System.String,System.String)">
@@ -288,7 +294,7 @@
             <summary>
             Add new country as admin
             </summary>
-            <param name="name"></param>
+            <param name="name">Country's name</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.CountryController.RenameAsync(System.String,System.String)">
@@ -316,7 +322,7 @@
             <summary>
             Add item to favourite list
             </summary>
-            <param name="guid"></param>
+            <param name="guid">Product's ID</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.FavouritesController.RemoveFromFavourites(System.String)">
@@ -324,6 +330,50 @@
             Remove item from favourite list
             </summary>
             <param name="guid">Product's ID, not FavouriteItem's</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.OrderController.GetStatesEnum">
+            <summary>
+            Return order's states
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.OrderController.GetOrders(System.Int32)">
+            <summary>
+            Get own orders as a user
+            </summary>
+            <param name="page"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.OrderController.GetOrdersSeller(System.Int32)">
+            <summary>
+            Get own orders as a seller
+            </summary>
+            <param name="page"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.OrderController.AddOrderNow(System.String,System.String,System.Int32)">
+            <summary>
+            Add order instantly (without cart) as user
+            </summary>
+            <param name="guid">Pruduct ID</param>
+            <param name="addressGuid">Address ID</param>
+            <param name="quantity">Quantity</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.OrderController.AddFromCart(System.String)">
+            <summary>
+            Add everything in cart as orders
+            </summary>
+            <param name="addressGuid">Address ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.OrderController.ChangeStatus(System.String,System.Int32)">
+            <summary>
+            Change status of your order
+            </summary>
+            <param name="orderGuid">Order ID</param>
+            <param name="status">Order status/state ("states" URL or GetStatesEnum)</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.GetSortingEnum">
@@ -336,7 +386,7 @@
             <summary>
             Gets product by its id
             </summary>
-            <param name="guid"></param>
+            <param name="guid">Product ID</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.ByTitle(System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32,System.Boolean)">
@@ -404,16 +454,16 @@
             <summary>
             Edit stock of a product, must be seller of that product or admin
             </summary>
-            <param name="guid"></param>
-            <param name="inStock"></param>
+            <param name="guid">Product ID</param>
+            <param name="inStock">Boolean, is in stock or not</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.EditPhotosAsync(System.String,Microsoft.AspNetCore.Http.IFormFile[])">
             <summary>
             Edit photos of a product, must be seller of that product or admin
             </summary>
-            <param name="guid"></param>
-            <param name="photos"></param>
+            <param name="guid">Product ID</param>
+            <param name="photos">Photos</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.StatisticsAsync(System.String)">
@@ -427,7 +477,50 @@
             <summary>
             Delete specific product, must be seller of that product or admin
             </summary>
-            <param name="guid"></param>
+            <param name="guid">Product's ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ProfileController.ReturnMyInfo">
+            <summary>
+            Return any authorized user's info
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ReviewController.GetByProductId(System.String,System.Int32,System.Int32)">
+            <summary>
+            Get all reviews for specified product
+            </summary>
+            <param name="guid">Product ID</param>
+            <param name="page"></param>
+            <param name="onPage">Products on page</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ReviewController.AddReview(ECommerce1.Models.ViewModels.AddReviewViewModel)">
+            <summary>
+            Add review for specified product
+            </summary>
+            <param name="review"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.ReviewController.DeleteAsync(System.String)">
+            <summary>
+            Delete review
+            </summary>
+            <param name="guid">Review ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.SellerController.ByTitle(System.String)">
+            <summary>
+            Find sellers by title
+            </summary>
+            <param name="title"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.SellerController.PostProfilePicture(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            As a seller, add profile/company picture
+            </summary>
+            <param name="picture"></param>
             <returns></returns>
         </member>
         <member name="T:ECommerce1.Models.Address">

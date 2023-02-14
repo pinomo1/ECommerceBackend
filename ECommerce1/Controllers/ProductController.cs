@@ -56,7 +56,7 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Gets product by its id
         /// </summary>
-        /// <param name="guid"></param>
+        /// <param name="guid">Product ID</param>
         /// <returns></returns>
         [HttpGet("{guid}")]
         public async Task<ActionResult<Product>> GetProduct(string guid)
@@ -460,8 +460,8 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Edit stock of a product, must be seller of that product or admin
         /// </summary>
-        /// <param name="guid"></param>
-        /// <param name="inStock"></param>
+        /// <param name="guid">Product ID</param>
+        /// <param name="inStock">Boolean, is in stock or not</param>
         /// <returns></returns>
         [HttpPatch("edit/{guid}/stock")]
         public async Task<IActionResult> EditStockAsync(string guid, bool inStock)
@@ -489,8 +489,8 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Edit photos of a product, must be seller of that product or admin
         /// </summary>
-        /// <param name="guid"></param>
-        /// <param name="photos"></param>
+        /// <param name="guid">Product ID</param>
+        /// <param name="photos">Photos</param>
         /// <returns></returns>
         [HttpPatch("edit/{guid}/photos")]
         public async Task<IActionResult> EditPhotosAsync(string guid, [FromForm] IFormFile[] photos)
@@ -570,7 +570,7 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Delete specific product, must be seller of that product or admin
         /// </summary>
-        /// <param name="guid"></param>
+        /// <param name="guid">Product's ID</param>
         /// <returns></returns>
         [HttpDelete("delete/{guid}")]
         [Authorize(Roles = "Admin,Seller")]

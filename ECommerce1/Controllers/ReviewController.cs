@@ -25,6 +25,13 @@ namespace ECommerce1.Controllers
             BlobWorker = blobWorker;
         }
 
+        /// <summary>
+        /// Get all reviews for specified product
+        /// </summary>
+        /// <param name="guid">Product ID</param>
+        /// <param name="page"></param>
+        /// <param name="onPage">Products on page</param>
+        /// <returns></returns>
         [HttpGet("product/{guid}")]
         public async Task<ActionResult<ReviewsViewModel>> GetByProductId(string guid, int page = 1, int onPage = 20)
         {
@@ -66,6 +73,11 @@ namespace ECommerce1.Controllers
             };
         }
 
+        /// <summary>
+        /// Add review for specified product
+        /// </summary>
+        /// <param name="review"></param>
+        /// <returns></returns>
         [HttpPost("add")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> AddReview([FromForm] AddReviewViewModel review)
@@ -114,6 +126,11 @@ namespace ECommerce1.Controllers
             return Ok(rev.Id);
         }
 
+        /// <summary>
+        /// Delete review
+        /// </summary>
+        /// <param name="guid">Review ID</param>
+        /// <returns></returns>
         [HttpDelete("delete")]
         [Authorize(Roles ="User,Admin")]
         public async Task<IActionResult> DeleteAsync(string guid)

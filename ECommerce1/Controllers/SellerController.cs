@@ -26,6 +26,11 @@ namespace ECommerce1.Controllers
             BlobWorker = blobWorker;
         }
 
+        /// <summary>
+        /// Find sellers by title
+        /// </summary>
+        /// <param name="title"></param>
+        /// <returns></returns>
         [HttpGet("title/{title}")]
         public async Task<ActionResult<IList<Seller>>> ByTitle(string title)
         {
@@ -40,7 +45,12 @@ namespace ECommerce1.Controllers
                 .Where(s => EF.Functions.Like(s.CompanyName, $"%{title}%")).ToListAsync();
             return Ok(sellers);
         }
-
+        
+        /// <summary>
+        /// As a seller, add profile/company picture
+        /// </summary>
+        /// <param name="picture"></param>
+        /// <returns></returns>
         [HttpPost("postpfp")]
         [Authorize(Roles ="Seller")]
         public async Task<IActionResult> PostProfilePicture(IFormFile? picture)

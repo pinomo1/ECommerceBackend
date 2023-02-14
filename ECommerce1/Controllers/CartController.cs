@@ -23,6 +23,10 @@ namespace ECommerce1.Controllers
             this.configuration = configuration;
         }
 
+        /// <summary>
+        /// Return maximum quantity of certain product in the cart
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("get_max")]
         public async Task<IActionResult> GetMax()
         {
@@ -111,7 +115,7 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Add item to cart
         /// </summary>
-        /// <param name="guid"></param>
+        /// <param name="guid">Product ID</param>
         /// <returns></returns>
         [Obsolete("Use ChageQuantity (change/{guid}) instead")]
         [HttpPost("add/{guid}")]
