@@ -104,6 +104,15 @@ namespace ECommerce1.Controllers
                     Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
                     InStock = p.InStock
                 }).ToListAsync();
+            
+            if (onPage > 50)
+            {
+                onPage = 50;
+            }
+            else if (onPage < 5)
+            {
+                onPage = 5;
+            }
 
             int totalCount = unorderedProducts.Count();
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
@@ -162,6 +171,15 @@ namespace ECommerce1.Controllers
                 return NotFound(new { error_message = "No such seller exists" });
             }
 
+            if (onPage > 50)
+            {
+                onPage = 50;
+            }
+            else if (onPage < 5)
+            {
+                onPage = 5;
+            }
+
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
                 .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true))
                 .Include(p => p.Reviews)
@@ -215,7 +233,7 @@ namespace ECommerce1.Controllers
         }
 
         [NonAction]
-        public async Task<IList<ProductsProductViewModel>> GetSubcategoriesAndProducts(string guid)
+        public async Task<IList<ProductsProductViewModel>> GetSubcategoriesAndProducts(string guid, int fromPrice, int toPrice, bool inStock, string? title)
         {
             Category? category = await resourceDbContext.Categories
                 .Include(c => c.ChildCategories)
@@ -227,7 +245,7 @@ namespace ECommerce1.Controllers
             }
 
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
-                .Where(p => p.Category.Id.ToString() == guid)
+                .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true))
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
@@ -244,7 +262,7 @@ namespace ECommerce1.Controllers
 
             foreach (Category subcategory in category.ChildCategories)
             {
-                unorderedProducts = unorderedProducts.Concat(await GetSubcategoriesAndProducts(subcategory.Id.ToString())).ToList();
+                unorderedProducts = unorderedProducts.Concat(await GetSubcategoriesAndProducts(subcategory.Id.ToString(), fromPrice, toPrice, inStock, title)).ToList();
             }
 
             return unorderedProducts;
@@ -276,6 +294,15 @@ namespace ECommerce1.Controllers
                 });
             }
 
+            if(onPage > 50)
+            {
+                onPage = 50;
+            }
+            else if(onPage < 5)
+            {
+                onPage = 5;
+            }
+
             // Obsolete piece of code
             /*
             if (!category.AllowProducts)
@@ -284,23 +311,9 @@ namespace ECommerce1.Controllers
             }
             */
 
-            IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
-                .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true))
-                .Include(p => p.Reviews)
-                .Select(p => new ProductsProductViewModel()
-                {
-                    Id = p.Id,
-                    CreationTime = p.CreationTime,
-                    Description = p.Description,
-                    FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
-                    Name = p.Name,
-                    Price = p.Price,
-                    OrderCount = p.Orders.Count,
-                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
-                    InStock = p.InStock
-                }).ToListAsync();
+            IList<ProductsProductViewModel> unorderedProducts = new List<ProductsProductViewModel>();
 
-            unorderedProducts = unorderedProducts.Concat(await GetSubcategoriesAndProducts(guid)).ToList();
+            unorderedProducts = unorderedProducts.Concat(await GetSubcategoriesAndProducts(guid, fromPrice, toPrice, inStock, title)).ToList();
 
             int totalCount = unorderedProducts.Count();
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
@@ -361,6 +374,7 @@ namespace ECommerce1.Controllers
             {
                 page = 1;
             }
+            /*
             if (onPage > 50)
             {
                 onPage = 50;
@@ -369,6 +383,7 @@ namespace ECommerce1.Controllers
             {
                 onPage = 5;
             }
+            */
 
             IOrderedEnumerable<ProductsProductViewModel> orderedProducts = sorting switch
             {
