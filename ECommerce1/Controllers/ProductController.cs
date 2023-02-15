@@ -82,7 +82,7 @@ namespace ECommerce1.Controllers
         /// <param name="sorting">Sorting method</param>
         /// <param name="fromPrice">Minimum price</param>
         /// <param name="toPrice">Maximum price</param>
-        /// <param name="inStock"></param>
+        /// <param name="inStock">true to output only in stock. false to output everyone</param>
         /// <returns></returns>
         [HttpGet("title")]
         public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
@@ -99,7 +99,8 @@ namespace ECommerce1.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     OrderCount = p.Orders.Count,
-                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality)
+                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
+                    InStock = p.InStock
                 });
 
             int totalCount = unorderedProducts.Count();
@@ -145,7 +146,7 @@ namespace ECommerce1.Controllers
         /// <param name="sorting">Sorting method</param>
         /// <param name="fromPrice">Minimum price</param>
         /// <param name="toPrice">Maximum price</param>
-        /// <param name="inStock"></param>
+        /// <param name="inStock">true to output only in stock. false to output everyone</param>
         /// <returns></returns>
         [HttpGet("seller/{guid}")]
         public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
@@ -170,7 +171,8 @@ namespace ECommerce1.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     OrderCount = p.Orders.Count,
-                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality)
+                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
+                    InStock = p.InStock
                 });
 
             int totalCount = unorderedProducts.Count();
@@ -219,7 +221,7 @@ namespace ECommerce1.Controllers
         /// <param name="sorting">Sorting method</param>
         /// <param name="fromPrice">Minimum price</param>
         /// <param name="toPrice">Maximum price</param>
-        /// <param name="inStock"></param>
+        /// <param name="inStock">true to output only in stock. false to output everyone</param>
         /// <returns></returns>
         [HttpGet("category/{guid}")]
         public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
@@ -251,7 +253,8 @@ namespace ECommerce1.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     OrderCount = p.Orders.Count,
-                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality)
+                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
+                    InStock = p.InStock
                 });
 
             int totalCount = unorderedProducts.Count();
