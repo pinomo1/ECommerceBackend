@@ -399,7 +399,7 @@
             <param name="sorting">Sorting method</param>
             <param name="fromPrice">Minimum price</param>
             <param name="toPrice">Maximum price</param>
-            <param name="inStock"></param>
+            <param name="inStock">true to output only in stock. false to output everyone</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.BySellerId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32,System.Boolean)">
@@ -413,7 +413,7 @@
             <param name="sorting">Sorting method</param>
             <param name="fromPrice">Minimum price</param>
             <param name="toPrice">Maximum price</param>
-            <param name="inStock"></param>
+            <param name="inStock">true to output only in stock. false to output everyone</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.ByCategoryId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32,System.Boolean)">
@@ -427,7 +427,7 @@
             <param name="sorting">Sorting method</param>
             <param name="fromPrice">Minimum price</param>
             <param name="toPrice">Maximum price</param>
-            <param name="inStock"></param>
+            <param name="inStock">true to output only in stock. false to output everyone</param>
             <returns></returns>
         </member>
         <member name="T:ECommerce1.Controllers.ProductController.ProductPreparation">

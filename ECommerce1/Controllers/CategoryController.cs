@@ -103,6 +103,7 @@ namespace ECommerce1.Controllers
         /// <param name="guid">Parent category's id</param>
         /// <returns></returns>
         [HttpGet("{guid}")]
+        [Obsolete]
         public async Task<IActionResult> GetCategory(string guid)
         {
             Category? category = await resourceDbContext.Categories
@@ -163,6 +164,7 @@ namespace ECommerce1.Controllers
         /// <param name="guid">Parent category's id</param>
         /// <returns></returns>
         [HttpGet("sub/{guid}")]
+        [Obsolete]
         public async Task<ActionResult<Category>> GetSubCategories(string guid)
         {
             var category = await resourceDbContext.Categories

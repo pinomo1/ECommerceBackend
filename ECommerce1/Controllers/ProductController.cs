@@ -88,7 +88,7 @@ namespace ECommerce1.Controllers
         public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
         {
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => EF.Functions.Like(p.Name, $"%{title}%") && p.Price >= fromPrice && p.Price <= toPrice && inStock == true ? inStock == p.InStock : true)
+                .Where(p => (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && p.Price >= fromPrice && p.Price <= toPrice && (inStock == true ? inStock == p.InStock : true))
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
@@ -123,7 +123,7 @@ namespace ECommerce1.Controllers
 
             ProductsViewModelByTitle viewModel = new()
             {
-                Products = unorderedProducts,
+                Products = products,
                 Title = title,
                 TotalProductCount = totalCount,
                 TotalPageCount = totalPages,
@@ -160,7 +160,7 @@ namespace ECommerce1.Controllers
             }
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && EF.Functions.Like(p.Name, $"%{title}%") && inStock == true ? inStock == p.InStock : true)
+                .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true))
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
@@ -242,7 +242,7 @@ namespace ECommerce1.Controllers
             }
 
             IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
-                .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && EF.Functions.Like(p.Name, $"%{title}%") && inStock == true ? inStock == p.InStock : true)
+                .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true))
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
