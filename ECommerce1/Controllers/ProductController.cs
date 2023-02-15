@@ -5,6 +5,8 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
+using System.Linq;
 using System.Security.Claims;
 using static ECommerce1.Models.ViewModels.ProductsViewModel;
 
@@ -87,7 +89,7 @@ namespace ECommerce1.Controllers
         [HttpGet("title")]
         public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
         {
-            IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
+            IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
                 .Where(p => (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && p.Price >= fromPrice && p.Price <= toPrice && (inStock == true ? inStock == p.InStock : true))
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
@@ -101,7 +103,7 @@ namespace ECommerce1.Controllers
                     OrderCount = p.Orders.Count,
                     Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
                     InStock = p.InStock
-                });
+                }).ToListAsync();
 
             int totalCount = unorderedProducts.Count();
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
@@ -135,6 +137,7 @@ namespace ECommerce1.Controllers
 
             return Ok(viewModel);
         }
+        
 
         /// <summary>
         /// Gets list of products by seller's id
@@ -159,7 +162,7 @@ namespace ECommerce1.Controllers
                 return NotFound(new { error_message = "No such seller exists" });
             }
 
-            IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
+            IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
                 .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true))
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
@@ -173,7 +176,7 @@ namespace ECommerce1.Controllers
                     OrderCount = p.Orders.Count,
                     Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
                     InStock = p.InStock
-                });
+                }).ToListAsync();
 
             int totalCount = unorderedProducts.Count();
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
@@ -211,6 +214,42 @@ namespace ECommerce1.Controllers
             return Ok(viewModel);
         }
 
+        [NonAction]
+        public async Task<IList<ProductsProductViewModel>> GetSubcategoriesAndProducts(string guid)
+        {
+            Category? category = await resourceDbContext.Categories
+                .Include(c => c.ChildCategories)
+                .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
+
+            if (category == null)
+            {
+                return new List<ProductsProductViewModel>();
+            }
+
+            IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
+                .Where(p => p.Category.Id.ToString() == guid)
+                .Include(p => p.Reviews)
+                .Select(p => new ProductsProductViewModel()
+                {
+                    Id = p.Id,
+                    CreationTime = p.CreationTime,
+                    Description = p.Description,
+                    FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
+                    Name = p.Name,
+                    Price = p.Price,
+                    OrderCount = p.Orders.Count,
+                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
+                    InStock = p.InStock
+                }).ToListAsync();
+
+            foreach (Category subcategory in category.ChildCategories)
+            {
+                unorderedProducts = unorderedProducts.Concat(await GetSubcategoriesAndProducts(subcategory.Id.ToString())).ToList();
+            }
+
+            return unorderedProducts;
+        }
+
         /// <summary>
         /// Gets list of products by category's id
         /// </summary>
@@ -227,6 +266,7 @@ namespace ECommerce1.Controllers
         public async Task<ActionResult<ProductsViewModel>> ByCategoryId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
         {
             Category? category = await resourceDbContext.Categories
+                .Include(c => c.ChildCategories)
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
             if (category == null)
             {
@@ -236,12 +276,15 @@ namespace ECommerce1.Controllers
                 });
             }
 
+            // Obsolete piece of code
+            /*
             if (!category.AllowProducts)
             {
                 return RedirectToAction("GetSubCategories", "Category", new { guid });
             }
+            */
 
-            IQueryable<ProductsProductViewModel> unorderedProducts = resourceDbContext.Products
+            IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
                 .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true))
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
@@ -255,7 +298,9 @@ namespace ECommerce1.Controllers
                     OrderCount = p.Orders.Count,
                     Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
                     InStock = p.InStock
-                });
+                }).ToListAsync();
+
+            unorderedProducts = unorderedProducts.Concat(await GetSubcategoriesAndProducts(guid)).ToList();
 
             int totalCount = unorderedProducts.Count();
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
@@ -294,15 +339,15 @@ namespace ECommerce1.Controllers
         }
 
         [NonAction]
-        private async Task<ProductPreparation> PrepareProducts(IQueryable<ProductsProductViewModel> unorderedProducts, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
+        private async Task<ProductPreparation> PrepareProducts(IList<ProductsProductViewModel> unorderedProducts, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
         {
             int totalCount = unorderedProducts.Count();
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
             decimal maxPrice = 0, minPrice = 0;
             try
             {
-                maxPrice = await unorderedProducts.MaxAsync(p => p.Price);
-                minPrice = await unorderedProducts.MinAsync(p => p.Price);
+                maxPrice = unorderedProducts.Max(p => p.Price);
+                minPrice = unorderedProducts.Min(p => p.Price);
             }
             catch (Exception)
             {
@@ -325,7 +370,7 @@ namespace ECommerce1.Controllers
                 onPage = 5;
             }
 
-            IOrderedQueryable<ProductsProductViewModel> orderedProducts = sorting switch
+            IOrderedEnumerable<ProductsProductViewModel> orderedProducts = sorting switch
             {
                 ProductSorting.OlderFirst => unorderedProducts.OrderBy(p => p.CreationTime),
                 ProductSorting.NewerFirst => unorderedProducts.OrderByDescending(p => p.CreationTime),
