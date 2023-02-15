@@ -342,9 +342,19 @@ namespace ECommerce1.Controllers
                 });
             }
 
+            if (oldEmail == newEmail)
+            {
+                return BadRequest(new
+                {
+                    error_message = "New email must be different from old one"
+                });
+            }
+
             string code = await userManager.GenerateChangeEmailTokenAsync(user, newEmail);
-            await emailSender.SendEmailAsync(user.Email, "Confirm your email change",
-                $"Confirm your email change by clicking on the link: <a href=\"{configuration["Links:Site"]}api/auth/mailchanged?userId={user.Id}&newmail={HttpUtility.UrlEncode(newEmail)}&code={HttpUtility.UrlEncode(code)}\">Confirm email</button>");
+            await emailSender.SendEmailAsync(newEmail, "Confirm your email change",
+                $"Confirm your email change by clicking on the link: <a href=\"{configuration["Links:Site"]}api/auth/mailchanged?userId={user.Id}&newmail={HttpUtility.UrlEncode(newEmail)}&code={HttpUtility.UrlEncode(code)}\">Confirm email</a>");
+            await emailSender.SendEmailAsync(user.Email, "Email change",
+                $"A request was sent to change your email address. If it was not you, quickly log into the account and change the password. Otherwise, ignore this message");
             return Ok();
         }
 
@@ -426,9 +436,17 @@ namespace ECommerce1.Controllers
                 });
             }
 
+            if (user.PhoneNumber == phone)
+            {
+                return BadRequest(new
+                {
+                    error_message = "New phone number must be different from old one"
+                });
+            }
+
             string code = await userManager.GenerateChangePhoneNumberTokenAsync(user, phone);
             await emailSender.SendEmailAsync(user.Email, "Confirm your phone number change",
-                $"Confirm your phone number change by clicking on the link: <a href=\"{configuration["Links:Site"]}api/auth/phonechanged?userId={user.Id}&phone={HttpUtility.UrlEncode(phone)}&code={HttpUtility.UrlEncode(code)}\">Confirm phone number</button>");
+                $"Confirm your phone number change by clicking on the link: <a href=\"{configuration["Links:Site"]}api/auth/phonechanged?userId={user.Id}&phone={HttpUtility.UrlEncode(phone)}&code={HttpUtility.UrlEncode(code)}\">Confirm phone number</a>");
             return Ok();
         }
 
