@@ -109,9 +109,9 @@ namespace ECommerce1.Controllers
             {
                 onPage = 50;
             }
-            else if (onPage < 5)
+            else if (onPage < 1)
             {
-                onPage = 5;
+                onPage = 1;
             }
 
             int totalCount = unorderedProducts.Count();
@@ -175,9 +175,9 @@ namespace ECommerce1.Controllers
             {
                 onPage = 50;
             }
-            else if (onPage < 5)
+            else if (onPage < 1)
             {
-                onPage = 5;
+                onPage = 1;
             }
 
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
@@ -298,9 +298,9 @@ namespace ECommerce1.Controllers
             {
                 onPage = 50;
             }
-            else if(onPage < 5)
+            else if (onPage < 1)
             {
-                onPage = 5;
+                onPage = 1;
             }
 
             // Obsolete piece of code
