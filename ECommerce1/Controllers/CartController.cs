@@ -105,7 +105,7 @@ namespace ECommerce1.Controllers
             else
             {
                 difference = -difference;
-                List<CartItem> cartItems = (List<CartItem>)resourceDbContext.CartItems.Where(ci => ci.Product.Id.ToString() == guid && ci.User.AuthId == userId).Take(difference);
+                var cartItems = resourceDbContext.CartItems.Where(ci => ci.Product.Id.ToString() == guid && ci.User.AuthId == userId).Take(difference);
                 resourceDbContext.CartItems.RemoveRange(cartItems);
                 await resourceDbContext.SaveChangesAsync();
                 return Ok();
