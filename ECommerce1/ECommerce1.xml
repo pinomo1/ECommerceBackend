@@ -1125,6 +1125,61 @@
             The password of the user.
             </summary>
         </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrderViewModel.TotalProductCount">
+            <summary>
+            The total number of orders in the database by given query.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrderViewModel.OnPageProductCount">
+            <summary>
+            The number of orders to be displayed on the page.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrderViewModel.TotalPageCount">
+            <summary>
+            The total number of pages.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrderViewModel.CurrentPage">
+            <summary>
+            The current page.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrdersOrderViewModel.UserId">
+            <summary>
+            The user who owns this item
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrdersOrderViewModel.ProductName">
+            <summary>
+            Product name
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrdersOrderViewModel.Price">
+            <summary>
+            Product price
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrdersOrderViewModel.InStock">
+            <summary>
+            Whether in stock or not
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrdersOrderViewModel.AddressCopy">
+            <summary>
+            Copy of the full address instead of address object
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrdersOrderViewModel.OrderTime">
+            <summary>
+            Time of order
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.OrdersOrderViewModel.OrderStatus">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:ECommerce1.Models.ViewModels.ProductsViewModel">
             <summary>
             The base class for all the view models that are used to display a list of products.

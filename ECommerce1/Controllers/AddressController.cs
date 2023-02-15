@@ -30,7 +30,7 @@ namespace ECommerce1.Controllers
         public async Task<IActionResult> GetAddresses()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<Address> addresses = await resourceDbContext.Addresses.Where(a => a.User.AuthId == userId).ToListAsync();
+            List<Address> addresses = await resourceDbContext.Addresses.Include(a => a.City).ThenInclude(c => c.Country).Where(a => a.User.AuthId == userId).ToListAsync();
             return Ok(addresses);
         }
 

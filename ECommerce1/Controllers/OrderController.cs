@@ -48,15 +48,35 @@ namespace ECommerce1.Controllers
         /// <returns></returns>
         [HttpGet("getOwn")]
         [Authorize(Roles = "User")]
-        public async Task<ActionResult<IList<Order>>> GetOrders(int page = 1)
+        public async Task<ActionResult<OrderViewModel>> GetOrders(int page = 1)
         {
             if (page < 1)
             {
                 return BadRequest(new { error_message = "Page must be > 1" });
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<Order> cartItems = await resourceDbContext.Orders.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).Skip((page-1) * 20).Take(20).ToListAsync();
-            return Ok(cartItems);
+            int count = await resourceDbContext.Orders.Where(ci => ci.User.AuthId == userId).CountAsync();
+            List<OrdersOrderViewModel> cartItems = await resourceDbContext.Orders.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).Skip((page-1) * 20).Take(20).Select(ci=>new OrdersOrderViewModel()
+            {
+                UserId = ci.User.Id.ToString(),
+                InStock = ci.Product.InStock,
+                ProductName = ci.Product.Name,
+                ProductId = ci.Product.Id.ToString(),
+                // Description = ci.Product.Description,
+                Price = ci.Product.Price,
+                AddressCopy = ci.AddressCopy,
+                OrderTime = ci.OrderTime,
+                OrderStatus = ci.OrderStatus,
+                Id = ci.Id
+            }).ToListAsync();
+            return Ok(new OrderViewModel()
+            {
+                CurrentPage = page,
+                OnPageProductCount = cartItems.Count,
+                TotalPageCount = (int)Math.Ceiling((double)count / 20.0),
+                TotalProductCount = count,
+                Orders = cartItems
+            });
         }
 
         /// <summary>
@@ -66,15 +86,35 @@ namespace ECommerce1.Controllers
         /// <returns></returns>
         [HttpGet("getOwnSeller")]
         [Authorize(Roles = "Seller")]
-        public async Task<ActionResult<IList<Order>>> GetOrdersSeller(int page = 1)
+        public async Task<ActionResult<OrderViewModel>> GetOrdersSeller(int page = 1)
         {
             if(page < 1)
             {
                 return BadRequest(new { error_message = "Page must be > 1" });
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<Order> cartItems = await resourceDbContext.Orders.Where(ci => ci.Product.Seller.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).Skip((page-1)*20).Take(20).ToListAsync();
-            return Ok(cartItems);
+            int count = await resourceDbContext.Orders.Where(ci => ci.User.AuthId == userId).CountAsync();
+            List<OrdersOrderViewModel> cartItems = await resourceDbContext.Orders.Where(ci => ci.Product.Seller.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).Skip((page-1)*20).Take(20).Select(ci => new OrdersOrderViewModel()
+            {
+                UserId = ci.User.Id.ToString(),
+                InStock = ci.Product.InStock,
+                ProductName = ci.Product.Name,
+                ProductId = ci.Product.Id.ToString(),
+                // Description = ci.Product.Description,
+                Price = ci.Product.Price,
+                AddressCopy = ci.AddressCopy,
+                OrderTime = ci.OrderTime,
+                OrderStatus = ci.OrderStatus,
+                Id = ci.Id
+            }).ToListAsync();
+            return Ok(new OrderViewModel()
+            {
+                CurrentPage = page,
+                OnPageProductCount = cartItems.Count,
+                TotalPageCount = (int)Math.Ceiling((double)count / 20.0),
+                TotalProductCount = count,
+                Orders = cartItems
+            });
         }
 
         /// <summary>
@@ -122,13 +162,14 @@ namespace ECommerce1.Controllers
 
             for (int i = 0; i < quantity; i++)
             {
-                Order order = new()
+                orders.Add(new()
                 {
                     AddressCopy = address.Normalize(profile.PhoneNumber),
                     OrderTime = DateTime.Now,
                     Product = product,
-                    User = profile
-                };
+                    User = profile,
+                    OrderStatus = (int)OrderStatus.Unverified
+                });
             }
 
             await resourceDbContext.Orders.AddRangeAsync(orders);
@@ -175,7 +216,8 @@ namespace ECommerce1.Controllers
                     AddressCopy = address.Normalize(profile.PhoneNumber),
                     OrderTime = DateTime.Now,
                     Product = item.Product,
-                    User = profile
+                    User = profile,
+                    OrderStatus = (int)OrderStatus.Unverified
                 });
             }
 
