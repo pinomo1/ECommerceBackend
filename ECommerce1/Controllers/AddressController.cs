@@ -115,7 +115,7 @@ namespace ECommerce1.Controllers
         public async Task<IActionResult> EditAddress(string addressId, AddAddressViewModel address)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Address? oldAddress = await resourceDbContext.Addresses.FirstOrDefaultAsync(a => a.Id.ToString() == addressId);
+            Address? oldAddress = await resourceDbContext.Addresses.Include(a => a.User).FirstOrDefaultAsync(a => a.Id.ToString() == addressId);
             if (oldAddress == null)
                 return BadRequest(new
                 {
