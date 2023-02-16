@@ -32,6 +32,7 @@ namespace ECommerce1.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<AddressViewModel> addresses = await resourceDbContext.Addresses.Where(a => a.User.AuthId == userId).Select(a => new AddressViewModel()
             {
+                Id = a.Id.ToString(),
                 First = a.First,
                 Second = a.Second,
                 Zip = a.Zip,

@@ -2,6 +2,7 @@
 {
     public class AddressViewModel
     {
+        public string Id { get; set; }
         public string First { get; set; }
         public string Second { get; set; }
         public string Zip { get; set; }
