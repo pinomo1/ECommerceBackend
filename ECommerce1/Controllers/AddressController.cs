@@ -27,10 +27,17 @@ namespace ECommerce1.Controllers
         /// <returns></returns>
         [HttpGet("get_own")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> GetAddresses()
+        public async Task<ActionResult<IList<AddressViewModel>>> GetAddresses()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<Address> addresses = await resourceDbContext.Addresses.Include(a => a.City).ThenInclude(c => c.Country).Where(a => a.User.AuthId == userId).ToListAsync();
+            List<AddressViewModel> addresses = await resourceDbContext.Addresses.Where(a => a.User.AuthId == userId).Select(a => new AddressViewModel()
+            {
+                First = a.First,
+                Second = a.Second,
+                Zip = a.Zip,
+                City = new() { Id = a.City.Id.ToString(), Name = a.City.Name },
+                Country = new() { Id = a.City.Country.Id.ToString(), Name = a.City.Name }
+            }).ToListAsync();
             return Ok(addresses);
         }
 

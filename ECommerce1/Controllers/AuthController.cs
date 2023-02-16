@@ -344,7 +344,7 @@ namespace ECommerce1.Controllers
 
             if (oldEmail == newEmail)
             {
-                return BadRequest(new
+                return Ok(new
                 {
                     error_message = "New email must be different from old one"
                 });
@@ -438,7 +438,7 @@ namespace ECommerce1.Controllers
 
             if (user.PhoneNumber == phone)
             {
-                return BadRequest(new
+                return Ok(new
                 {
                     error_message = "New phone number must be different from old one"
                 });
