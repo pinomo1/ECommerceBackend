@@ -77,11 +77,10 @@
             <param name="code">Generated code</param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.AuthController.ChangeEmailAsync(System.String,System.String)">
+        <member name="M:ECommerce1.Controllers.AuthController.ChangeEmailAsync(System.String)">
             <summary>
             Send link to email to change email
             </summary>
-            <param name="oldEmail"></param>
             <param name="newEmail"></param>
             <returns></returns>
         </member>
@@ -94,11 +93,10 @@
             <param name="code"></param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.AuthController.ChangePhoneAsync(System.String,System.String)">
+        <member name="M:ECommerce1.Controllers.AuthController.ChangePhoneAsync(System.String)">
             <summary>
             Send link to email to change phone number
             </summary>
-            <param name="email"></param>
             <param name="phone"></param>
             <returns></returns>
         </member>

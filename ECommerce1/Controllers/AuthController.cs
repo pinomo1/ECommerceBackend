@@ -320,11 +320,11 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Send link to email to change email
         /// </summary>
-        /// <param name="oldEmail"></param>
         /// <param name="newEmail"></param>
         /// <returns></returns>
         [HttpGet("changemail")]
-        public async Task<IActionResult> ChangeEmailAsync(string oldEmail, string newEmail)
+        [Authorize]
+        public async Task<IActionResult> ChangeEmailAsync(string newEmail)
         {
             if (!Regex.IsMatch(newEmail, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z"))
             {
@@ -333,14 +333,23 @@ namespace ECommerce1.Controllers
                     error_message = "Not email"
                 });
             }
-            AuthUser? user = await userManager.FindByEmailAsync(oldEmail);
-            if(user == null)
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (id == null)
             {
                 return BadRequest(new
                 {
                     error_message = "Not logged in"
                 });
             }
+            AuthUser? user = await userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return BadRequest(new
+                {
+                    error_message = "Not logged in"
+                });
+            }
+            string oldEmail = user.Email;
 
             if (oldEmail == newEmail)
             {
@@ -428,28 +437,20 @@ namespace ECommerce1.Controllers
                     error_message = "Not logged in"
                 });
             }
-            AuthUser? authUser = await userManager.FindByIdAsync(id);
-            if (authUser == null)
-            {
-                return BadRequest(new
-                {
-                    error_message = "Not logged in"
-                });
-            }
-            string email = authUser.Email;
-            if (!Regex.IsMatch(phone, @"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"))
-            {
-                return BadRequest(new
-                {
-                    error_message = "Not a phone number"
-                });
-            }
-            AuthUser? user = await userManager.FindByEmailAsync(email);
+            AuthUser? user = await userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return BadRequest(new
                 {
                     error_message = "Not logged in"
+                });
+            }
+            string email = user.Email;
+            if (!Regex.IsMatch(phone, @"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"))
+            {
+                return BadRequest(new
+                {
+                    error_message = "Not a phone number"
                 });
             }
 
@@ -462,7 +463,7 @@ namespace ECommerce1.Controllers
             }
 
             string code = await userManager.GenerateChangePhoneNumberTokenAsync(user, phone);
-            await emailSender.SendEmailAsync(user.Email, "Confirm your phone number change",
+            await emailSender.SendEmailAsync(email, "Confirm your phone number change",
                 $"Confirm your phone number change by clicking on the link: <a href=\"{configuration["Links:Site"]}api/auth/phonechanged?userId={user.Id}&phone={HttpUtility.UrlEncode(phone)}&code={HttpUtility.UrlEncode(code)}\">Confirm phone number</a>");
             return Ok();
         }

@@ -38,7 +38,8 @@ services.AddIdentity<AuthUser, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
 }).AddEntityFrameworkStores<AccountDbContext>()
-.AddTokenProvider<DataProtectorTokenProvider<AuthUser>>(TokenOptions.DefaultProvider);
+.AddTokenProvider<DataProtectorTokenProvider<AuthUser>>(TokenOptions.DefaultProvider)
+.AddTokenProvider<DataProtectorTokenProvider<AuthUser>>(TokenOptions.DefaultPhoneProvider);
 
 services.AddControllers().AddJsonOptions(x =>
 {
