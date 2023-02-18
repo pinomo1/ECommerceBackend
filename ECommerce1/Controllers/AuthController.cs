@@ -437,7 +437,7 @@ namespace ECommerce1.Controllers
                 });
             }
             string email = authUser.Email;
-            if (!Regex.IsMatch(phone, "@\"^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$\""))
+            if (!Regex.IsMatch(phone, @"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"))
             {
                 return BadRequest(new
                 {
@@ -477,7 +477,7 @@ namespace ECommerce1.Controllers
         [HttpGet("phonechanged")]
         public async Task<IActionResult> PhoneChangeAsync(string userId, string phone, string code)
         {
-            if(!Regex.IsMatch(phone, "@\"^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$\""))
+            if(!Regex.IsMatch(phone, @"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"))
             {
                 return BadRequest(new
                 {
