@@ -4,6 +4,7 @@ using ECommerce1.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using System.Security.Claims;
 
 namespace ECommerce1.Controllers
@@ -44,6 +45,30 @@ namespace ECommerce1.Controllers
                 }
             }
             return Ok(user);
+        }
+
+        [HttpPatch("changeMyInfo")]
+        [Authorize("User")]
+        public async Task<IActionResult> ChangeMyInfo(string first, string last, string? middle)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(u => u.AuthId == userId);
+            if (user == null)
+                return BadRequest(new
+                {
+                    error_message = "User not found"
+                });
+            // check if first and last are not empty
+            if (string.IsNullOrEmpty(first) || string.IsNullOrEmpty(last))
+                return BadRequest(new
+                {
+                    error_message = "First and last name cannot be empty"
+                });
+            user.FirstName = first;
+            user.LastName = last;
+            user.MiddleName = middle;
+            await resourceDbContext.SaveChangesAsync();
+            return Ok();
         }
     }
 }
