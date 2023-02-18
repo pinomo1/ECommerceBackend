@@ -198,7 +198,7 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "No such address was found" });
             }
-            IList<CartItem>? products = await resourceDbContext.CartItems.Include(ci => ci.Product).Where(p => p.User.AuthId.ToString() == userId).ToListAsync();
+            IList<CartItem>? products = await resourceDbContext.CartItems.Include(ci => ci.Product).Include(ci => ci.User).Where(p => p.User.AuthId.ToString() == userId).ToListAsync();
             if (products == null)
             {
                 return BadRequest(new { error_message = "No product were found" });
