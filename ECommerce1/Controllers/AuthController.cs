@@ -414,12 +414,29 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Send link to email to change phone number
         /// </summary>
-        /// <param name="email"></param>
         /// <param name="phone"></param>
         /// <returns></returns>
         [HttpGet("changephone")]
-        public async Task<IActionResult> ChangePhoneAsync(string email, string phone)
+        [Authorize]
+        public async Task<IActionResult> ChangePhoneAsync(string phone)
         {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (id == null)
+            {
+                return BadRequest(new
+                {
+                    error_message = "Not logged in"
+                });
+            }
+            AuthUser? authUser = await userManager.FindByIdAsync(id);
+            if (authUser == null)
+            {
+                return BadRequest(new
+                {
+                    error_message = "Not logged in"
+                });
+            }
+            string email = authUser.Email;
             if (!Regex.IsMatch(phone, "@\"^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$\""))
             {
                 return BadRequest(new
