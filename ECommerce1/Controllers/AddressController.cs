@@ -88,7 +88,7 @@ namespace ECommerce1.Controllers
         public async Task<IActionResult> DeleteAddress(string id)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Address? address = await resourceDbContext.Addresses.FirstOrDefaultAsync(a => a.Id.ToString() == id);
+            Address? address = await resourceDbContext.Addresses.Include(a=>a.User).FirstOrDefaultAsync(a => a.Id.ToString() == id);
             if (address == null)
                 return BadRequest(new
                 {
