@@ -42,7 +42,7 @@ namespace ECommerce1.Controllers
         public async Task<ActionResult<IList<CartItemViewModel>>> GetCart()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ToListAsync();
+            List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ThenInclude(ci => ci.ProductPhotos).ToListAsync();
             List<CartItemViewModel> cartItemViewModels = new();
             foreach (var group in cartItems.GroupBy(ci => ci.Product))
             {
