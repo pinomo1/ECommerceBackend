@@ -48,7 +48,7 @@ namespace ECommerce1.Controllers
         }
 
         [HttpPatch("changeMyInfo")]
-        [Authorize("User")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> ChangeMyInfo(string first, string last, string? middle)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -58,7 +58,6 @@ namespace ECommerce1.Controllers
                 {
                     error_message = "User not found"
                 });
-            // check if first and last are not empty
             if (string.IsNullOrEmpty(first) || string.IsNullOrEmpty(last))
                 return BadRequest(new
                 {
