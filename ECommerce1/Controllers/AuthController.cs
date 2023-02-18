@@ -236,6 +236,42 @@ namespace ECommerce1.Controllers
             return Redirect("/opersucc.html");
         }
 
+        [HttpPost("forgotpassword")]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            AuthUser? user = await userManager.FindByEmailAsync(email);
+            if(user == null)
+            {
+                return BadRequest(new
+                {
+                    error_message = "User not found"
+                });
+            }
+            string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            string validDigits = "0123456789";
+            string validOthers = "#?!@$%^&*-_";
+            Random random = new Random();
+            char[] chars = new char[16];
+            for (int i = 0; i < 7; i++)
+            {
+                chars[i] = validChars[random.Next(0, validChars.Length)];
+            }
+            for (int i = 0; i < 7; i++)
+            {
+                chars[7 + i] = validDigits[random.Next(0, validDigits.Length)];
+            }
+            for (int i = 0; i < 2; i++)
+            {
+                chars[14 + i] = validOthers[random.Next(0, validOthers.Length)];
+            }
+            string newPassword = new string(chars);
+            string code = await userManager.GeneratePasswordResetTokenAsync(user);
+            await userManager.ResetPasswordAsync(user, code, newPassword);
+            await emailSender.SendEmailAsync(user.Email, "Reset password",
+                $"You requested password reset, your new password: {newPassword}");
+            return Ok();
+        }
+
         /// <summary>
         /// Resend email confirmation
         /// </summary>
