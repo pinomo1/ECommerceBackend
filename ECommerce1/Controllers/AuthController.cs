@@ -696,7 +696,8 @@ namespace ECommerce1.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 CompanyName = registrationDto.CompanyName,
-                WebsiteUrl = registrationDto.WebsiteUrl
+                WebsiteUrl = registrationDto.WebsiteUrl,
+                ProfilePhotoUrl = "https://itstep-ecommerce.azurewebsites.net/images/default.png"
             };
 
             await resourceDbContext.Sellers.AddAsync(profile);
