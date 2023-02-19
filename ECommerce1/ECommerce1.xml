@@ -400,7 +400,7 @@
             <param name="inStock">true to output only in stock. false to output everyone</param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.ProductController.BySellerId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32,System.Boolean)">
+        <member name="M:ECommerce1.Controllers.ProductController.BySellerId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32,System.Boolean,System.String)">
             <summary>
             Gets list of products by seller's id
             </summary>
@@ -412,6 +412,7 @@
             <param name="fromPrice">Minimum price</param>
             <param name="toPrice">Maximum price</param>
             <param name="inStock">true to output only in stock. false to output everyone</param>
+            <param name="categoryId"></param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.ByCategoryId(System.String,System.String,System.Int32,System.Int32,ECommerce1.Models.ViewModels.ProductsViewModel.ProductSorting,System.Int32,System.Int32,System.Boolean)">

@@ -146,7 +146,7 @@ namespace ECommerce1.Controllers
 
             return Ok(viewModel);
         }
-        
+
 
         /// <summary>
         /// Gets list of products by seller's id
@@ -159,9 +159,10 @@ namespace ECommerce1.Controllers
         /// <param name="fromPrice">Minimum price</param>
         /// <param name="toPrice">Maximum price</param>
         /// <param name="inStock">true to output only in stock. false to output everyone</param>
+        /// <param name="categoryId"></param>
         /// <returns></returns>
         [HttpGet("seller/{guid}")]
-        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
+        public async Task<ActionResult<ProductsViewModel>> BySellerId(string guid, string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false, string? categoryId = null)
         {
             Seller? user = await resourceDbContext.Sellers
                 .FirstOrDefaultAsync(c => c.Id.ToString() == guid);
@@ -180,8 +181,21 @@ namespace ECommerce1.Controllers
                 onPage = 1;
             }
 
+            if(categoryId != null)
+            {
+                Category? category = await resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Id.ToString() == categoryId);
+                if(category == null)
+                {
+                    return NotFound(new { error_message = "No such category exists" });
+                }
+                if(category.AllowProducts == false)
+                {
+                    return BadRequest(new { error_message = "No products here" });
+                }
+            }
+
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
-                .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true))
+                .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true) && (categoryId != null ? p.Category.Id.ToString() == categoryId : true))
                 .Include(p => p.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
