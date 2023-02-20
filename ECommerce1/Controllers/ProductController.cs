@@ -233,7 +233,7 @@ namespace ECommerce1.Controllers
 
             ProductsViewModelBySeller viewModel = new()
             {
-                Products = unorderedProducts,
+                Products = products,
                 Seller = user,
                 TotalProductCount = totalCount,
                 TotalPageCount = totalPages,
@@ -352,7 +352,7 @@ namespace ECommerce1.Controllers
 
             ProductsViewModelByCategory viewModel = new()
             {
-                Products = unorderedProducts,
+                Products = products,
                 Category = category,
                 TotalProductCount = totalCount,
                 TotalPageCount = totalPages,
