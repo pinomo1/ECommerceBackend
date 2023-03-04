@@ -93,8 +93,8 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "No such product exists" });
             }
-            Review? review1 = await resourceDbContext.Reviews.FirstOrDefaultAsync(r => r.User.AuthId == id);
-            if(review1 != null)
+            Review? review1 = await resourceDbContext.Reviews.FirstOrDefaultAsync(r => r.User.AuthId == id && r.Product.Id == product.Id);
+            if (review1 != null)
             {
                 return BadRequest(new
                 {
