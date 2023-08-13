@@ -178,7 +178,7 @@ namespace ECommerce1.Services
                 e.HasIndex(e => e.Email).IsUnique();
 
                 e.HasMany(e => e.Addresses)
-                .WithOne(a => a.User)
+                .WithOne(a => (Profile)(a.User))
                 .OnDelete(DeleteBehavior.Cascade);
 
                 e.HasMany(e => e.CartItems)
@@ -260,6 +260,10 @@ namespace ECommerce1.Services
                 .IsRequired();
 
                 e.HasIndex(e => e.Email).IsUnique();
+
+                e.HasMany(e => e.Addresses)
+                .WithOne(a => (Seller)(a.User))
+                .OnDelete(DeleteBehavior.SetNull);
             });
 
             builder.Entity<Product>(e =>
@@ -312,6 +316,10 @@ namespace ECommerce1.Services
 
                 e.HasKey(e => e.Id);
 
+                e.Property(e => e.Quantity)
+                .IsRequired()
+                .HasDefaultValue(1);
+
                 e.HasOne(e => e.User)
                 .WithMany(e => e.CartItems)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -352,7 +360,12 @@ namespace ECommerce1.Services
                 .WithMany(e => e.Orders)
                 .OnDelete(DeleteBehavior.Cascade);
 
-                e.Property(e => e.AddressCopy)
+                e.Property(e => e.CustomerAddressCopy)
+                .HasColumnType("nvarchar(256)")
+                .HasMaxLength(256)
+                .IsRequired();
+
+                e.Property(e => e.WarehouseAddressCopy)
                 .HasColumnType("nvarchar(256)")
                 .HasMaxLength(256)
                 .IsRequired();

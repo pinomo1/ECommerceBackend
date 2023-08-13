@@ -26,7 +26,7 @@ namespace ECommerce1.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("get_own")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Seller")]
         public async Task<ActionResult<IList<AddressViewModel>>> GetAddresses()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -34,7 +34,7 @@ namespace ECommerce1.Controllers
             {
                 Id = a.Id.ToString(),
                 First = a.First,
-                Second = a.Second,
+                Second = a.Second ?? "",
                 Zip = a.Zip,
                 City = new() { Id = a.City.Id.ToString(), Name = a.City.Name },
                 Country = new() { Id = a.City.Country.Id.ToString(), Name = a.City.Name }
@@ -48,7 +48,7 @@ namespace ECommerce1.Controllers
         /// <param name="address"></param>
         /// <returns></returns>
         [HttpPost("add")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Seller")]
         public async Task<IActionResult> AddAddress(AddAddressViewModel address)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -84,7 +84,7 @@ namespace ECommerce1.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("delete/{id}")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Seller")]
         public async Task<IActionResult> DeleteAddress(string id)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -111,7 +111,7 @@ namespace ECommerce1.Controllers
         /// <param name="address"></param>
         /// <returns></returns>
         [HttpPut("edit")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Seller")]
         public async Task<IActionResult> EditAddress(string addressId, AddAddressViewModel address)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

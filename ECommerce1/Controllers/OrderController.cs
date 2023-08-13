@@ -27,7 +27,7 @@ namespace ECommerce1.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("states")]
-        public async Task<ActionResult<IList<string>>> GetStatesEnum()
+        public ActionResult<IList<string>> GetStatesEnum()
         {
             IDictionary<int, string> names = Enum.GetNames(typeof(OrderStatus)).ToList().Select((s, i) => new { s, i }).ToDictionary(x => x.i + 1, x => x.s);
 
@@ -64,7 +64,7 @@ namespace ECommerce1.Controllers
                 ProductId = ci.Product.Id.ToString(),
                 // Description = ci.Product.Description,
                 Price = ci.Product.Price,
-                AddressCopy = ci.AddressCopy,
+                AddressCopy = ci.CustomerAddressCopy,
                 OrderTime = ci.OrderTime,
                 OrderStatus = ci.OrderStatus,
                 Id = ci.Id
@@ -102,7 +102,7 @@ namespace ECommerce1.Controllers
                 ProductId = ci.Product.Id.ToString(),
                 // Description = ci.Product.Description,
                 Price = ci.Product.Price,
-                AddressCopy = ci.AddressCopy,
+                AddressCopy = ci.CustomerAddressCopy,
                 OrderTime = ci.OrderTime,
                 OrderStatus = ci.OrderStatus,
                 Id = ci.Id
@@ -164,7 +164,7 @@ namespace ECommerce1.Controllers
             {
                 orders.Add(new()
                 {
-                    AddressCopy = address.Normalize(profile.PhoneNumber),
+                    CustomerAddressCopy = address.Normalize(profile.PhoneNumber),
                     OrderTime = DateTime.Now,
                     Product = product,
                     User = profile,
@@ -213,7 +213,7 @@ namespace ECommerce1.Controllers
                 }
                 orders.Add(new()
                 {
-                    AddressCopy = address.Normalize(profile.PhoneNumber),
+                    CustomerAddressCopy = address.Normalize(profile.PhoneNumber),
                     OrderTime = DateTime.Now,
                     Product = item.Product,
                     User = profile,

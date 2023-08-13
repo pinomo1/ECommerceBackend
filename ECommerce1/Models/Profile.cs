@@ -3,7 +3,7 @@
     /// <summary>
     /// This class represents a buyer's profile.
     /// </summary>
-    public class Profile : AUser
+    public class Profile : AddressedUser
     {
         /// <summary>
         /// The first name/name of the buyer.
@@ -17,10 +17,6 @@
         /// The last name/family name/surname of the buyer.
         /// </summary>
         public string LastName { get; set; }
-        /// <summary>
-        /// Address list of the buyer.
-        /// </summary>
-        public IList<Address> Addresses { get; set; }
         /// <summary>
         /// Items that are in cart of the buyer.
         /// </summary>

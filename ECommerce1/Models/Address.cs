@@ -12,7 +12,7 @@
         /// <summary>
         /// The user that owns this address
         /// </summary>
-        public Profile User { get; set; }
+        public AddressedUser User { get; set; }
         /// <summary>
         /// The first line of the address
         /// </summary>
@@ -25,6 +25,10 @@
         /// The zip code of the address
         /// </summary>
         public string Zip { get; set; }
+        /// <summary>
+        /// Products in said address
+        /// </summary>
+        public IList<ProductAddress> Products { get; set; }
 
         public string Normalize()
         {

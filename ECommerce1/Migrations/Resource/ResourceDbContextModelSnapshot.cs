@@ -174,7 +174,7 @@ namespace ECommerce1.Migrations.Resource
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AddressCopy")
+                    b.Property<string>("CustomerAddressCopy")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");

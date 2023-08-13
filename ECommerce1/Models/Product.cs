@@ -54,6 +54,10 @@
         /// Can be used to determine which users have added this product to their favourites
         /// </summary>
         public IList<FavouriteItem> FavouriteItems { get; set; }
+        /// <summary>
+        /// Warehouse addresses of the product
+        /// </summary>
+        public IList<ProductAddress> ProductAddresses { get; set; }
 
         public Product()
         {

@@ -3,7 +3,7 @@
     /// <summary>
     /// Seller is a type of user that can sell products.
     /// </summary>
-    public class Seller : AUser
+    public class Seller : AddressedUser
     {
         /// <summary>
         /// The name of the company that the seller represents.
