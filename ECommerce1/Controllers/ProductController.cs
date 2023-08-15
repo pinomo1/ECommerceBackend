@@ -34,7 +34,7 @@ namespace ECommerce1.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("sorting")]
-        public async Task<ActionResult<IList<string>>> GetSortingEnum()
+        public ActionResult<IList<string>> GetSortingEnum()
         {
             IDictionary<int, string> names = Enum.GetNames(typeof(ProductSorting)).ToList().Select((s, i) => new { s, i }).ToDictionary(x => x.i + 1, x => x.s);
             
@@ -72,7 +72,19 @@ namespace ECommerce1.Controllers
             {
                 return NotFound(new { error_message = "No such product exists" } );
             }
-            return Ok(product);
+
+            IList<ProductAddress> productAddresses = await resourceDbContext.ProductAddresses
+                .Include(pa => pa.Address)
+                .Where(pa => pa.Product == product)
+                .ToListAsync();
+            
+            int quantity = productAddresses.Sum(pa => pa.Quantity);
+
+            return Ok(new {
+                product,
+                productAddresses,
+                quantity
+            });
         }
 
         /// <summary>
@@ -90,19 +102,23 @@ namespace ECommerce1.Controllers
         public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
         {
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
-                .Where(p => (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && p.Price >= fromPrice && p.Price <= toPrice && (inStock == true ? inStock == p.InStock : true))
-                .Include(p => p.Reviews)
+                .Select(p => new {
+                    Product = p,
+                    Quantity = p.ProductAddresses.Sum(pa => pa.Quantity)
+                })
+                .Where(p => (title == null || EF.Functions.Like(p.Product.Name, $"%{title}%")) && p.Product.Price >= fromPrice && p.Product.Price <= toPrice && (inStock != true || p.Quantity > 0))
+                .Include(p => p.Product.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
-                    Id = p.Id,
-                    CreationTime = p.CreationTime,
-                    Description = p.Description,
-                    FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
-                    Name = p.Name,
-                    Price = p.Price,
-                    OrderCount = p.Orders.Count,
-                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
-                    InStock = p.InStock
+                    Id = p.Product.Id,
+                    CreationTime = p.Product.CreationTime,
+                    Description = p.Product.Description,
+                    FirstPhotoUrl = p.Product.ProductPhotos.Count == 0 ? "" : p.Product.ProductPhotos[0].Url,
+                    Name = p.Product.Name,
+                    Price = p.Product.Price,
+                    OrderCount = p.Product.Orders.Count,
+                    Rating = p.Product.Reviews.Count == 0 ? 0 : p.Product.Reviews.Average(r => r.Quality),
+                    Quantity = p.Quantity
                 }).ToListAsync();
             
             if (onPage > 50)
@@ -114,7 +130,7 @@ namespace ECommerce1.Controllers
                 onPage = 1;
             }
 
-            int totalCount = unorderedProducts.Count();
+            int totalCount = unorderedProducts.Count;
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
 
             IEnumerable<ProductsProductViewModel> products;
@@ -135,7 +151,7 @@ namespace ECommerce1.Controllers
             ProductsViewModelByTitle viewModel = new()
             {
                 Products = products,
-                Title = title,
+                Title = title ?? "",
                 TotalProductCount = totalCount,
                 TotalPageCount = totalPages,
                 OnPageProductCount = onPage,
@@ -195,22 +211,26 @@ namespace ECommerce1.Controllers
             }
 
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
-                .Where(p => p.Seller.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true) && (categoryId != null ? p.Category.Id.ToString() == categoryId : true))
-                .Include(p => p.Reviews)
+                .Select(p => new {
+                    Product = p,
+                    Quantity = p.ProductAddresses.Sum(pa => pa.Quantity)
+                })
+                .Where(p => p.Product.Seller.Id.ToString() == guid && p.Product.Price >= fromPrice && p.Product.Price <= toPrice && (title == null || EF.Functions.Like(p.Product.Name, $"%{title}%")) && (inStock != true || p.Quantity > 0) && (categoryId == null || p.Product.Category.Id.ToString() == categoryId))
+                .Include(p => p.Product.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
-                    Id = p.Id,
-                    CreationTime = p.CreationTime,
-                    Description = p.Description,
-                    FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
-                    Name = p.Name,
-                    Price = p.Price,
-                    OrderCount = p.Orders.Count,
-                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
-                    InStock = p.InStock
+                    Id = p.Product.Id,
+                    CreationTime = p.Product.CreationTime,
+                    Description = p.Product.Description,
+                    FirstPhotoUrl = p.Product.ProductPhotos.Count == 0 ? "" : p.Product.ProductPhotos[0].Url,
+                    Name = p.Product.Name,
+                    Price = p.Product.Price,
+                    OrderCount = p.Product.Orders.Count,
+                    Rating = p.Product.Reviews.Count == 0 ? 0 : p.Product.Reviews.Average(r => r.Quality),
+                    Quantity = p.Quantity
                 }).ToListAsync();
 
-            int totalCount = unorderedProducts.Count();
+            int totalCount = unorderedProducts.Count;
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
 
             IEnumerable<ProductsProductViewModel> products;
@@ -259,19 +279,23 @@ namespace ECommerce1.Controllers
             }
 
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
-                .Where(p => p.Category.Id.ToString() == guid && p.Price >= fromPrice && p.Price <= toPrice && (title == null ? true : EF.Functions.Like(p.Name, $"%{title}%")) && (inStock == true ? inStock == p.InStock : true))
-                .Include(p => p.Reviews)
+                .Select(p => new {
+                    Product = p,
+                    Quantity = p.ProductAddresses.Sum(pa => pa.Quantity)
+                })
+                .Where(p => p.Product.Category.Id.ToString() == guid && p.Product.Price >= fromPrice && p.Product.Price <= toPrice && (title == null || EF.Functions.Like(p.Product.Name, $"%{title}%")) && (inStock != true || p.Quantity > 0))
+                .Include(p => p.Product.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
-                    Id = p.Id,
-                    CreationTime = p.CreationTime,
-                    Description = p.Description,
-                    FirstPhotoUrl = p.ProductPhotos.Count == 0 ? "" : p.ProductPhotos[0].Url,
-                    Name = p.Name,
-                    Price = p.Price,
-                    OrderCount = p.Orders.Count,
-                    Rating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Quality),
-                    InStock = p.InStock
+                    Id = p.Product.Id,
+                    CreationTime = p.Product.CreationTime,
+                    Description = p.Product.Description,
+                    FirstPhotoUrl = p.Product.ProductPhotos.Count == 0 ? "" : p.Product.ProductPhotos[0].Url,
+                    Name = p.Product.Name,
+                    Price = p.Product.Price,
+                    OrderCount = p.Product.Orders.Count,
+                    Rating = p.Product.Reviews.Count == 0 ? 0 : p.Product.Reviews.Average(r => r.Quality),
+                    Quantity = p.Quantity
                 }).ToListAsync();
 
             foreach (Category subcategory in category.ChildCategories)
@@ -329,7 +353,7 @@ namespace ECommerce1.Controllers
 
             unorderedProducts = unorderedProducts.Concat(await GetSubcategoriesAndProducts(guid, fromPrice, toPrice, inStock, title)).ToList();
 
-            int totalCount = unorderedProducts.Count();
+            int totalCount = unorderedProducts.Count;
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
 
             IEnumerable<ProductsProductViewModel> products;
@@ -366,9 +390,9 @@ namespace ECommerce1.Controllers
         }
 
         [NonAction]
-        private async Task<ProductPreparation> PrepareProducts(IList<ProductsProductViewModel> unorderedProducts, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
+        private static async Task<ProductPreparation> PrepareProducts(IList<ProductsProductViewModel> unorderedProducts, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.NewerFirst)
         {
-            int totalCount = unorderedProducts.Count();
+            int totalCount = unorderedProducts.Count;
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
             decimal maxPrice = 0, minPrice = 0;
             try
@@ -463,7 +487,7 @@ namespace ECommerce1.Controllers
             }
 
             IEnumerable<string> references = await BlobWorker.AddPublicationPhotos(product.Photos);
-            if (references.Count() == 0)
+            if (!references.Any())
             {
                 return BadRequest(new { error_message = "Photos has not been uploaded" });
             }
@@ -538,10 +562,11 @@ namespace ECommerce1.Controllers
         /// Edit stock of a product, must be seller of that product or admin
         /// </summary>
         /// <param name="guid">Product ID</param>
-        /// <param name="inStock">Boolean, is in stock or not</param>
+        /// <param name="stock">New stock</param>
+        /// <param name="warehouseId">Warehouse ID</param>
         /// <returns></returns>
         [HttpPatch("edit/{guid}/stock")]
-        public async Task<IActionResult> EditStockAsync(string guid, bool inStock)
+        public async Task<IActionResult> EditStockAsync(string guid, string warehouseId, int stock)
         {
             Product? prod = await resourceDbContext.Products.Include(p => p.Seller).FirstOrDefaultAsync(p => p.Id.ToString() == guid);
 
@@ -553,12 +578,37 @@ namespace ECommerce1.Controllers
                 });
             }
 
-            if (User.IsInRole("Seller") && User.FindFirstValue(ClaimTypes.NameIdentifier) != prod.Seller.AuthId)
+            Address? address = await resourceDbContext.Addresses.FirstOrDefaultAsync(p => p.Id.ToString() == warehouseId);
+
+            if (address == null)
             {
-                return BadRequest(new { error_message = "Not your product" });
+                return BadRequest(new
+                {
+                    error_message = "No such address/warehouse exists"
+                });
             }
 
-            prod.InStock = inStock;
+            if (User.IsInRole("Seller") && (User.FindFirstValue(ClaimTypes.NameIdentifier) != prod.Seller.AuthId || User.FindFirstValue(ClaimTypes.NameIdentifier) != address.User.AuthId))
+            {
+                return BadRequest(new { error_message = "Not your product or warehouse" });
+            }
+
+            ProductAddress? warehouse = await resourceDbContext.ProductAddresses.FirstOrDefaultAsync(p => p.Address == address && p.Product == prod);
+
+            if (warehouse == null)
+            {
+                ProductAddress newWarehouse = new()
+                {
+                    Address = address,
+                    Product = prod,
+                    Quantity = stock
+                };
+                await resourceDbContext.ProductAddresses.AddAsync(newWarehouse);
+                await resourceDbContext.SaveChangesAsync();
+                return Ok(prod.Id);
+            }
+
+            warehouse.Quantity = stock;
             await resourceDbContext.SaveChangesAsync();
             return Ok(prod.Id);
         }

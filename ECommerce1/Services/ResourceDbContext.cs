@@ -10,6 +10,7 @@ namespace ECommerce1.Services
             Database.EnsureCreated();
         }
 
+        public DbSet<ProductAddress> ProductAddresses { get; set; }
         public DbSet<FavouriteItem> FavouriteItems { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductPhoto> ProductPhotos { get; set; }
@@ -91,6 +92,27 @@ namespace ECommerce1.Services
                 e.HasOne(e => e.City)
                 .WithMany(e => e.Addresses)
                 .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasMany(e => e.Products)
+                .WithOne(e => e.Address)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<ProductAddress>(e =>
+            {
+                e.HasOne(e => e.Product)
+                .WithMany(e => e.ProductAddresses)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+
+                e.HasOne(e => e.Address)
+                .WithMany(e => e.Products)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+
+                e.Property(e => e.Quantity)
+                .HasDefaultValue(0)
+                .IsRequired();
             });
 
             builder.Entity<Category>(e =>
@@ -248,10 +270,6 @@ namespace ECommerce1.Services
                 .HasColumnType("nvarchar(max)")
                 .IsRequired().HasDefaultValue("/images/default.png");
 
-                e.Property(e => e.WebsiteUrl)
-                .HasColumnType("nvarchar(max)")
-                .IsRequired();
-
                 e.HasIndex(e => e.PhoneNumber).IsUnique();
 
                 e.Property(e => e.Email)
@@ -289,8 +307,8 @@ namespace ECommerce1.Services
                 .HasColumnType("money")
                 .IsRequired();
 
-                e.Property(e => e.InStock)
-                .HasDefaultValue(true);
+                e.HasMany(p => p.ProductAddresses)
+                .WithOne(pa => pa.Product);
 
                 e.HasOne(p => p.Category)
                 .WithMany(c => c.Products)

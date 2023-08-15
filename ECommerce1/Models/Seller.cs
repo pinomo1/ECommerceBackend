@@ -10,10 +10,6 @@
         /// </summary>
         public string CompanyName { get; set; }
         /// <summary>
-        /// The website of the company that the seller represents.
-        /// </summary>
-        public string WebsiteUrl { get; set; }
-        /// <summary>
         /// The URL of the profile photo of the seller.
         /// </summary>
         public string ProfilePhotoUrl { get; set; }

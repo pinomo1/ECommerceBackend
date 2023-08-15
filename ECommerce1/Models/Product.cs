@@ -21,10 +21,6 @@
         /// Product price
         /// </summary>
         public decimal Price { get; set; }
-        /// <summary>
-        /// Whether in stock or not
-        /// </summary>
-        public bool? InStock { get; set; }
 
         /// <summary>
         /// Product category

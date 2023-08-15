@@ -387,10 +387,6 @@ namespace ECommerce1.Migrations.Resource
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValue("/images/default.png");
 
-                    b.Property<string>("WebsiteUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Email")

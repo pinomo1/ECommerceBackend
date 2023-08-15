@@ -201,7 +201,6 @@ namespace ECommerce1.Migrations.Resource
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CompanyName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                    WebsiteUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProfilePhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "/images/default.png"),
                     AuthId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(320)", maxLength: 320, nullable: false),

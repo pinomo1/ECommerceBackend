@@ -82,7 +82,7 @@ namespace ECommerce1.Controllers
             int inCartQuantityNow = await resourceDbContext.CartItems.CountAsync(ci => ci.Product.Id.ToString() == guid && ci.User.AuthId == userId);
             if(quantity > maxProductInCart)
             {
-                return BadRequest(new { error_message = $"Max quantity is {maxProductInCart}" });
+                quantity = maxProductInCart;
             }
             if(quantity < 0)
             {
