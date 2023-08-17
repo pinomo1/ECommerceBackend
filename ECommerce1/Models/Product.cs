@@ -54,6 +54,10 @@
         /// Warehouse addresses of the product
         /// </summary>
         public IList<ProductAddress> ProductAddresses { get; set; }
+        /// <summary>
+        /// Buyers that recently viewed this product
+        /// </summary>
+        public IList<RecentlyViewedItem> RecentlyViewedItems { get; set; }
 
         public Product()
         {
@@ -62,6 +66,7 @@
             CartItems = new List<CartItem>();
             Orders = new List<Order>();
             FavouriteItems = new List<FavouriteItem>();
+            RecentlyViewedItems = new List<RecentlyViewedItem>();
         }
     }
 }

@@ -34,6 +34,11 @@
         /// </summary>
         public IList<FavouriteItem> FavouriteItems { get; set; }
 
+        /// <summary>
+        /// Recently viewed items of the buyer.
+        /// </summary>
+        public IList<RecentlyViewedItem> RecentlyViewedItems { get; set; }
+
         public Profile()
         {
             Addresses = new List<Address>();
@@ -41,6 +46,7 @@
             Orders = new List<Order>();
             Reviews = new List<Review>();
             FavouriteItems = new List<FavouriteItem>();
+            RecentlyViewedItems = new List<RecentlyViewedItem>();
         }
     }
 }

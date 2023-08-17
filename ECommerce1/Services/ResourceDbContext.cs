@@ -25,6 +25,7 @@ namespace ECommerce1.Services
         public DbSet<Order> Orders { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<ReviewPhoto> ReviewPhotos { get; set; }
+        public DbSet<RecentlyViewedItem> RecentlyViewedItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -360,6 +361,22 @@ namespace ECommerce1.Services
 
                 e.HasOne(e => e.Product)
                 .WithMany(e => e.FavouriteItems)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<RecentlyViewedItem>(e =>
+            {
+                e.Property(e => e.Id)
+               .IsRequired();
+
+                e.HasKey(e => e.Id);
+
+                e.HasOne(e => e.User)
+                .WithMany(e => e.RecentlyViewedItems)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(e => e.Product)
+                .WithMany(e => e.RecentlyViewedItems)
                 .OnDelete(DeleteBehavior.Cascade);
             });
 

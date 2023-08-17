@@ -68,9 +68,37 @@ namespace ECommerce1.Controllers
                 .Include(p => p.ProductPhotos)
                 .FirstOrDefaultAsync(p => p.Id.ToString() == guid);
 
-            if(product == null)
+            if (product == null)
             {
-                return NotFound(new { error_message = "No such product exists" } );
+                return NotFound(new { error_message = "No such product exists" });
+            }
+
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Profile? profile = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
+
+            if (profile != null)
+            {
+                List<RecentlyViewedItem> recentlyViewedItems = await resourceDbContext.RecentlyViewedItems.Where(ci => ci.User == profile).Include(ci => ci.Product).ToListAsync();
+                RecentlyViewedItem? recentlyViewedItem = recentlyViewedItems.FirstOrDefault(ci => ci.Product == product);
+                if (recentlyViewedItem == null)
+                {
+                    RecentlyViewedItem newItem = new()
+                    {
+                        Product = product,
+                        User = profile
+                    };
+                    if (recentlyViewedItems.Count > 10)
+                    {
+                        resourceDbContext.RecentlyViewedItems.Remove(recentlyViewedItems[0]);
+                    }
+                    await resourceDbContext.RecentlyViewedItems.AddAsync(newItem);
+                }
+                else
+                {
+                    resourceDbContext.RecentlyViewedItems.Remove(recentlyViewedItem);
+                    await resourceDbContext.RecentlyViewedItems.AddAsync(recentlyViewedItem);
+                }
+                await resourceDbContext.SaveChangesAsync();
             }
 
             IList<ProductAddress> productAddresses = await resourceDbContext.ProductAddresses
