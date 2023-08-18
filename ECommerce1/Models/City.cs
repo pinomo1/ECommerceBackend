@@ -17,11 +17,16 @@
         /// <summary>
         /// Addresses of this city
         /// </summary>
-        public IList<Address> Addresses { get; set; }
+        public IList<UserAddress> UserAddresses { get; set; }
+        /// <summary>
+        /// Warehouses of this city
+        /// </summary>
+        public IList<WarehouseAddress> WarehouseAddresses { get; set; }
 
         public City()
         {
-            Addresses = new List<Address>();
+            UserAddresses = new List<UserAddress>();
+            WarehouseAddresses = new List<WarehouseAddress>();
         }
     }
 }

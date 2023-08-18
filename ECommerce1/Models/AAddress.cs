@@ -1,18 +1,11 @@
 ﻿namespace ECommerce1.Models
 {
-    /// <summary>
-    /// The address of a user
-    /// </summary>
-    public class Address : AModel
+    public abstract class AAddress : AModel
     {
         /// <summary>
         /// The city of the address
         /// </summary>
         public City City { get; set; }
-        /// <summary>
-        /// The user that owns this address
-        /// </summary>
-        public AddressedUser User { get; set; }
         /// <summary>
         /// The first line of the address
         /// </summary>
@@ -25,10 +18,6 @@
         /// The zip code of the address
         /// </summary>
         public string Zip { get; set; }
-        /// <summary>
-        /// Products in said address
-        /// </summary>
-        public IList<ProductAddress> Products { get; set; }
 
         public string Normalize()
         {

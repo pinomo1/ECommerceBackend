@@ -30,7 +30,7 @@ namespace ECommerce1.Controllers
         public async Task<ActionResult<IList<AddressViewModel>>> GetAddresses()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<AddressViewModel> addresses = await resourceDbContext.Addresses.Where(a => a.User.AuthId == userId).Select(a => new AddressViewModel()
+            List<AddressViewModel> addresses = await resourceDbContext.UserAddresses.Where(a => a.User.AuthId == userId).Select(a => new AddressViewModel()
             {
                 Id = a.Id.ToString(),
                 First = a.First,
@@ -65,7 +65,7 @@ namespace ECommerce1.Controllers
                     error_message = "City not found"
                 });
 
-            Address newAddress = new()
+            UserAddress newAddress = new()
             {
                 City = city,
                 User = user,
@@ -73,7 +73,7 @@ namespace ECommerce1.Controllers
                 Second = address.Second,
                 Zip = address.Zip
             };
-            await resourceDbContext.Addresses.AddAsync(newAddress);
+            await resourceDbContext.UserAddresses.AddAsync(newAddress);
             await resourceDbContext.SaveChangesAsync();
             return Ok(newAddress.Id);
         }
@@ -88,18 +88,18 @@ namespace ECommerce1.Controllers
         public async Task<IActionResult> DeleteAddress(string id)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Address? address = await resourceDbContext.Addresses.Include(a=>a.User).FirstOrDefaultAsync(a => a.Id.ToString() == id);
+            UserAddress? address = await resourceDbContext.UserAddresses.Include(a=>a.User).FirstOrDefaultAsync(a => a.Id.ToString() == id);
             if (address == null)
                 return BadRequest(new
                 {
-                    error_message = "Address not found"
+                    error_message = "UserAddress not found"
                 });
             if (address.User.AuthId != userId)
                 return BadRequest(new
                 {
                     error_message = "You are not authorized to delete this address"
                 });
-            resourceDbContext.Addresses.Remove(address);
+            resourceDbContext.UserAddresses.Remove(address);
             await resourceDbContext.SaveChangesAsync();
             return Ok();
         }
@@ -115,11 +115,11 @@ namespace ECommerce1.Controllers
         public async Task<IActionResult> EditAddress(string addressId, AddAddressViewModel address)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Address? oldAddress = await resourceDbContext.Addresses.Include(a => a.User).FirstOrDefaultAsync(a => a.Id.ToString() == addressId);
+            UserAddress? oldAddress = await resourceDbContext.UserAddresses.Include(a => a.User).FirstOrDefaultAsync(a => a.Id.ToString() == addressId);
             if (oldAddress == null)
                 return BadRequest(new
                 {
-                    error_message = "Address not found"
+                    error_message = "UserAddress not found"
                 });
             if (oldAddress.User.AuthId != userId)
                 return BadRequest(new

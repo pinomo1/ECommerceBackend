@@ -77,7 +77,7 @@ namespace ECommerce1.Migrations.Resource
                 defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
 
             migrationBuilder.CreateTable(
-                name: "Addresses",
+                name: "UserAddresses",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -252,12 +252,12 @@ namespace ECommerce1.Migrations.Resource
 
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_CityId",
-                table: "Addresses",
+                table: "UserAddresses",
                 column: "CityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_UserId",
-                table: "Addresses",
+                table: "UserAddresses",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -353,7 +353,7 @@ namespace ECommerce1.Migrations.Resource
                 table: "Products");
 
             migrationBuilder.DropTable(
-                name: "Addresses");
+                name: "UserAddresses");
 
             migrationBuilder.DropTable(
                 name: "CartItems");

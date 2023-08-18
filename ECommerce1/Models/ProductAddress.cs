@@ -10,7 +10,7 @@
         /// <summary>
         /// Address of the product
         /// </summary>
-        public Address Address { get; set; }
+        public WarehouseAddress Address { get; set; }
 
         /// <summary>
         /// Product that this address is for

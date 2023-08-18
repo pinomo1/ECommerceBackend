@@ -67,6 +67,7 @@
             Orders = new List<Order>();
             FavouriteItems = new List<FavouriteItem>();
             RecentlyViewedItems = new List<RecentlyViewedItem>();
+            ProductAddresses = new List<ProductAddress>();
         }
     }
 }

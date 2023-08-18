@@ -18,7 +18,8 @@ namespace ECommerce1.Services
         public DbSet<Staff> Staffs { get; set; }
         public DbSet<Seller> Sellers { get; set; }
         public DbSet<Profile> Profiles { get; set; }
-        public DbSet<Address> Addresses { get; set; }
+        public DbSet<UserAddress> UserAddresses { get; set; }
+        public DbSet<WarehouseAddress> WarehouseAddresses { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
@@ -44,7 +45,7 @@ namespace ECommerce1.Services
                 .WithMany(p => p.Cities)
                 .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasMany(c => c.Addresses)
+                e.HasMany(c => c.UserAddresses)
                 .WithOne(a => a.City)
                 .OnDelete(DeleteBehavior.Cascade);
             });
@@ -67,7 +68,7 @@ namespace ECommerce1.Services
                 e.HasIndex(e => e.Name).IsUnique();
             });
 
-            builder.Entity<Address>(e =>
+            builder.Entity<UserAddress>(e =>
             {
                 e.Property(e => e.First)
                 .HasColumnType("nvarchar(256)")
@@ -91,25 +92,53 @@ namespace ECommerce1.Services
                 .OnDelete(DeleteBehavior.Cascade);
 
                 e.HasOne(e => e.City)
+                .WithMany(e => e.UserAddresses)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<WarehouseAddress>(e =>
+            {
+                e.Property(e => e.First)
+                .HasColumnType("nvarchar(256)")
+                .HasMaxLength(256).IsRequired();
+
+                e.Property(e => e.Second)
+                .HasColumnType("nvarchar(256)")
+                .HasMaxLength(256);
+
+                e.Property(e => e.Zip)
+                .HasColumnType("nvarchar(8)")
+                .HasMaxLength(8).IsRequired();
+
+                e.Property(e => e.Id)
+                .IsRequired();
+
+                e.HasKey(e => e.Id);
+
+                e.HasOne(e => e.User)
                 .WithMany(e => e.Addresses)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(e => e.City)
+                .WithMany(e => e.WarehouseAddresses)
                 .OnDelete(DeleteBehavior.Cascade);
 
                 e.HasMany(e => e.Products)
                 .WithOne(e => e.Address)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.SetNull);
             });
 
             builder.Entity<ProductAddress>(e =>
             {
                 e.HasOne(e => e.Product)
                 .WithMany(e => e.ProductAddresses)
-                .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
                 e.HasOne(e => e.Address)
                 .WithMany(e => e.Products)
-                .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
                 e.Property(e => e.Quantity)
                 .HasDefaultValue(0)
@@ -201,7 +230,7 @@ namespace ECommerce1.Services
                 e.HasIndex(e => e.Email).IsUnique();
 
                 e.HasMany(e => e.Addresses)
-                .WithOne(a => (Profile)(a.User))
+                .WithOne(a => a.User)
                 .OnDelete(DeleteBehavior.Cascade);
 
                 e.HasMany(e => e.CartItems)
@@ -281,8 +310,8 @@ namespace ECommerce1.Services
                 e.HasIndex(e => e.Email).IsUnique();
 
                 e.HasMany(e => e.Addresses)
-                .WithOne(a => (Seller)(a.User))
-                .OnDelete(DeleteBehavior.SetNull);
+                .WithOne(a => a.User)
+                .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Product>(e =>
@@ -309,7 +338,8 @@ namespace ECommerce1.Services
                 .IsRequired();
 
                 e.HasMany(p => p.ProductAddresses)
-                .WithOne(pa => pa.Product);
+                .WithOne(pa => pa.Product)
+                .IsRequired();
 
                 e.HasOne(p => p.Category)
                 .WithMany(c => c.Products)

@@ -606,7 +606,7 @@ namespace ECommerce1.Controllers
                 });
             }
 
-            Address? address = await resourceDbContext.Addresses.FirstOrDefaultAsync(p => p.Id.ToString() == warehouseId);
+            WarehouseAddress? address = await resourceDbContext.WarehouseAddresses.FirstOrDefaultAsync(p => p.Id.ToString() == warehouseId);
 
             if (address == null)
             {

@@ -144,7 +144,7 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "No such profile was found" });
             }
-            Address? address = await resourceDbContext.Addresses.Include(a => a.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(a => a.User.AuthId == userId && a.Id.ToString() == addressGuid);
+            UserAddress? address = await resourceDbContext.UserAddresses.Include(a => a.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(a => a.User.AuthId == userId && a.Id.ToString() == addressGuid);
             if(address == null)
             {
                 return BadRequest(new { error_message = "No such address was found" });
@@ -204,7 +204,7 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "No such profile was found" });
             }
-            Address? address = await resourceDbContext.Addresses.Include(a => a.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(a => a.User.AuthId == userId && a.Id.ToString() == addressGuid);
+            UserAddress? address = await resourceDbContext.UserAddresses.Include(a => a.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(a => a.User.AuthId == userId && a.Id.ToString() == addressGuid);
             if (address == null)
             {
                 return BadRequest(new { error_message = "No such address was found" });
