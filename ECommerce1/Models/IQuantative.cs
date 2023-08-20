@@ -1,9 +1,6 @@
 ﻿namespace ECommerce1.Models
 {
-    /// <summary>
-    /// This class represents a cart item.
-    /// </summary>
-    public class CartItem : AItemUser, IQuantative
+    public interface IQuantative
     {
         /// <summary>
         /// Quantity of the product

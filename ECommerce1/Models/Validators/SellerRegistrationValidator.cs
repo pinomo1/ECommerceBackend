@@ -23,9 +23,6 @@ namespace ECommerce1.Models.Validators
                 .Matches(@"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$").WithMessage("Not valid phone number");
             RuleFor(c => c.CompanyName)
                 .ValidCheckString("Company name", 3, 64);
-            RuleFor(c => c.WebsiteUrl)
-                .ValidCheckString("Company site", 4, 1024)
-                .Matches(@"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,16}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)").WithMessage("Not valid URL");
         }
     }
 }

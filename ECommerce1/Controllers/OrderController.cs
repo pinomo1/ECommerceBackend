@@ -27,7 +27,7 @@ namespace ECommerce1.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("states")]
-        public async Task<ActionResult<IList<string>>> GetStatesEnum()
+        public ActionResult<IList<string>> GetStatesEnum()
         {
             IDictionary<int, string> names = Enum.GetNames(typeof(OrderStatus)).ToList().Select((s, i) => new { s, i }).ToDictionary(x => x.i + 1, x => x.s);
 
@@ -59,12 +59,12 @@ namespace ECommerce1.Controllers
             List<OrdersOrderViewModel> cartItems = await resourceDbContext.Orders.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).Skip((page-1) * 20).Take(20).Select(ci=>new OrdersOrderViewModel()
             {
                 UserId = ci.User.Id.ToString(),
-                InStock = ci.Product.InStock,
+                Qunatity = ci.Quantity,
                 ProductName = ci.Product.Name,
                 ProductId = ci.Product.Id.ToString(),
                 // Description = ci.Product.Description,
                 Price = ci.Product.Price,
-                AddressCopy = ci.AddressCopy,
+                AddressCopy = ci.CustomerAddressCopy,
                 OrderTime = ci.OrderTime,
                 OrderStatus = ci.OrderStatus,
                 Id = ci.Id
@@ -94,19 +94,21 @@ namespace ECommerce1.Controllers
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             int count = await resourceDbContext.Orders.Where(ci => ci.User.AuthId == userId).CountAsync();
-            List<OrdersOrderViewModel> cartItems = await resourceDbContext.Orders.Where(ci => ci.Product.Seller.AuthId == userId).Include(ci => ci.Product).OrderByDescending(o => o.OrderTime).Skip((page-1)*20).Take(20).Select(ci => new OrdersOrderViewModel()
-            {
-                UserId = ci.User.Id.ToString(),
-                InStock = ci.Product.InStock,
-                ProductName = ci.Product.Name,
-                ProductId = ci.Product.Id.ToString(),
-                // Description = ci.Product.Description,
-                Price = ci.Product.Price,
-                AddressCopy = ci.AddressCopy,
-                OrderTime = ci.OrderTime,
-                OrderStatus = ci.OrderStatus,
-                Id = ci.Id
-            }).ToListAsync();
+            List<OrdersOrderViewModel> cartItems = await resourceDbContext.Orders.Where(ci => ci.Product.Seller.AuthId == userId)
+                .Include(ci => ci.Product)
+                .OrderByDescending(o => o.OrderTime).Skip((page-1)*20).Take(20).Select(ci => new OrdersOrderViewModel()
+                {
+                    UserId = ci.User.Id.ToString(),
+                    Qunatity = ci.Quantity,
+                    ProductName = ci.Product.Name,
+                    ProductId = ci.Product.Id.ToString(),
+                    // Description = ci.Product.Description,
+                    Price = ci.Product.Price,
+                    AddressCopy = ci.CustomerAddressCopy,
+                    OrderTime = ci.OrderTime,
+                    OrderStatus = ci.OrderStatus,
+                    Id = ci.Id
+                }).ToListAsync();
             return Ok(new OrderViewModel()
             {
                 CurrentPage = page,
@@ -132,10 +134,9 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "Quantity must be at least 1" });
             }
-            if(quantity > 100)
+            if(quantity > 99)
             {
-                // TODO: put max quantity in appsettings
-                return BadRequest(new { error_message = $"Max quantity is 100" });
+                return BadRequest(new { error_message = $"Max quantity is 99" });
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? profile = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
@@ -143,7 +144,7 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "No such profile was found" });
             }
-            Address? address = await resourceDbContext.Addresses.Include(a => a.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(a => a.User.AuthId == userId && a.Id.ToString() == addressGuid);
+            UserAddress? address = await resourceDbContext.UserAddresses.Include(a => a.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(a => a.User.AuthId == userId && a.Id.ToString() == addressGuid);
             if(address == null)
             {
                 return BadRequest(new { error_message = "No such address was found" });
@@ -153,23 +154,33 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "No such product was found" });
             }
-            if(product.InStock == false)
+            IList<ProductAddress> productAddresses = await resourceDbContext.ProductAddresses.Where(pa => pa.Product == product).ToListAsync();
+            int productStock = await resourceDbContext.ProductAddresses.Where(pa => pa.Product == product).SumAsync(pa => pa.Quantity);
+            if(productStock < quantity)
             {
-                return BadRequest(new { error_message = "Product is not in stock" });
+                return BadRequest(new { error_message = "There is not enough of product" });
             }
 
             List<Order> orders = new();
 
-            for (int i = 0; i < quantity; i++)
+            foreach (ProductAddress productAddress in productAddresses)
             {
+                int quantityToTake = Math.Min(quantity, productAddress.Quantity);
+                quantity -= quantityToTake;
                 orders.Add(new()
                 {
-                    AddressCopy = address.Normalize(profile.PhoneNumber),
+                    CustomerAddressCopy = address.Normalize(profile.PhoneNumber),
+                    WarehouseAddressCopy = productAddress.Address.Normalize(),
                     OrderTime = DateTime.Now,
                     Product = product,
                     User = profile,
+                    Quantity = quantityToTake,
                     OrderStatus = (int)OrderStatus.Unverified
                 });
+                if (quantity == 0)
+                {
+                    break;
+                }
             }
 
             await resourceDbContext.Orders.AddRangeAsync(orders);
@@ -193,7 +204,7 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "No such profile was found" });
             }
-            Address? address = await resourceDbContext.Addresses.Include(a => a.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(a => a.User.AuthId == userId && a.Id.ToString() == addressGuid);
+            UserAddress? address = await resourceDbContext.UserAddresses.Include(a => a.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(a => a.User.AuthId == userId && a.Id.ToString() == addressGuid);
             if (address == null)
             {
                 return BadRequest(new { error_message = "No such address was found" });
@@ -207,18 +218,32 @@ namespace ECommerce1.Controllers
 
             foreach (var item in products)
             {
-                if(item.Product.InStock == false)
+                IList<ProductAddress> productAddresses = await resourceDbContext.ProductAddresses.Where(pa => pa.Product == item.Product).ToListAsync();
+                int quantity = item.Quantity;
+                int productStock = await resourceDbContext.ProductAddresses.Where(pa => pa.Product == item.Product).SumAsync(pa => pa.Quantity);
+                if (productStock < quantity)
                 {
-                    return BadRequest(new { error_message = "One of the products is not in stock" });
+                    return BadRequest(new { error_message = "There is not enough of product" });
                 }
-                orders.Add(new()
+                foreach (ProductAddress productAddress in productAddresses)
                 {
-                    AddressCopy = address.Normalize(profile.PhoneNumber),
-                    OrderTime = DateTime.Now,
-                    Product = item.Product,
-                    User = profile,
-                    OrderStatus = (int)OrderStatus.Unverified
-                });
+                    int quantityToTake = Math.Min(quantity, productAddress.Quantity);
+                    quantity -= quantityToTake;
+                    orders.Add(new()
+                    {
+                        CustomerAddressCopy = address.Normalize(profile.PhoneNumber),
+                        WarehouseAddressCopy = productAddress.Address.Normalize(),
+                        OrderTime = DateTime.Now,
+                        Product = item.Product,
+                        User = profile,
+                        Quantity = quantityToTake,
+                        OrderStatus = (int)OrderStatus.Unverified
+                    });
+                    if (quantity == 0)
+                    {
+                        break;
+                    }
+                }
             }
 
             await resourceDbContext.Orders.AddRangeAsync(orders);

@@ -9,9 +9,5 @@
         /// The company name.
         /// </summary>
         public string CompanyName { get; set; }
-        /// <summary>
-        /// The website URL.
-        /// </summary>
-        public string WebsiteUrl { get; set; }
     }
 }

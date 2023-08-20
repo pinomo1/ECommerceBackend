@@ -77,7 +77,7 @@ namespace ECommerce1.Migrations.Resource
                 defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
 
             migrationBuilder.CreateTable(
-                name: "Addresses",
+                name: "UserAddresses",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -201,7 +201,6 @@ namespace ECommerce1.Migrations.Resource
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CompanyName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                    WebsiteUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProfilePhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "/images/default.png"),
                     AuthId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(320)", maxLength: 320, nullable: false),
@@ -253,12 +252,12 @@ namespace ECommerce1.Migrations.Resource
 
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_CityId",
-                table: "Addresses",
+                table: "UserAddresses",
                 column: "CityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_UserId",
-                table: "Addresses",
+                table: "UserAddresses",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -354,7 +353,7 @@ namespace ECommerce1.Migrations.Resource
                 table: "Products");
 
             migrationBuilder.DropTable(
-                name: "Addresses");
+                name: "UserAddresses");
 
             migrationBuilder.DropTable(
                 name: "CartItems");

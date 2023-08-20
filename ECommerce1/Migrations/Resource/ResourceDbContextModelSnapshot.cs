@@ -22,41 +22,6 @@ namespace ECommerce1.Migrations.Resource
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("ECommerce1.Models.Address", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CityId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("First")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("Second")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Zip")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CityId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Addresses");
-                });
-
             modelBuilder.Entity("ECommerce1.Models.CartItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -65,6 +30,11 @@ namespace ECommerce1.Migrations.Resource
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -174,7 +144,7 @@ namespace ECommerce1.Migrations.Resource
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AddressCopy")
+                    b.Property<string>("CustomerAddressCopy")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -192,8 +162,16 @@ namespace ECommerce1.Migrations.Resource
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("WarehouseAddressCopy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
@@ -222,11 +200,6 @@ namespace ECommerce1.Migrations.Resource
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("InStock")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -245,6 +218,32 @@ namespace ECommerce1.Migrations.Resource
                     b.HasIndex("SellerId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("ECommerce1.Models.ProductAddress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductAddresses");
                 });
 
             modelBuilder.Entity("ECommerce1.Models.ProductPhoto", b =>
@@ -310,6 +309,27 @@ namespace ECommerce1.Migrations.Resource
                         .IsUnique();
 
                     b.ToTable("Profiles");
+                });
+
+            modelBuilder.Entity("ECommerce1.Models.RecentlyViewedItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RecentlyViewedItems");
                 });
 
             modelBuilder.Entity("ECommerce1.Models.Review", b =>
@@ -390,10 +410,6 @@ namespace ECommerce1.Migrations.Resource
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValue("/images/default.png");
 
-                    b.Property<string>("WebsiteUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
@@ -441,23 +457,74 @@ namespace ECommerce1.Migrations.Resource
                     b.ToTable("Staffs");
                 });
 
-            modelBuilder.Entity("ECommerce1.Models.Address", b =>
+            modelBuilder.Entity("ECommerce1.Models.UserAddress", b =>
                 {
-                    b.HasOne("ECommerce1.Models.City", "City")
-                        .WithMany("Addresses")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasOne("ECommerce1.Models.Profile", "User")
-                        .WithMany("Addresses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("CityId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Navigation("City");
+                    b.Property<string>("First")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
-                    b.Navigation("User");
+                    b.Property<string>("Second")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Zip")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserAddresses");
+                });
+
+            modelBuilder.Entity("ECommerce1.Models.WarehouseAddress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("First")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Second")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Zip")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WarehouseAddresses");
                 });
 
             modelBuilder.Entity("ECommerce1.Models.CartItem", b =>
@@ -556,6 +623,25 @@ namespace ECommerce1.Migrations.Resource
                     b.Navigation("Seller");
                 });
 
+            modelBuilder.Entity("ECommerce1.Models.ProductAddress", b =>
+                {
+                    b.HasOne("ECommerce1.Models.WarehouseAddress", "Address")
+                        .WithMany("Products")
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce1.Models.Product", "Product")
+                        .WithMany("ProductAddresses")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("ECommerce1.Models.ProductPhoto", b =>
                 {
                     b.HasOne("ECommerce1.Models.Product", "Product")
@@ -565,6 +651,25 @@ namespace ECommerce1.Migrations.Resource
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ECommerce1.Models.RecentlyViewedItem", b =>
+                {
+                    b.HasOne("ECommerce1.Models.Product", "Product")
+                        .WithMany("RecentlyViewedItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce1.Models.Profile", "User")
+                        .WithMany("RecentlyViewedItems")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ECommerce1.Models.Review", b =>
@@ -597,6 +702,44 @@ namespace ECommerce1.Migrations.Resource
                     b.Navigation("Review");
                 });
 
+            modelBuilder.Entity("ECommerce1.Models.UserAddress", b =>
+                {
+                    b.HasOne("ECommerce1.Models.City", "City")
+                        .WithMany("UserAddresses")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce1.Models.Profile", "User")
+                        .WithMany("Addresses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ECommerce1.Models.WarehouseAddress", b =>
+                {
+                    b.HasOne("ECommerce1.Models.City", "City")
+                        .WithMany("WarehouseAddresses")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce1.Models.Seller", "User")
+                        .WithMany("Addresses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ECommerce1.Models.Category", b =>
                 {
                     b.Navigation("ChildCategories");
@@ -606,7 +749,9 @@ namespace ECommerce1.Migrations.Resource
 
             modelBuilder.Entity("ECommerce1.Models.City", b =>
                 {
-                    b.Navigation("Addresses");
+                    b.Navigation("UserAddresses");
+
+                    b.Navigation("WarehouseAddresses");
                 });
 
             modelBuilder.Entity("ECommerce1.Models.Country", b =>
@@ -622,7 +767,11 @@ namespace ECommerce1.Migrations.Resource
 
                     b.Navigation("Orders");
 
+                    b.Navigation("ProductAddresses");
+
                     b.Navigation("ProductPhotos");
+
+                    b.Navigation("RecentlyViewedItems");
 
                     b.Navigation("Reviews");
                 });
@@ -637,6 +786,8 @@ namespace ECommerce1.Migrations.Resource
 
                     b.Navigation("Orders");
 
+                    b.Navigation("RecentlyViewedItems");
+
                     b.Navigation("Reviews");
                 });
 
@@ -646,6 +797,13 @@ namespace ECommerce1.Migrations.Resource
                 });
 
             modelBuilder.Entity("ECommerce1.Models.Seller", b =>
+                {
+                    b.Navigation("Addresses");
+
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("ECommerce1.Models.WarehouseAddress", b =>
                 {
                     b.Navigation("Products");
                 });

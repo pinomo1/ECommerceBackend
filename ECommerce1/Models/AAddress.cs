@@ -1,18 +1,11 @@
 ﻿namespace ECommerce1.Models
 {
-    /// <summary>
-    /// The address of a user
-    /// </summary>
-    public class Address : AModel
+    public abstract class AAddress : AModel
     {
         /// <summary>
         /// The city of the address
         /// </summary>
         public City City { get; set; }
-        /// <summary>
-        /// The user that owns this address
-        /// </summary>
-        public Profile User { get; set; }
         /// <summary>
         /// The first line of the address
         /// </summary>

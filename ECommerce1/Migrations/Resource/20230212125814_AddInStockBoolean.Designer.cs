@@ -24,7 +24,7 @@ namespace ECommerce1.Migrations.Resource
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("ECommerce1.Models.Address", b =>
+            modelBuilder.Entity("ECommerce1.Models.UserAddress", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -56,7 +56,7 @@ namespace ECommerce1.Migrations.Resource
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("UserAddresses");
                 });
 
             modelBuilder.Entity("ECommerce1.Models.CartItem", b =>
@@ -176,7 +176,7 @@ namespace ECommerce1.Migrations.Resource
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AddressCopy")
+                    b.Property<string>("CustomerAddressCopy")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -392,10 +392,6 @@ namespace ECommerce1.Migrations.Resource
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValue("/images/default.png");
 
-                    b.Property<string>("WebsiteUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
@@ -443,16 +439,16 @@ namespace ECommerce1.Migrations.Resource
                     b.ToTable("Staffs");
                 });
 
-            modelBuilder.Entity("ECommerce1.Models.Address", b =>
+            modelBuilder.Entity("ECommerce1.Models.UserAddress", b =>
                 {
                     b.HasOne("ECommerce1.Models.City", "City")
-                        .WithMany("Addresses")
+                        .WithMany("UserAddresses")
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ECommerce1.Models.Profile", "User")
-                        .WithMany("Addresses")
+                        .WithMany("UserAddresses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -608,7 +604,7 @@ namespace ECommerce1.Migrations.Resource
 
             modelBuilder.Entity("ECommerce1.Models.City", b =>
                 {
-                    b.Navigation("Addresses");
+                    b.Navigation("UserAddresses");
                 });
 
             modelBuilder.Entity("ECommerce1.Models.Country", b =>
@@ -631,7 +627,7 @@ namespace ECommerce1.Migrations.Resource
 
             modelBuilder.Entity("ECommerce1.Models.Profile", b =>
                 {
-                    b.Navigation("Addresses");
+                    b.Navigation("UserAddresses");
 
                     b.Navigation("CartItems");
 

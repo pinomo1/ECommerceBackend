@@ -48,7 +48,7 @@
         /// <summary>
         /// Whether in stock or not
         /// </summary>
-        public bool? InStock { get; set; }
+        public int Qunatity { get; set; }
         /// <summary>
         /// Copy of the full address instead of address object
         /// </summary>

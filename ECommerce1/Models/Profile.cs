@@ -18,10 +18,6 @@
         /// </summary>
         public string LastName { get; set; }
         /// <summary>
-        /// Address list of the buyer.
-        /// </summary>
-        public IList<Address> Addresses { get; set; }
-        /// <summary>
         /// Items that are in cart of the buyer.
         /// </summary>
         public IList<CartItem> CartItems { get; set; }
@@ -38,13 +34,23 @@
         /// </summary>
         public IList<FavouriteItem> FavouriteItems { get; set; }
 
+        /// <summary>
+        /// Recently viewed items of the buyer.
+        /// </summary>
+        public IList<RecentlyViewedItem> RecentlyViewedItems { get; set; }
+        // <summary>
+        // Address list of the buyer.
+        // </summary>
+        public IList<UserAddress> Addresses { get; set; }
+
         public Profile()
         {
-            Addresses = new List<Address>();
+            Addresses = new List<UserAddress>();
             CartItems = new List<CartItem>();
             Orders = new List<Order>();
             Reviews = new List<Review>();
             FavouriteItems = new List<FavouriteItem>();
+            RecentlyViewedItems = new List<RecentlyViewedItem>();
         }
     }
 }

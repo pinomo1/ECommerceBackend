@@ -21,10 +21,6 @@
         /// Product price
         /// </summary>
         public decimal Price { get; set; }
-        /// <summary>
-        /// Whether in stock or not
-        /// </summary>
-        public bool? InStock { get; set; }
 
         /// <summary>
         /// Product category
@@ -54,6 +50,14 @@
         /// Can be used to determine which users have added this product to their favourites
         /// </summary>
         public IList<FavouriteItem> FavouriteItems { get; set; }
+        /// <summary>
+        /// Warehouse addresses of the product
+        /// </summary>
+        public IList<ProductAddress> ProductAddresses { get; set; }
+        /// <summary>
+        /// Buyers that recently viewed this product
+        /// </summary>
+        public IList<RecentlyViewedItem> RecentlyViewedItems { get; set; }
 
         public Product()
         {
@@ -62,6 +66,8 @@
             CartItems = new List<CartItem>();
             Orders = new List<Order>();
             FavouriteItems = new List<FavouriteItem>();
+            RecentlyViewedItems = new List<RecentlyViewedItem>();
+            ProductAddresses = new List<ProductAddress>();
         }
     }
 }

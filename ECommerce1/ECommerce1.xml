@@ -170,20 +170,6 @@
             <param name="quantity">Quantity desired in total</param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.CartController.AddToCart(System.String)">
-            <summary>
-            Add item to cart
-            </summary>
-            <param name="guid">Product ID</param>
-            <returns></returns>
-        </member>
-        <member name="M:ECommerce1.Controllers.CartController.RemoveFromCart(System.String)">
-            <summary>
-            Remove item from cart
-            </summary>
-            <param name="guid">Product's ID, not CartItem's</param>
-            <returns></returns>
-        </member>
         <member name="M:ECommerce1.Controllers.CategoryController.AddMainCategory(System.String)">
             <summary>
             Adds main category (main category is a category that has no parent category)
@@ -449,12 +435,13 @@
             <param name="product"></param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.ProductController.EditStockAsync(System.String,System.Boolean)">
+        <member name="M:ECommerce1.Controllers.ProductController.EditStockAsync(System.String,System.String,System.Int32)">
             <summary>
             Edit stock of a product, must be seller of that product or admin
             </summary>
             <param name="guid">Product ID</param>
-            <param name="inStock">Boolean, is in stock or not</param>
+            <param name="stock">New stock</param>
+            <param name="warehouseId">Warehouse ID</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ProductController.EditPhotosAsync(System.String,Microsoft.AspNetCore.Http.IFormFile[])">
@@ -483,6 +470,19 @@
             <summary>
             Return any authorized user's info
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.RecentlyViewedController.GetRecentlyViewed">
+            <summary>
+            Get all recently viewed items
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.RecentlyViewedController.RemoveFromRecentlyViewed(System.String)">
+            <summary>
+            Remove item from recently viewed list
+            </summary>
+            <param name="guid">Product's ID, not RecentlyViewedItem's ID</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ReviewController.GetByProductId(System.String,System.Int32,System.Int32)">
@@ -522,32 +522,50 @@
             <param name="picture"></param>
             <returns></returns>
         </member>
-        <member name="T:ECommerce1.Models.Address">
+        <member name="M:ECommerce1.Controllers.WarehouseController.GetAddresses">
             <summary>
-            The address of a user
+            Get all your own addresses (as a user)
             </summary>
+            <returns></returns>
         </member>
-        <member name="P:ECommerce1.Models.Address.City">
+        <member name="M:ECommerce1.Controllers.WarehouseController.AddAddress(ECommerce1.Models.ViewModels.AddAddressViewModel)">
+            <summary>
+            Add address to address list
+            </summary>
+            <param name="address"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.WarehouseController.DeleteAddress(System.String)">
+            <summary>
+            Delete address from address list
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.WarehouseController.EditAddress(System.String,ECommerce1.Models.ViewModels.AddAddressViewModel)">
+            <summary>
+            Edit existing address
+            </summary>
+            <param name="addressId"></param>
+            <param name="address"></param>
+            <returns></returns>
+        </member>
+        <member name="P:ECommerce1.Models.AAddress.City">
             <summary>
             The city of the address
             </summary>
         </member>
-        <member name="P:ECommerce1.Models.Address.User">
-            <summary>
-            The user that owns this address
-            </summary>
-        </member>
-        <member name="P:ECommerce1.Models.Address.First">
+        <member name="P:ECommerce1.Models.AAddress.First">
             <summary>
             The first line of the address
             </summary>
         </member>
-        <member name="P:ECommerce1.Models.Address.Second">
+        <member name="P:ECommerce1.Models.AAddress.Second">
             <summary>
             The second line of the address
             </summary>
         </member>
-        <member name="P:ECommerce1.Models.Address.Zip">
+        <member name="P:ECommerce1.Models.AAddress.Zip">
             <summary>
             The zip code of the address
             </summary>
@@ -597,6 +615,11 @@
             This class represents a cart item.
             </summary>
         </member>
+        <member name="P:ECommerce1.Models.CartItem.Quantity">
+            <summary>
+            Quantity of the product
+            </summary>
+        </member>
         <member name="T:ECommerce1.Models.Category">
             <summary>
             This class represents a category
@@ -644,9 +667,14 @@
             Country this city belongs to
             </summary>
         </member>
-        <member name="P:ECommerce1.Models.City.Addresses">
+        <member name="P:ECommerce1.Models.City.UserAddresses">
             <summary>
             Addresses of this city
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.City.WarehouseAddresses">
+            <summary>
+            Warehouses of this city
             </summary>
         </member>
         <member name="T:ECommerce1.Models.Country">
@@ -664,12 +692,32 @@
             Cities of this country
             </summary>
         </member>
+        <member name="P:ECommerce1.Models.IQuantative.Quantity">
+            <summary>
+            Quantity of the product
+            </summary>
+        </member>
         <member name="T:ECommerce1.Models.Order">
             <summary>
             (Mail) Order class
             </summary>
         </member>
-        <member name="P:ECommerce1.Models.Order.AddressCopy">
+        <member name="P:ECommerce1.Models.Order.User">
+            <summary>
+            The user who owns this item
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Order.Product">
+            <summary>
+            The product that this item is for
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Order.CustomerAddressCopy">
+            <summary>
+            Copy of the full address instead of address object
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Order.WarehouseAddressCopy">
             <summary>
             Copy of the full address instead of address object
             </summary>
@@ -681,7 +729,12 @@
         </member>
         <member name="P:ECommerce1.Models.Order.OrderStatus">
             <summary>
-            
+            Status of the order
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Order.Quantity">
+            <summary>
+            Quantity of the product
             </summary>
         </member>
         <member name="T:ECommerce1.Models.Product">
@@ -707,11 +760,6 @@
         <member name="P:ECommerce1.Models.Product.Price">
             <summary>
             Product price
-            </summary>
-        </member>
-        <member name="P:ECommerce1.Models.Product.InStock">
-            <summary>
-            Whether in stock or not
             </summary>
         </member>
         <member name="P:ECommerce1.Models.Product.Category">
@@ -747,6 +795,31 @@
         <member name="P:ECommerce1.Models.Product.FavouriteItems">
             <summary>
             Can be used to determine which users have added this product to their favourites
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.ProductAddresses">
+            <summary>
+            Warehouse addresses of the product
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Product.RecentlyViewedItems">
+            <summary>
+            Buyers that recently viewed this product
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ProductAddress.Quantity">
+            <summary>
+            Quantity of the product in this address
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ProductAddress.Address">
+            <summary>
+            Address of the product
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ProductAddress.Product">
+            <summary>
+            Product that this address is for
             </summary>
         </member>
         <member name="T:ECommerce1.Models.ProductPhoto">
@@ -799,11 +872,6 @@
             The last name/family name/surname of the buyer.
             </summary>
         </member>
-        <member name="P:ECommerce1.Models.Profile.Addresses">
-            <summary>
-            Address list of the buyer.
-            </summary>
-        </member>
         <member name="P:ECommerce1.Models.Profile.CartItems">
             <summary>
             Items that are in cart of the buyer.
@@ -822,6 +890,11 @@
         <member name="P:ECommerce1.Models.Profile.FavouriteItems">
             <summary>
             Favourite items of the buyer.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.RecentlyViewedItems">
+            <summary>
+            Recently viewed items of the buyer.
             </summary>
         </member>
         <member name="T:ECommerce1.Models.RefreshToken">
@@ -889,11 +962,6 @@
             The name of the company that the seller represents.
             </summary>
         </member>
-        <member name="P:ECommerce1.Models.Seller.WebsiteUrl">
-            <summary>
-            The website of the company that the seller represents.
-            </summary>
-        </member>
         <member name="P:ECommerce1.Models.Seller.ProfilePhotoUrl">
             <summary>
             The URL of the profile photo of the seller.
@@ -912,6 +980,16 @@
         <member name="P:ECommerce1.Models.Staff.DisplayName">
             <summary>
             Staff's display name
+            </summary>
+        </member>
+        <member name="T:ECommerce1.Models.UserAddress">
+            <summary>
+            The address of a user
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.UserAddress.User">
+            <summary>
+            The user that owns this address
             </summary>
         </member>
         <member name="T:ECommerce1.Models.ViewModels.AddAddressViewModel">
@@ -1159,7 +1237,7 @@
             Product price
             </summary>
         </member>
-        <member name="P:ECommerce1.Models.ViewModels.OrdersOrderViewModel.InStock">
+        <member name="P:ECommerce1.Models.ViewModels.OrdersOrderViewModel.Qunatity">
             <summary>
             Whether in stock or not
             </summary>
@@ -1303,7 +1381,7 @@
             Rating of product
             </summary>
         </member>
-        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.InStock">
+        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.Quantity">
             <summary>
             Whether in stock or not
             </summary>
@@ -1316,11 +1394,6 @@
         <member name="P:ECommerce1.Models.ViewModels.SellerCredentials.CompanyName">
             <summary>
             The company name.
-            </summary>
-        </member>
-        <member name="P:ECommerce1.Models.ViewModels.SellerCredentials.WebsiteUrl">
-            <summary>
-            The website URL.
             </summary>
         </member>
         <member name="T:ECommerce1.Models.ViewModels.StaffCredentials">
@@ -1351,6 +1424,16 @@
         <member name="P:ECommerce1.Models.ViewModels.UserCredentials.LastName">
             <summary>
             The user's last name.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.WarehouseAddress.User">
+            <summary>
+            The user that owns this address
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.WarehouseAddress.Products">
+            <summary>
+            Products in said address
             </summary>
         </member>
     </members>

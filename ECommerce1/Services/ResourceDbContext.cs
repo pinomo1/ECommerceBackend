@@ -10,6 +10,7 @@ namespace ECommerce1.Services
             Database.EnsureCreated();
         }
 
+        public DbSet<ProductAddress> ProductAddresses { get; set; }
         public DbSet<FavouriteItem> FavouriteItems { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductPhoto> ProductPhotos { get; set; }
@@ -17,13 +18,15 @@ namespace ECommerce1.Services
         public DbSet<Staff> Staffs { get; set; }
         public DbSet<Seller> Sellers { get; set; }
         public DbSet<Profile> Profiles { get; set; }
-        public DbSet<Address> Addresses { get; set; }
+        public DbSet<UserAddress> UserAddresses { get; set; }
+        public DbSet<WarehouseAddress> WarehouseAddresses { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<ReviewPhoto> ReviewPhotos { get; set; }
+        public DbSet<RecentlyViewedItem> RecentlyViewedItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -42,7 +45,7 @@ namespace ECommerce1.Services
                 .WithMany(p => p.Cities)
                 .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasMany(c => c.Addresses)
+                e.HasMany(c => c.UserAddresses)
                 .WithOne(a => a.City)
                 .OnDelete(DeleteBehavior.Cascade);
             });
@@ -65,7 +68,7 @@ namespace ECommerce1.Services
                 e.HasIndex(e => e.Name).IsUnique();
             });
 
-            builder.Entity<Address>(e =>
+            builder.Entity<UserAddress>(e =>
             {
                 e.Property(e => e.First)
                 .HasColumnType("nvarchar(256)")
@@ -89,8 +92,57 @@ namespace ECommerce1.Services
                 .OnDelete(DeleteBehavior.Cascade);
 
                 e.HasOne(e => e.City)
+                .WithMany(e => e.UserAddresses)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<WarehouseAddress>(e =>
+            {
+                e.Property(e => e.First)
+                .HasColumnType("nvarchar(256)")
+                .HasMaxLength(256).IsRequired();
+
+                e.Property(e => e.Second)
+                .HasColumnType("nvarchar(256)")
+                .HasMaxLength(256);
+
+                e.Property(e => e.Zip)
+                .HasColumnType("nvarchar(8)")
+                .HasMaxLength(8).IsRequired();
+
+                e.Property(e => e.Id)
+                .IsRequired();
+
+                e.HasKey(e => e.Id);
+
+                e.HasOne(e => e.User)
                 .WithMany(e => e.Addresses)
                 .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(e => e.City)
+                .WithMany(e => e.WarehouseAddresses)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasMany(e => e.Products)
+                .WithOne(e => e.Address)
+                .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            builder.Entity<ProductAddress>(e =>
+            {
+                e.HasOne(e => e.Product)
+                .WithMany(e => e.ProductAddresses)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(e => e.Address)
+                .WithMany(e => e.Products)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+                e.Property(e => e.Quantity)
+                .HasDefaultValue(0)
+                .IsRequired();
             });
 
             builder.Entity<Category>(e =>
@@ -248,10 +300,6 @@ namespace ECommerce1.Services
                 .HasColumnType("nvarchar(max)")
                 .IsRequired().HasDefaultValue("/images/default.png");
 
-                e.Property(e => e.WebsiteUrl)
-                .HasColumnType("nvarchar(max)")
-                .IsRequired();
-
                 e.HasIndex(e => e.PhoneNumber).IsUnique();
 
                 e.Property(e => e.Email)
@@ -260,6 +308,10 @@ namespace ECommerce1.Services
                 .IsRequired();
 
                 e.HasIndex(e => e.Email).IsUnique();
+
+                e.HasMany(e => e.Addresses)
+                .WithOne(a => a.User)
+                .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Product>(e =>
@@ -285,8 +337,9 @@ namespace ECommerce1.Services
                 .HasColumnType("money")
                 .IsRequired();
 
-                e.Property(e => e.InStock)
-                .HasDefaultValue(true);
+                e.HasMany(p => p.ProductAddresses)
+                .WithOne(pa => pa.Product)
+                .IsRequired();
 
                 e.HasOne(p => p.Category)
                 .WithMany(c => c.Products)
@@ -311,6 +364,10 @@ namespace ECommerce1.Services
                .IsRequired();
 
                 e.HasKey(e => e.Id);
+
+                e.Property(e => e.Quantity)
+                .IsRequired()
+                .HasDefaultValue(1);
 
                 e.HasOne(e => e.User)
                 .WithMany(e => e.CartItems)
@@ -337,6 +394,22 @@ namespace ECommerce1.Services
                 .OnDelete(DeleteBehavior.Cascade);
             });
 
+            builder.Entity<RecentlyViewedItem>(e =>
+            {
+                e.Property(e => e.Id)
+               .IsRequired();
+
+                e.HasKey(e => e.Id);
+
+                e.HasOne(e => e.User)
+                .WithMany(e => e.RecentlyViewedItems)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(e => e.Product)
+                .WithMany(e => e.RecentlyViewedItems)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+
             builder.Entity<Order>(e =>
             {
                 e.Property(e => e.Id)
@@ -352,7 +425,12 @@ namespace ECommerce1.Services
                 .WithMany(e => e.Orders)
                 .OnDelete(DeleteBehavior.Cascade);
 
-                e.Property(e => e.AddressCopy)
+                e.Property(e => e.CustomerAddressCopy)
+                .HasColumnType("nvarchar(256)")
+                .HasMaxLength(256)
+                .IsRequired();
+
+                e.Property(e => e.WarehouseAddressCopy)
                 .HasColumnType("nvarchar(256)")
                 .HasMaxLength(256)
                 .IsRequired();

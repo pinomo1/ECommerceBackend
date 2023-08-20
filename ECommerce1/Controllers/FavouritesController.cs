@@ -93,19 +93,16 @@ namespace ECommerce1.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> RemoveFromFavourites(string guid)
         {
-            FavouriteItem? favouriteItem = await resourceDbContext.FavouriteItems.FirstOrDefaultAsync(p => p.Product.Id.ToString() == guid);
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
+            if (user == null)
+            {
+                return BadRequest(new { error_message = "User not found" });
+            }
+            FavouriteItem? favouriteItem = await resourceDbContext.FavouriteItems.FirstOrDefaultAsync(p => p.Product.Id.ToString() == guid && p.User.AuthId == userId);
             if (favouriteItem == null)
             {
                 return NotFound(new { error_message = "No such product" });
-            }
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
-            if (userId != favouriteItem.User.AuthId)
-            {
-                return BadRequest(new
-                {
-                    error_message = "You are not authorized to remove this item"
-                });
             }
             resourceDbContext.FavouriteItems.Remove(favouriteItem);
             await resourceDbContext.SaveChangesAsync();

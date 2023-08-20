@@ -28,7 +28,7 @@ namespace ECommerce1.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("get_max")]
-        public async Task<IActionResult> GetMax()
+        public IActionResult GetMax()
         {
             return Ok(new { max = maxProductInCart });
         }
@@ -44,13 +44,15 @@ namespace ECommerce1.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ThenInclude(ci => ci.ProductPhotos).ToListAsync();
             List<CartItemViewModel> cartItemViewModels = new();
-            foreach (var group in cartItems.GroupBy(ci => ci.Product))
+            
+            foreach (CartItem cartItem in cartItems)
             {
-                cartItemViewModels.Add(new CartItemViewModel
+                CartItemViewModel cartItemViewModel = new()
                 {
-                    Product = group.Key,
-                    Quantity = group.Count()
-                });
+                    Product = cartItem.Product,
+                    Quantity = cartItem.Quantity
+                };
+                cartItemViewModels.Add(cartItemViewModel);
             }
 
             return Ok(cartItemViewModels);
@@ -80,95 +82,41 @@ namespace ECommerce1.Controllers
             int inCartQuantityNow = await resourceDbContext.CartItems.CountAsync(ci => ci.Product.Id.ToString() == guid && ci.User.AuthId == userId);
             if(quantity > maxProductInCart)
             {
-                return BadRequest(new { error_message = $"Max quantity is {maxProductInCart}" });
+                quantity = maxProductInCart;
             }
             if(quantity < 0)
             {
                 return BadRequest(new { error_message = "Quantity cannot be less than 0" });
             }
-            int difference = quantity - inCartQuantityNow;
-            if(difference == 0)
+            if(quantity == 0)
             {
-                return NoContent();
-            }
-            else if(difference > 0)
-            {
-                List<CartItem> cartItems = new();
-                for (int i = 0; i < difference; i++)
+                CartItem? cartItem = await resourceDbContext.CartItems.FirstOrDefaultAsync(ci => ci.Product.Id.ToString() == guid && ci.User.AuthId == userId);
+                if(cartItem == null)
                 {
-                    cartItems.Add(new() { User = user, Product = product });
+                    return BadRequest(new { error_message = "No such item in cart" });
                 }
-                await resourceDbContext.CartItems.AddRangeAsync(cartItems);
+                resourceDbContext.CartItems.Remove(cartItem);
                 await resourceDbContext.SaveChangesAsync();
                 return Ok();
             }
-            else
+            if(inCartQuantityNow == 0)
             {
-                difference = -difference;
-                var cartItems = resourceDbContext.CartItems.Where(ci => ci.Product.Id.ToString() == guid && ci.User.AuthId == userId).Take(difference);
-                resourceDbContext.CartItems.RemoveRange(cartItems);
-                await resourceDbContext.SaveChangesAsync();
-                return Ok();
-            }
-        }
-
-        /// <summary>
-        /// Add item to cart
-        /// </summary>
-        /// <param name="guid">Product ID</param>
-        /// <returns></returns>
-        [Obsolete("Use ChageQuantity (change/{guid}) instead")]
-        [HttpPost("add/{guid}")]
-        [Authorize(Roles = "User")]
-        public async Task<IActionResult> AddToCart(string guid)
-        {
-            Product? product = await resourceDbContext.Products.FirstOrDefaultAsync(p => p.Id.ToString() == guid);
-            if(product == null)
-            {
-                return BadRequest(new { error_message = "No such product" });
-            }
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
-            if(user == null)
-            {
-                return BadRequest(new { error_message = "User not found" });
-            }
-            CartItem item = new()
-            {
-                User = user,
-                Product = product
-            };
-            await resourceDbContext.CartItems.AddAsync(item);
-            await resourceDbContext.SaveChangesAsync();
-            return Ok(item.Id);
-        }
-
-
-        /// <summary>
-        /// Remove item from cart
-        /// </summary>
-        /// <param name="guid">Product's ID, not CartItem's</param>
-        /// <returns></returns>
-        [Obsolete("Use ChageQuantity (change/{guid}) instead")]
-        [HttpDelete("delete/{id}")]
-        [Authorize(Roles = "User")]
-        public async Task<IActionResult> RemoveFromCart(string guid)
-        {
-            CartItem? cartItem = await resourceDbContext.CartItems.FirstOrDefaultAsync(p => p.Product.Id.ToString() == guid);
-            if (cartItem == null)
-            {
-                return NotFound(new { error_message = "No such product" });
-            }
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
-            if(userId != cartItem.User.AuthId)
-            {
-                return BadRequest(new
+                CartItem cartItem = new()
                 {
-                    error_message = "You are not authorized to remove this item"
-                });
+                    Product = product,
+                    User = user,
+                    Quantity = quantity
+                };
+                await resourceDbContext.CartItems.AddAsync(cartItem);
+                await resourceDbContext.SaveChangesAsync();
+                return Ok();
             }
-            resourceDbContext.CartItems.Remove(cartItem);
+            CartItem? cartItemNow = await resourceDbContext.CartItems.FirstOrDefaultAsync(ci => ci.Product.Id.ToString() == guid && ci.User.AuthId == userId);
+            if(cartItemNow == null)
+            {
+                return BadRequest(new { error_message = "No such item in cart" });
+            }
+            cartItemNow.Quantity = quantity;
             await resourceDbContext.SaveChangesAsync();
             return Ok();
         }
