@@ -130,12 +130,12 @@ namespace ECommerce1.Controllers
         public async Task<ActionResult<ProductsViewModel>> ByTitle(string? title, int page = 1, int onPage = 20, ProductSorting sorting = ProductSorting.PopularFirst, int fromPrice = 0, int toPrice = 100000, bool inStock = false)
         {
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
+                .Include(p => p.Reviews)
                 .Select(p => new {
                     Product = p,
                     Quantity = p.ProductAddresses.Sum(pa => pa.Quantity)
                 })
                 .Where(p => (title == null || EF.Functions.Like(p.Product.Name, $"%{title}%")) && p.Product.Price >= fromPrice && p.Product.Price <= toPrice && (inStock != true || p.Quantity > 0))
-                .Include(p => p.Product.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Product.Id,
@@ -239,12 +239,12 @@ namespace ECommerce1.Controllers
             }
 
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
+                .Include(p => p.Reviews)
                 .Select(p => new {
                     Product = p,
                     Quantity = p.ProductAddresses.Sum(pa => pa.Quantity)
                 })
                 .Where(p => p.Product.Seller.Id.ToString() == guid && p.Product.Price >= fromPrice && p.Product.Price <= toPrice && (title == null || EF.Functions.Like(p.Product.Name, $"%{title}%")) && (inStock != true || p.Quantity > 0) && (categoryId == null || p.Product.Category.Id.ToString() == categoryId))
-                .Include(p => p.Product.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Product.Id,
@@ -307,12 +307,12 @@ namespace ECommerce1.Controllers
             }
 
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
+                .Include(p => p.Reviews)
                 .Select(p => new {
                     Product = p,
                     Quantity = p.ProductAddresses.Sum(pa => pa.Quantity)
                 })
                 .Where(p => p.Product.Category.Id.ToString() == guid && p.Product.Price >= fromPrice && p.Product.Price <= toPrice && (title == null || EF.Functions.Like(p.Product.Name, $"%{title}%")) && (inStock != true || p.Quantity > 0))
-                .Include(p => p.Product.Reviews)
                 .Select(p => new ProductsProductViewModel()
                 {
                     Id = p.Product.Id,

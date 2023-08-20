@@ -522,6 +522,34 @@
             <param name="picture"></param>
             <returns></returns>
         </member>
+        <member name="M:ECommerce1.Controllers.WarehouseController.GetAddresses">
+            <summary>
+            Get all your own addresses (as a user)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.WarehouseController.AddAddress(ECommerce1.Models.ViewModels.AddAddressViewModel)">
+            <summary>
+            Add address to address list
+            </summary>
+            <param name="address"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.WarehouseController.DeleteAddress(System.String)">
+            <summary>
+            Delete address from address list
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.WarehouseController.EditAddress(System.String,ECommerce1.Models.ViewModels.AddAddressViewModel)">
+            <summary>
+            Edit existing address
+            </summary>
+            <param name="addressId"></param>
+            <param name="address"></param>
+            <returns></returns>
+        </member>
         <member name="P:ECommerce1.Models.AAddress.City">
             <summary>
             The city of the address

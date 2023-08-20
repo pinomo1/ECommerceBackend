@@ -144,7 +144,7 @@ namespace ECommerce1.Controllers
                 Name = c.Name,
                 AllowProducts = c.AllowProducts
             })
-                .ToArray<CategoryResponse>();
+                .ToArray();
 
             allCategoriesResponse.SubCategories = resourceDbContext.Categories.Where(c => c.AllowProducts == true).Select(c => new CategoryResponse
             {
@@ -153,7 +153,7 @@ namespace ECommerce1.Controllers
                 Name = c.Name,
                 AllowProducts = c.AllowProducts
             })
-                .ToArray<CategoryResponse>();
+                .ToArray();
 
             return Ok(allCategoriesResponse);
         }
