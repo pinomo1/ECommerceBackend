@@ -172,6 +172,10 @@ namespace ECommerce1.Services
                 .WithOne(c => c.ParentCategory)
                 .IsRequired(false);
 
+                e.Property(e => e.ImageUrl)
+                .HasColumnType("nvarchar(max)")
+                .HasDefaultValue("");
+
                 e.HasIndex(e => e.Name).IsUnique();
             });
 

@@ -12,10 +12,14 @@ namespace ECommerce1.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ResourceDbContext resourceDbContext;
+        private readonly IConfiguration configuration;
+        public BlobWorker BlobWorker { get; set; }
 
-        public CategoryController(ResourceDbContext resourceDbContext)
+        public CategoryController(ResourceDbContext resourceDbContext, IConfiguration configuration, BlobWorker blobWorker)
         {
             this.resourceDbContext = resourceDbContext;
+            this.configuration = configuration;
+            BlobWorker = blobWorker;
         }
 
         /// <summary>
@@ -39,7 +43,8 @@ namespace ECommerce1.Controllers
             {
                 AllowProducts = false,
                 Name = category,
-                ParentCategory = null
+                ParentCategory = null,
+                ImageUrl = ""
             };
             await resourceDbContext.Categories.AddAsync(newCategory);
             await resourceDbContext.SaveChangesAsync();
@@ -79,7 +84,8 @@ namespace ECommerce1.Controllers
             {
                 AllowProducts = category.AllowProducts,
                 Name = category.Name,
-                ParentCategory = parentCategory
+                ParentCategory = parentCategory,
+                ImageUrl = ""
             };
             await resourceDbContext.Categories.AddAsync(newCategory);
             await resourceDbContext.SaveChangesAsync();
@@ -142,7 +148,8 @@ namespace ECommerce1.Controllers
                 Id = c.Id,
                 ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
                 Name = c.Name,
-                AllowProducts = c.AllowProducts
+                AllowProducts = c.AllowProducts,
+                ImageUrl = c.ImageUrl
             })
                 .ToArray();
 
@@ -151,7 +158,8 @@ namespace ECommerce1.Controllers
                 Id = c.Id,
                 ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
                 Name = c.Name,
-                AllowProducts = c.AllowProducts
+                AllowProducts = c.AllowProducts,
+                ImageUrl = c.ImageUrl
             })
                 .ToArray();
 
@@ -215,6 +223,28 @@ namespace ECommerce1.Controllers
             }
             foundCategory.Name = category.Name;
             foundCategory.AllowProducts = category.AllowProducts;
+            await resourceDbContext.SaveChangesAsync();
+            return Ok(foundCategory.Id);
+        }
+
+        [HttpPatch("edit/image/{guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditCategoryImage(string guid, IFormFile image)
+        {
+            Category? foundCategory = await resourceDbContext.Categories.FirstOrDefaultAsync(c => c.Id.ToString() == guid);
+            if (foundCategory == null)
+            {
+                return NotFound("No such category exists");
+            }
+            string? reference = await BlobWorker.AddPublicationPhoto(image);
+            if (reference == String.Empty)
+            {
+                return BadRequest(new
+                {
+                    error_message = "Bad photo"
+                });
+            }
+            foundCategory.ImageUrl = reference;
             await resourceDbContext.SaveChangesAsync();
             return Ok(foundCategory.Id);
         }

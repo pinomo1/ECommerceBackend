@@ -21,6 +21,11 @@
         public bool AllowProducts { get; set; }
 
         /// <summary>
+        /// The URL of the image of the category
+        /// </summary>
+        public string ImageUrl { get; set; }
+
+        /// <summary>
         /// The products that are in this category if AllowProducts is true
         /// </summary>
         public IList<Product> Products { get; set; }
