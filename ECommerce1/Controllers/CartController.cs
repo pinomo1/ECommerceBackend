@@ -120,5 +120,44 @@ namespace ECommerce1.Controllers
             await resourceDbContext.SaveChangesAsync();
             return Ok();
         }
+
+        /// <summary>
+        /// Change quantity of specified product in cart
+        /// </summary>
+        /// <param name="guid">Product GUID</param>
+        /// <param name="quantity">Quantity desired in total</param>
+        /// <returns></returns>
+        [HttpDelete("deleteSelected")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> DeleteSelected(IList<string> guids)
+        {
+            List<Product> products = new List<Product>();
+            foreach (string guid in guids)
+            {
+                Product? product = await resourceDbContext.Products.FirstOrDefaultAsync(p => p.Id.ToString() == guid);
+                if (product == null)
+                {
+                    return BadRequest(new { error_message = "No such product" });
+                }
+                products.Add(product);
+            }
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
+            if (user == null)
+            {
+                return BadRequest(new { error_message = "User not found" });
+            }
+            foreach (Product product in products)
+            {
+                CartItem? cartItem = await resourceDbContext.CartItems.FirstOrDefaultAsync(ci => ci.Product.Id.ToString() == product.Id.ToString() && ci.User.AuthId == userId);
+                if (cartItem == null)
+                {
+                    return BadRequest(new { error_message = "No such item in cart" });
+                }
+                resourceDbContext.CartItems.Remove(cartItem);
+            }
+            await resourceDbContext.SaveChangesAsync();
+            return Ok();
+        }
     }
 }

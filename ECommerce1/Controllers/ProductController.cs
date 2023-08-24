@@ -61,7 +61,7 @@ namespace ECommerce1.Controllers
         /// <param name="guid">Product ID</param>
         /// <returns></returns>
         [HttpGet("{guid}")]
-        public async Task<ActionResult<Product>> GetProduct(string guid)
+        public async Task<IActionResult> GetProduct(string guid)
         {
             Product? product = await resourceDbContext.Products
                 .Include(p => p.Category).Include(p => p.Seller)
@@ -73,11 +73,14 @@ namespace ECommerce1.Controllers
                 return NotFound(new { error_message = "No such product exists" });
             }
 
+            bool isInCart = false;
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? profile = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
 
             if (profile != null)
             {
+                isInCart = await resourceDbContext.CartItems.AnyAsync(ci => ci.User == profile && ci.Product == product);
+
                 List<RecentlyViewedItem> recentlyViewedItems = await resourceDbContext.RecentlyViewedItems.Where(ci => ci.User == profile).Include(ci => ci.Product).ToListAsync();
                 RecentlyViewedItem? recentlyViewedItem = recentlyViewedItems.FirstOrDefault(ci => ci.Product == product);
                 if (recentlyViewedItem == null)
@@ -111,7 +114,8 @@ namespace ECommerce1.Controllers
             return Ok(new {
                 product,
                 productAddresses,
-                quantity
+                quantity,
+                isInCart
             });
         }
 

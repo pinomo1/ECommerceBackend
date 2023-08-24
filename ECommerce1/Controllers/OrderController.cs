@@ -194,9 +194,9 @@ namespace ECommerce1.Controllers
         /// </summary>
         /// <param name="addressGuid">Address ID</param>
         /// <returns></returns>
-        [HttpPost("addFromCart")]
+        [HttpPost("addAllFromCart")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> AddFromCart(string addressGuid)
+        public async Task<IActionResult> AddAllFromCart(string addressGuid)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? profile = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
@@ -210,6 +210,77 @@ namespace ECommerce1.Controllers
                 return BadRequest(new { error_message = "No such address was found" });
             }
             IList<CartItem>? products = await resourceDbContext.CartItems.Include(ci => ci.Product).Include(ci => ci.User).Where(p => p.User.AuthId == userId).ToListAsync();
+            if (products == null)
+            {
+                return BadRequest(new { error_message = "No product were found" });
+            }
+            List<Order> orders = new();
+
+            foreach (var item in products)
+            {
+                IList<ProductAddress> productAddresses = await resourceDbContext.ProductAddresses.Where(pa => pa.Product == item.Product).ToListAsync();
+                int quantity = item.Quantity;
+                int productStock = await resourceDbContext.ProductAddresses.Where(pa => pa.Product == item.Product).SumAsync(pa => pa.Quantity);
+                if (productStock < quantity)
+                {
+                    return BadRequest(new { error_message = "There is not enough of product" });
+                }
+                foreach (ProductAddress productAddress in productAddresses)
+                {
+                    int quantityToTake = Math.Min(quantity, productAddress.Quantity);
+                    quantity -= quantityToTake;
+                    orders.Add(new()
+                    {
+                        CustomerAddressCopy = address.Normalize(profile.PhoneNumber),
+                        WarehouseAddressCopy = productAddress.Address.Normalize(),
+                        OrderTime = DateTime.Now,
+                        Product = item.Product,
+                        User = profile,
+                        Quantity = quantityToTake,
+                        OrderStatus = (int)OrderStatus.Unverified
+                    });
+                    if (quantity == 0)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            await resourceDbContext.Orders.AddRangeAsync(orders);
+            resourceDbContext.CartItems.RemoveRange(products);
+            await resourceDbContext.SaveChangesAsync();
+
+            return Ok(orders.Select(o => new { id = o.Id }));
+        }
+
+        public struct ItemQuantity
+        {
+            public string Id { get; set; }
+            public int Quantity { get; set; }
+        }
+
+        /// <summary>
+        /// Add everything in cart as orders
+        /// </summary>
+        /// <param name="addressGuid">Address ID</param>
+        /// <param name="itemQuantities">List of item IDs and quantities</param>
+        /// <returns></returns>
+        [HttpPost("addSelectedFromCart")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> AddSelectedFromCart(string addressGuid, IList<ItemQuantity> itemQuantities)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Profile? profile = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
+            if (profile == null)
+            {
+                return BadRequest(new { error_message = "No such profile was found" });
+            }
+            UserAddress? address = await resourceDbContext.UserAddresses.Include(a => a.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(a => a.User.AuthId == userId && a.Id.ToString() == addressGuid);
+            if (address == null)
+            {
+                return BadRequest(new { error_message = "No such address was found" });
+            }
+            IList<CartItem>? products = await resourceDbContext.CartItems.Include(ci => ci.Product).Include(ci => ci.User).Where(p => p.User.AuthId == userId && itemQuantities.Any(iq => iq.Id == p.Product.Id.ToString())).ToListAsync();
             if (products == null)
             {
                 return BadRequest(new { error_message = "No product were found" });
