@@ -16,11 +16,9 @@ namespace ECommerce1.Controllers
     {
         private const int maxProductInCart = 99;
         private readonly ResourceDbContext resourceDbContext;
-        private readonly IConfiguration configuration;
-        public CartController(ResourceDbContext resourceDbContext, IConfiguration configuration)
+        public CartController(ResourceDbContext resourceDbContext)
         {
             this.resourceDbContext = resourceDbContext;
-            this.configuration = configuration;
         }
 
         /// <summary>
@@ -44,7 +42,7 @@ namespace ECommerce1.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ThenInclude(ci => ci.ProductPhotos).ToListAsync();
             List<CartItemViewModel> cartItemViewModels = new();
-            
+
             foreach (CartItem cartItem in cartItems)
             {
                 CartItemViewModel cartItemViewModel = new()
@@ -56,6 +54,61 @@ namespace ECommerce1.Controllers
             }
 
             return Ok(cartItemViewModels);
+        }
+
+        public struct CartItemsGroupedBySeller
+        {
+            public Seller Seller { get; set; }
+            public IList<CartItemViewModel> CartItems { get; set; }
+        }
+
+        /// <summary>
+        /// Get all items in cart grouped by seller
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("get_own_by_seller")]
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult<IList<CartItemsGroupedBySeller>>> GetCartBySeller()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ThenInclude(ci => ci.ProductPhotos).ToListAsync();
+            List<CartItemViewModel> cartItemViewModels = new();
+            
+            foreach (CartItem cartItem in cartItems)
+            {
+                CartItemViewModel cartItemViewModel = new()
+                {
+                    Product = cartItem.Product,
+                    Quantity = cartItem.Quantity
+                };
+                cartItemViewModels.Add(cartItemViewModel);
+            }
+
+            List<CartItemsGroupedBySeller> cartItemsGroupedBySellers = new();
+            foreach (CartItemViewModel cartItemViewModel in cartItemViewModels)
+            {
+                Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(s => s.Id == cartItemViewModel.Product.Seller.Id);
+                if (seller == null)
+                {
+                    return BadRequest(new { error_message = "Seller not found" });
+                }
+                CartItemsGroupedBySeller cartItemsGroupedBySeller = cartItemsGroupedBySellers.FirstOrDefault(cigs => cigs.Seller.Id == seller.Id);
+                if (cartItemsGroupedBySeller.Seller == null)
+                {
+                    cartItemsGroupedBySeller.Seller = seller;
+                    cartItemsGroupedBySeller.CartItems = new List<CartItemViewModel>
+                    {
+                        cartItemViewModel
+                    };
+                    cartItemsGroupedBySellers.Add(cartItemsGroupedBySeller);
+                }
+                else
+                {
+                    cartItemsGroupedBySeller.CartItems.Add(cartItemViewModel);
+                }
+            }
+
+            return Ok(cartItemsGroupedBySellers);
         }
 
         /// <summary>
@@ -124,14 +177,13 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Change quantity of specified product in cart
         /// </summary>
-        /// <param name="guid">Product GUID</param>
-        /// <param name="quantity">Quantity desired in total</param>
+        /// <param name="guids">Product GUIDs</param>
         /// <returns></returns>
         [HttpDelete("deleteSelected")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> DeleteSelected(IList<string> guids)
         {
-            List<Product> products = new List<Product>();
+            List<Product> products = new();
             foreach (string guid in guids)
             {
                 Product? product = await resourceDbContext.Products.FirstOrDefaultAsync(p => p.Id.ToString() == guid);

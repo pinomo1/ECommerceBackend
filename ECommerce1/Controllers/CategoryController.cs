@@ -12,13 +12,11 @@ namespace ECommerce1.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ResourceDbContext resourceDbContext;
-        private readonly IConfiguration configuration;
         public BlobWorker BlobWorker { get; set; }
 
-        public CategoryController(ResourceDbContext resourceDbContext, IConfiguration configuration, BlobWorker blobWorker)
+        public CategoryController(ResourceDbContext resourceDbContext, BlobWorker blobWorker)
         {
             this.resourceDbContext = resourceDbContext;
-            this.configuration = configuration;
             BlobWorker = blobWorker;
         }
 
@@ -109,7 +107,7 @@ namespace ECommerce1.Controllers
         /// <param name="guid">Parent category's id</param>
         /// <returns></returns>
         [HttpGet("{guid}")]
-        [Obsolete]
+        [Obsolete("Use below methods instead")]
         public async Task<IActionResult> GetCategory(string guid)
         {
             Category? category = await resourceDbContext.Categories
@@ -141,27 +139,28 @@ namespace ECommerce1.Controllers
         public async Task<IActionResult> GetAllCategories()
         {
 
-            AllCategoriesResponse allCategoriesResponse = new AllCategoriesResponse();
-
-            allCategoriesResponse.MainCategories = resourceDbContext.Categories.Where(c => c.AllowProducts == false).Select(c => new CategoryResponse
+            AllCategoriesResponse allCategoriesResponse = new()
             {
-                Id = c.Id,
-                ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
-                Name = c.Name,
-                AllowProducts = c.AllowProducts,
-                ImageUrl = c.ImageUrl
-            })
-                .ToArray();
+                MainCategories = resourceDbContext.Categories.Where(c => c.AllowProducts == false).Select(c => new CategoryResponse
+                {
+                    Id = c.Id,
+                    ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
+                    Name = c.Name,
+                    AllowProducts = c.AllowProducts,
+                    ImageUrl = c.ImageUrl
+                })
+                .ToArray(),
 
-            allCategoriesResponse.SubCategories = resourceDbContext.Categories.Where(c => c.AllowProducts == true).Select(c => new CategoryResponse
-            {
-                Id = c.Id,
-                ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
-                Name = c.Name,
-                AllowProducts = c.AllowProducts,
-                ImageUrl = c.ImageUrl
-            })
-                .ToArray();
+                SubCategories = resourceDbContext.Categories.Where(c => c.AllowProducts == true).Select(c => new CategoryResponse
+                {
+                    Id = c.Id,
+                    ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
+                    Name = c.Name,
+                    AllowProducts = c.AllowProducts,
+                    ImageUrl = c.ImageUrl
+                })
+                .ToArray()
+            };
 
             return Ok(allCategoriesResponse);
         }
@@ -172,7 +171,7 @@ namespace ECommerce1.Controllers
         /// <param name="guid">Parent category's id</param>
         /// <returns></returns>
         [HttpGet("sub/{guid}")]
-        [Obsolete]
+        [Obsolete("Use above methods instead")]
         public async Task<ActionResult<Category>> GetSubCategories(string guid)
         {
             var category = await resourceDbContext.Categories

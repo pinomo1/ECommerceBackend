@@ -13,11 +13,9 @@ namespace ECommerce1.Controllers
     public class FavouritesController : ControllerBase
     {
         private readonly ResourceDbContext resourceDbContext;
-        private readonly IConfiguration configuration;
-        public FavouritesController(ResourceDbContext resourceDbContext, IConfiguration configuration)
+        public FavouritesController(ResourceDbContext resourceDbContext)
         {
             this.resourceDbContext = resourceDbContext;
-            this.configuration = configuration;
         }
 
         /// <summary>
