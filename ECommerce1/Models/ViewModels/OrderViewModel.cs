@@ -38,10 +38,6 @@
         /// </summary>
         public string ProductName { get; set; }
         /// <summary>
-        /// Product description
-        /// </summary>
-        // public string Description { get; set; }
-        /// <summary>
         /// Product price
         /// </summary>
         public decimal Price { get; set; }

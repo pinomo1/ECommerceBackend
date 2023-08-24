@@ -141,7 +141,7 @@ namespace ECommerce1.Controllers
 
             AllCategoriesResponse allCategoriesResponse = new()
             {
-                MainCategories = resourceDbContext.Categories.Where(c => c.AllowProducts == false).Select(c => new CategoryResponse
+                MainCategories = await resourceDbContext.Categories.Where(c => c.AllowProducts == false).Select(c => new CategoryResponse
                 {
                     Id = c.Id,
                     ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
@@ -149,9 +149,9 @@ namespace ECommerce1.Controllers
                     AllowProducts = c.AllowProducts,
                     ImageUrl = c.ImageUrl
                 })
-                .ToArray(),
+                .ToArrayAsync(),
 
-                SubCategories = resourceDbContext.Categories.Where(c => c.AllowProducts == true).Select(c => new CategoryResponse
+                SubCategories = await resourceDbContext.Categories.Where(c => c.AllowProducts == true).Select(c => new CategoryResponse
                 {
                     Id = c.Id,
                     ParentId = (c.ParentCategory == null ? Guid.Empty : c.ParentCategory.Id),
@@ -159,7 +159,7 @@ namespace ECommerce1.Controllers
                     AllowProducts = c.AllowProducts,
                     ImageUrl = c.ImageUrl
                 })
-                .ToArray()
+                .ToArrayAsync()
             };
 
             return Ok(allCategoriesResponse);

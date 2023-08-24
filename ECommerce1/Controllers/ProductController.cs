@@ -429,8 +429,8 @@ namespace ECommerce1.Controllers
             decimal maxPrice = 0, minPrice = 0;
             try
             {
-                maxPrice = unorderedProducts.Max(p => p.Price);
-                minPrice = unorderedProducts.Min(p => p.Price);
+                maxPrice = await Task.Run(() => unorderedProducts.Max(p => p.Price));
+                minPrice = await Task.Run(() => unorderedProducts.Max(p => p.Price));
             }
             catch (Exception)
             {
