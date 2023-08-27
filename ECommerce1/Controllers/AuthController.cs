@@ -94,7 +94,7 @@ namespace ECommerce1.Controllers
             });
             if (!await userManager.IsEmailConfirmedAsync(user))
             {
-                await ResendEmailAsync(loginDto.Email);
+                // await ResendEmailAsync(loginDto.Email);
                 return BadRequest(new
                 {
                     error_message = "Email is not confirmed"
@@ -179,7 +179,6 @@ namespace ECommerce1.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 FirstName = registrationDto.FirstName,
-                MiddleName = registrationDto.MiddleName,
                 LastName = registrationDto.LastName,
             };
 

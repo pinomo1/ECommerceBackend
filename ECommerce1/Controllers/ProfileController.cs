@@ -49,7 +49,7 @@ namespace ECommerce1.Controllers
 
         [HttpPatch("changeMyInfo")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> ChangeMyInfo(string first, string last, string? middle)
+        public async Task<IActionResult> ChangeMyInfo(string first, string last)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Profile? user = await resourceDbContext.Profiles.FirstOrDefaultAsync(u => u.AuthId == userId);
@@ -65,7 +65,6 @@ namespace ECommerce1.Controllers
                 });
             user.FirstName = first;
             user.LastName = last;
-            user.MiddleName = middle;
             await resourceDbContext.SaveChangesAsync();
             return Ok();
         }

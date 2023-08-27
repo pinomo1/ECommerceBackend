@@ -162,12 +162,25 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:ECommerce1.Controllers.CartController.GetCartBySeller">
+            <summary>
+            Get all items in cart grouped by seller
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:ECommerce1.Controllers.CartController.ChangeQuantity(System.String,System.Int32)">
             <summary>
             Change quantity of specified product in cart
             </summary>
             <param name="guid">Product GUID</param>
             <param name="quantity">Quantity desired in total</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.CartController.DeleteSelected(System.Collections.Generic.IList{System.String})">
+            <summary>
+            Change quantity of specified product in cart
+            </summary>
+            <param name="guids">Product GUIDs</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.CategoryController.AddMainCategory(System.String)">
@@ -345,11 +358,19 @@
             <param name="quantity">Quantity</param>
             <returns></returns>
         </member>
-        <member name="M:ECommerce1.Controllers.OrderController.AddFromCart(System.String)">
+        <member name="M:ECommerce1.Controllers.OrderController.AddAllFromCart(System.String)">
             <summary>
             Add everything in cart as orders
             </summary>
             <param name="addressGuid">Address ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.OrderController.AddSelectedFromCart(System.String,System.Collections.Generic.IList{ECommerce1.Controllers.OrderController.ItemQuantity})">
+            <summary>
+            Add everything in cart as orders
+            </summary>
+            <param name="addressGuid">Address ID</param>
+            <param name="itemQuantities">List of item IDs and quantities</param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.OrderController.ChangeStatus(System.String,System.Int32)">
@@ -642,6 +663,11 @@
             2) false - category that stores other categories
             </summary>
         </member>
+        <member name="P:ECommerce1.Models.Category.ImageUrl">
+            <summary>
+            The URL of the image of the category
+            </summary>
+        </member>
         <member name="P:ECommerce1.Models.Category.Products">
             <summary>
             The products that are in this category if AllowProducts is true
@@ -860,11 +886,6 @@
         <member name="P:ECommerce1.Models.Profile.FirstName">
             <summary>
             The first name/name of the buyer.
-            </summary>
-        </member>
-        <member name="P:ECommerce1.Models.Profile.MiddleName">
-            <summary>
-            The middle name/patronym of the buyer if any.
             </summary>
         </member>
         <member name="P:ECommerce1.Models.Profile.LastName">
@@ -1414,11 +1435,6 @@
         <member name="P:ECommerce1.Models.ViewModels.UserCredentials.FirstName">
             <summary>
             The user's first name.
-            </summary>
-        </member>
-        <member name="P:ECommerce1.Models.ViewModels.UserCredentials.MiddleName">
-            <summary>
-            The user's middle name.
             </summary>
         </member>
         <member name="P:ECommerce1.Models.ViewModels.UserCredentials.LastName">

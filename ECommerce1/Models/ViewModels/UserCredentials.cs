@@ -10,10 +10,6 @@
         /// </summary>
         public string FirstName { get; set; }
         /// <summary>
-        /// The user's middle name.
-        /// </summary>
-        public string? MiddleName { get; set; }
-        /// <summary>
         /// The user's last name.
         /// </summary>
         public string LastName { get; set; }

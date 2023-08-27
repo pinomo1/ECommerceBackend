@@ -21,9 +21,6 @@ namespace ECommerce1.Models.Validators
             RuleFor(c => c.FirstName)
                 .ValidCheckString("Name/first name", 1, 64);
 
-            RuleFor(c => c.MiddleName)
-                .MaximumLength(64).WithMessage($"Maximum middle name length is 64 characters!");
-
             RuleFor(c => c.LastName)
                 .ValidCheckString("Surname/last name", 1, 64);
 

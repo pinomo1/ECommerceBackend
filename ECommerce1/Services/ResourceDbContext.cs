@@ -210,10 +210,6 @@ namespace ECommerce1.Services
                 .HasMaxLength(64)
                 .IsRequired();
 
-                e.Property(e => e.MiddleName)
-                .HasColumnType("nvarchar(64)")
-                .HasMaxLength(64);
-
                 e.Property(e => e.LastName)
                 .HasColumnType("nvarchar(64)")
                 .HasMaxLength(64)

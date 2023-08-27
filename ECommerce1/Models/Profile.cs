@@ -10,10 +10,6 @@
         /// </summary>
         public string FirstName { get; set; }
         /// <summary>
-        /// The middle name/patronym of the buyer if any.
-        /// </summary>
-        public string? MiddleName { get; set; }
-        /// <summary>
         /// The last name/family name/surname of the buyer.
         /// </summary>
         public string LastName { get; set; }
