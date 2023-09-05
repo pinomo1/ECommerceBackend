@@ -48,7 +48,6 @@ services.AddControllers().AddJsonOptions(x =>
 services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 services.AddEndpointsApiExplorer();
 services.AddSwagger();
-// services.AddJwtAuthentication(config["Secret"], new List<string>() { "User", "Seller", "Admin" });
 services.AddTransient<IEmailSender, SendGridEmailSender>();
 builder.Services.AddSendGrid(options =>
     options.ApiKey = builder.Configuration.GetValue<string>("SendGridApiKey")
@@ -62,9 +61,10 @@ services.AddScoped<IValidator<SellerCredentials>, SellerRegistrationValidator>()
 services.AddScoped<IValidator<LoginCredentials>, LoginValidator>();
 services.AddTransient<BlobServiceClient>(x =>
 {
-    return new BlobServiceClient(config.GetConnectionString("BlobStorage"));
+    return new(config.GetConnectionString("BlobStorage"));
 });
 services.AddTransient<BlobWorker>();
+services.AddTransient<TranslationService>();
 
 services.AddAzureClients(builder =>
 {

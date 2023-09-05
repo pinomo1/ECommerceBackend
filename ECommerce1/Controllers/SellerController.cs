@@ -34,7 +34,7 @@ namespace ECommerce1.Controllers
         [HttpGet("title/{title}")]
         public async Task<ActionResult<IList<Seller>>> ByTitle(string title)
         {
-            if(title.Length < 4)
+            if (title.Length < 4)
             {
                 return BadRequest(new
                 {
@@ -45,18 +45,18 @@ namespace ECommerce1.Controllers
                 .Where(s => EF.Functions.Like(s.CompanyName, $"%{title}%")).ToListAsync();
             return Ok(sellers);
         }
-        
+
         /// <summary>
         /// As a seller, add profile/company picture
         /// </summary>
         /// <param name="picture"></param>
         /// <returns></returns>
         [HttpPost("postpfp")]
-        [Authorize(Roles ="Seller")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> PostProfilePicture(IFormFile? picture)
         {
             Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(s => s.AuthId == User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if(seller == null)
+            if (seller == null)
             {
                 return BadRequest(new
                 {
@@ -64,7 +64,7 @@ namespace ECommerce1.Controllers
                 });
             }
             string reference = await BlobWorker.AddPublicationPhoto(picture);
-            if(reference == String.Empty)
+            if (reference == string.Empty)
             {
                 return BadRequest(new
                 {
@@ -74,6 +74,45 @@ namespace ECommerce1.Controllers
             seller.ProfilePhotoUrl = reference;
             await resourceDbContext.SaveChangesAsync();
             return Ok(seller.Id);
+        }
+
+        /// <summary>
+        /// Boost self
+        /// </summary>
+        /// <param name="untilDateTime"></param>
+        /// <returns></returns>
+        [HttpPost("boost")]
+        [Authorize(Roles = "Seller")]
+        public async Task<ActionResult> BoostSelf(DateTime untilDateTime)
+        {
+            Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(s => s.AuthId == User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (seller == null)
+            {
+                return BadRequest(new
+                {
+                    error_message = "Not authorized"
+                });
+            }
+
+            if (seller.BoostedUntil > DateTime.Now)
+            {
+                return BadRequest(new
+                {
+                    error_message = "Already boosted"
+                });
+            }
+
+            if (untilDateTime < DateTime.Now)
+            {
+                return BadRequest(new
+                {
+                    error_message = "Bad date"
+                });
+            }
+
+            seller.BoostedUntil = untilDateTime;
+
+            return Ok();
         }
     }
 }

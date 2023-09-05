@@ -50,7 +50,7 @@ namespace ECommerce1.Migrations.Resource
                     b.ToTable("CartItems");
                 });
 
-            modelBuilder.Entity("ECommerce1.Models.Category", b =>
+            modelBuilder.Entity("ECommerce1.Models.CategoryName", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -550,9 +550,9 @@ namespace ECommerce1.Migrations.Resource
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ECommerce1.Models.Category", b =>
+            modelBuilder.Entity("ECommerce1.Models.CategoryName", b =>
                 {
-                    b.HasOne("ECommerce1.Models.Category", "ParentCategory")
+                    b.HasOne("ECommerce1.Models.CategoryName", "ParentCategory")
                         .WithMany("ChildCategories")
                         .HasForeignKey("ParentCategoryId");
 
@@ -610,7 +610,7 @@ namespace ECommerce1.Migrations.Resource
 
             modelBuilder.Entity("ECommerce1.Models.Product", b =>
                 {
-                    b.HasOne("ECommerce1.Models.Category", "Category")
+                    b.HasOne("ECommerce1.Models.CategoryName", "CategoryName")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -622,7 +622,7 @@ namespace ECommerce1.Migrations.Resource
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
+                    b.Navigation("CategoryName");
 
                     b.Navigation("Seller");
                 });
@@ -744,7 +744,7 @@ namespace ECommerce1.Migrations.Resource
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ECommerce1.Models.Category", b =>
+            modelBuilder.Entity("ECommerce1.Models.CategoryName", b =>
                 {
                     b.Navigation("ChildCategories");
 

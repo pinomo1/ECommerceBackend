@@ -7,6 +7,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System;
 
 namespace ECommerce1.Services
 {
@@ -57,7 +58,7 @@ namespace ECommerce1.Services
             {
                 try
                 {
-                    List<string> references = new List<string>();
+                    List<string> references = new();
                     string containerPublicationPhoto = "uploads";
                     var containerClientPhoto = BlobServiceClient.GetBlobContainerClient(containerPublicationPhoto);
                     string newName;
@@ -104,36 +105,32 @@ namespace ECommerce1.Services
         {
             if (!String.IsNullOrWhiteSpace(path))
             {
-                var oldFileName = path.Substring(path.LastIndexOf('/') + 1);
+                var oldFileName = path[(path.LastIndexOf('/') + 1)..];
                 await containerClient.DeleteBlobIfExistsAsync(oldFileName);
             }
         }
 
-        private async Task<IFormFile?> FormatPhoto(IFormFile file, int thumbnailWidth)
+        private static async Task<IFormFile?> FormatPhoto(IFormFile file, int thumbnailWidth)
         {
             try
             {
-                using (Stream fileStream = file.OpenReadStream())
+                using Stream fileStream = file.OpenReadStream();
+                if (fileStream != null)
                 {
-                    if (fileStream != null)
+                    var extension = Path.GetExtension(file.FileName);
+                    var encoder = GetEncoder(extension);
+                    if (encoder != null)
                     {
-                        var extension = Path.GetExtension(file.FileName);
-                        var encoder = GetEncoder(extension);
-                        if (encoder != null)
-                        {
-                            var buffer = new byte[fileStream.Length];
-                            await fileStream.ReadAsync(buffer, 0, Convert.ToInt32(fileStream.Length));
-                            using (Image<Rgba32> image = Image.Load<Rgba32>(buffer))
-                            {
-                                var output = new MemoryStream();
-                                decimal divisor = image.Width / (decimal)thumbnailWidth;
-                                var height = Convert.ToInt32(Math.Round(image.Height / divisor));
-                                image.Mutate(x => x.Resize(thumbnailWidth, height));
-                                image.Save(output, encoder);
-                                output.Position = 0;
-                                return new FormFile(output, 0, output.Length, "\"file\"", file.FileName);
-                            }
-                        }
+                        var buffer = new byte[fileStream.Length];
+                        await fileStream.ReadAsync(buffer.AsMemory(0, Convert.ToInt32(fileStream.Length)));
+                        using Image<Rgba32> image = Image.Load<Rgba32>(buffer);
+                        var output = new MemoryStream();
+                        decimal divisor = image.Width / (decimal)thumbnailWidth;
+                        var height = Convert.ToInt32(Math.Round(image.Height / divisor));
+                        image.Mutate(x => x.Resize(thumbnailWidth, height));
+                        image.Save(output, encoder);
+                        output.Position = 0;
+                        return new FormFile(output, 0, output.Length, "\"file\"", file.FileName);
                     }
                 }
             }
@@ -143,7 +140,7 @@ namespace ECommerce1.Services
             }
             return null;
         }
-        private IImageEncoder? GetEncoder(string extension)
+        private static IImageEncoder? GetEncoder(string extension)
         {
             IImageEncoder? encoder = null;
             extension = extension.Replace(".", "");

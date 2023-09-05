@@ -90,7 +90,7 @@ namespace ECommerce1.Controllers
                         Product = product,
                         User = profile
                     };
-                    if (recentlyViewedItems.Count > 10)
+                    if (recentlyViewedItems.Count > 100)
                     {
                         resourceDbContext.RecentlyViewedItems.Remove(recentlyViewedItems[0]);
                     }
@@ -150,7 +150,8 @@ namespace ECommerce1.Controllers
                     Price = p.Product.Price,
                     OrderCount = p.Product.Orders.Count,
                     Rating = p.Product.Reviews.Count == 0 ? 0 : p.Product.Reviews.Average(r => r.Quality),
-                    Quantity = p.Quantity
+                    Quantity = p.Quantity,
+                    IsBoosted = p.Product.Seller.IsBoosted
                 }).ToListAsync();
             
             if (onPage > 50)
@@ -259,7 +260,8 @@ namespace ECommerce1.Controllers
                     Price = p.Product.Price,
                     OrderCount = p.Product.Orders.Count,
                     Rating = p.Product.Reviews.Count == 0 ? 0 : p.Product.Reviews.Average(r => r.Quality),
-                    Quantity = p.Quantity
+                    Quantity = p.Quantity,
+                    IsBoosted = p.Product.Seller.IsBoosted
                 }).ToListAsync();
 
             int totalCount = unorderedProducts.Count;
@@ -310,6 +312,11 @@ namespace ECommerce1.Controllers
                 return new List<ProductsProductViewModel>();
             }
 
+            if (category.IsSearchable == false)
+            {
+                return new List<ProductsProductViewModel>();
+            }
+
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
                 .Include(p => p.Reviews)
                 .Select(p => new {
@@ -327,7 +334,8 @@ namespace ECommerce1.Controllers
                     Price = p.Product.Price,
                     OrderCount = p.Product.Orders.Count,
                     Rating = p.Product.Reviews.Count == 0 ? 0 : p.Product.Reviews.Average(r => r.Quality),
-                    Quantity = p.Quantity
+                    Quantity = p.Quantity,
+                    IsBoosted = p.Product.Seller.IsBoosted
                 }).ToListAsync();
 
             foreach (Category subcategory in category.ChildCategories)
@@ -364,7 +372,15 @@ namespace ECommerce1.Controllers
                 });
             }
 
-            if(onPage > 50)
+            if (category.IsSearchable == false)
+            {
+                return NotFound(new
+                {
+                    error_message = "This category is not searchable"
+                });
+            }
+
+            if (onPage > 50)
             {
                 onPage = 50;
             }
@@ -457,13 +473,13 @@ namespace ECommerce1.Controllers
 
             IOrderedEnumerable<ProductsProductViewModel> orderedProducts = sorting switch
             {
-                ProductSorting.OlderFirst => unorderedProducts.OrderBy(p => p.CreationTime),
-                ProductSorting.NewerFirst => unorderedProducts.OrderByDescending(p => p.CreationTime),
-                ProductSorting.CheaperFirst => unorderedProducts.OrderBy(p => p.Price),
-                ProductSorting.ExpensiveFirst => unorderedProducts.OrderByDescending(p => p.Price),
-                ProductSorting.PopularFirst => unorderedProducts.OrderByDescending(p => p.OrderCount),
+                ProductSorting.OlderFirst => unorderedProducts.OrderByDescending(p => p.IsBoosted).ThenBy(p => p.CreationTime),
+                ProductSorting.NewerFirst => unorderedProducts.OrderByDescending(p => p.IsBoosted).ThenByDescending(p => p.CreationTime),
+                ProductSorting.CheaperFirst => unorderedProducts.OrderByDescending(p => p.IsBoosted).ThenBy(p => p.Price),
+                ProductSorting.ExpensiveFirst => unorderedProducts.OrderByDescending(p => p.IsBoosted).ThenByDescending(p => p.Price),
+                ProductSorting.PopularFirst => unorderedProducts.OrderByDescending(p => p.IsBoosted).ThenByDescending(p => p.OrderCount),
                 ProductSorting.BestFirst => unorderedProducts.OrderByDescending(p => p.Rating),
-                _ => unorderedProducts.OrderByDescending(p => p.OrderCount),
+                _ => unorderedProducts.OrderByDescending(p => p.IsBoosted).ThenByDescending(p => p.OrderCount),
             };
             return new ProductPreparation(minPrice, maxPrice, orderedProducts.Skip((page - 1) * onPage).Take(onPage));
         }
@@ -579,6 +595,14 @@ namespace ECommerce1.Controllers
                 return BadRequest(new
                 {
                     error_message = "No such category exists"
+                });
+            }
+
+            if (category.AllowProducts == false)
+            {
+                return BadRequest(new
+                {
+                    error_message = "This category does not allow products"
                 });
             }
             

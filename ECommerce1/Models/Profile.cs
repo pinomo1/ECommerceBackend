@@ -34,10 +34,14 @@
         /// Recently viewed items of the buyer.
         /// </summary>
         public IList<RecentlyViewedItem> RecentlyViewedItems { get; set; }
-        // <summary>
-        // Address list of the buyer.
-        // </summary>
+        /// <summary>
+        /// Address list of the buyer.
+        /// </summary>
         public IList<UserAddress> Addresses { get; set; }
+        /// <summary>
+        /// Questions of the buyer.
+        /// </summary>
+        public IList<QuestionProduct> QuestionProducts { get; set; }
 
         public Profile()
         {
@@ -47,6 +51,7 @@
             Reviews = new List<Review>();
             FavouriteItems = new List<FavouriteItem>();
             RecentlyViewedItems = new List<RecentlyViewedItem>();
+            QuestionProducts = new List<QuestionProduct>();
         }
     }
 }

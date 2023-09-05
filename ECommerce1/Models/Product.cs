@@ -1,4 +1,6 @@
-﻿namespace ECommerce1.Models
+﻿using Microsoft.Identity.Client;
+
+namespace ECommerce1.Models
 {
     /// <summary>
     /// Product model
@@ -59,6 +61,11 @@
         /// </summary>
         public IList<RecentlyViewedItem> RecentlyViewedItems { get; set; }
 
+        /// <summary>
+        /// Questions asked about this product
+        /// </summary>
+        public IList<QuestionProduct> QuestionProducts { get; set; }
+
         public Product()
         {
             ProductPhotos = new List<ProductPhoto>();
@@ -68,6 +75,7 @@
             FavouriteItems = new List<FavouriteItem>();
             RecentlyViewedItems = new List<RecentlyViewedItem>();
             ProductAddresses = new List<ProductAddress>();
+            QuestionProducts = new List<QuestionProduct>();
         }
     }
 }

@@ -126,5 +126,10 @@
         /// Whether in stock or not
         /// </summary>
         public int Quantity { get; set; }
+
+        /// <summary>
+        /// Whether the product is boosted or not
+        /// </summary>
+        public bool IsBoosted { get; set; }
     }
 }

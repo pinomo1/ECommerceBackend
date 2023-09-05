@@ -27,6 +27,9 @@ namespace ECommerce1.Services
         public DbSet<Review> Reviews { get; set; }
         public DbSet<ReviewPhoto> ReviewPhotos { get; set; }
         public DbSet<RecentlyViewedItem> RecentlyViewedItems { get; set; }
+        public DbSet<QuestionProduct> QuestionProducts { get; set; }
+        public DbSet<Report> Reports { get; set; }
+        public DbSet<Translation> Translations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -177,6 +180,9 @@ namespace ECommerce1.Services
                 .HasDefaultValue("");
 
                 e.HasIndex(e => e.Name).IsUnique();
+
+                e.Property(e => e.IsSearchable)
+                .HasDefaultValue(false);
             });
 
             builder.Entity<ProductPhoto>(e =>
@@ -244,6 +250,69 @@ namespace ECommerce1.Services
                 e.HasMany(e => e.Reviews)
                 .WithOne(a => a.User)
                 .OnDelete(DeleteBehavior.SetNull);
+
+                e.HasMany(e => e.QuestionProducts)
+                .WithOne(a => a.User)
+                .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            builder.Entity<Report>(e =>
+            {
+                e.Property(e => e.Id)
+                .IsRequired();
+
+                e.HasKey(e => e.Id);
+
+                e.Property(e => e.ReportText)
+                .HasColumnType("nvarchar(max)")
+                .IsRequired(false);
+
+                e.Property(e => e.ReportType)
+                .IsRequired();
+
+                e.Property(e => e.ReportStatus)
+                .IsRequired();
+
+                e.Property(e => e.ReporterName)
+                .HasColumnType("nvarchar(max)")
+                .IsRequired(false);
+
+                e.Property(e => e.ReporterEmail)
+                .HasColumnType("nvarchar(max)")
+                .IsRequired(false);
+
+                e.Property(e => e.ReportedItemId)
+                .IsRequired(false);
+
+                e.Property(e => e.IsAuthorized)
+                .IsRequired();
+            });
+
+            builder.Entity<Translation>(e =>
+            {
+                e.Property(e => e.Id)
+                .IsRequired();
+
+                e.HasKey(e => e.Id);
+
+                e.Property(e => e.ObjectId)
+                .HasColumnType("nvarchar(max)")
+                .IsRequired();
+
+                e.Property(e => e.ObjectType)
+                .IsRequired();
+
+                e.Property(e => e.Locale)
+                .HasColumnType("nvarchar(5)")
+                .HasMaxLength(5)
+                .IsRequired(false);
+
+                e.Property(e => e.IsDefault)
+                .IsRequired();
+
+                e.Property(e => e.Text)
+                .HasColumnType("nvarchar(max)")
+                .IsRequired();
             });
 
             builder.Entity<Staff>(e =>
@@ -312,6 +381,10 @@ namespace ECommerce1.Services
                 e.HasMany(e => e.Addresses)
                 .WithOne(a => a.User)
                 .OnDelete(DeleteBehavior.Cascade);
+
+                e.Property(e => e.BoostedUntil)
+                .HasColumnType("datetime2")
+                .HasDefaultValueSql("0001-01-01");
             });
 
             builder.Entity<Product>(e =>
@@ -356,6 +429,10 @@ namespace ECommerce1.Services
                 e.HasMany(p => p.Reviews)
                 .WithOne(r => r.Product)
                 .IsRequired();
+
+                e.HasMany(p => p.QuestionProducts)
+                .WithOne(q => q.Product)
+                .IsRequired();
             });
 
             builder.Entity<CartItem>(e =>
@@ -375,6 +452,33 @@ namespace ECommerce1.Services
 
                 e.HasOne(e => e.Product)
                 .WithMany(e => e.CartItems)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<QuestionProduct>(e =>
+            {
+                e.Property(e => e.Id)
+               .IsRequired();
+
+                e.HasKey(e => e.Id);
+
+                e.Property(e => e.Question)
+                .HasColumnType("nvarchar(max)")
+                .IsRequired();
+
+                e.Property(e => e.Answer)
+                .HasColumnType("nvarchar(max)")
+                .HasDefaultValue(null);
+
+                e.Property(e => e.IsAnswered)
+                .HasDefaultValue(false);
+
+                e.HasOne(e => e.User)
+                .WithMany(e => e.QuestionProducts)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(e => e.Product)
+                .WithMany(e => e.QuestionProducts)
                 .OnDelete(DeleteBehavior.Cascade);
             });
 

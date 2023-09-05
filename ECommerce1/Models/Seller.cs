@@ -1,4 +1,6 @@
-﻿namespace ECommerce1.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ECommerce1.Models
 {
     /// <summary>
     /// Seller is a type of user that can sell products.
@@ -21,5 +23,16 @@
         // Address list of the buyer.
         // </summary>
         public IList<WarehouseAddress> Addresses { get; set; }
+
+        public DateTime BoostedUntil { get; set; } = DateTime.MinValue;
+
+        [NotMapped]
+        public bool IsBoosted
+        {
+            get
+            {
+                return BoostedUntil > DateTime.Now;
+            }
+        }
     }
 }

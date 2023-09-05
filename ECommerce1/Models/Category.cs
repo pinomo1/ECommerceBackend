@@ -33,6 +33,10 @@
         /// The child categories of this category if AllowProducts is false
         /// </summary>
         public IList<Category> ChildCategories { get; set; }
+        /// <summary>
+        /// Is this category searchable
+        /// </summary>
+        public bool IsSearchable { get; set; }
 
         public Category()
         {

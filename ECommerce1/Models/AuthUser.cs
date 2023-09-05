@@ -7,5 +7,6 @@ namespace ECommerce1.Models
     /// </summary>
     public class AuthUser : IdentityUser
     {
+        public DateTime LastEmailVerificationAttemptTime { get; set; }
     }
 }

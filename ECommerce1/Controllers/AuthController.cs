@@ -249,7 +249,7 @@ namespace ECommerce1.Controllers
             string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             string validDigits = "0123456789";
             string validOthers = "#?!@$%^&*-_";
-            Random random = new Random();
+            Random random = new();
             char[] chars = new char[16];
             for (int i = 0; i < 7; i++)
             {
@@ -263,7 +263,7 @@ namespace ECommerce1.Controllers
             {
                 chars[14 + i] = validOthers[random.Next(0, validOthers.Length)];
             }
-            string newPassword = new string(chars);
+            string newPassword = new(chars);
             string code = await userManager.GeneratePasswordResetTokenAsync(user);
             await userManager.ResetPasswordAsync(user, code, newPassword);
             await emailSender.SendEmailAsync(user.Email, "Reset password",

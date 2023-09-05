@@ -324,6 +324,64 @@ namespace ECommerce1.Controllers
             return Ok(orders.Select(o => new { id = o.Id }));
         }
 
+        [HttpPost("addBySellerFromCart")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> AddSelectedFromCart(string addressGuid, string sellerId)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Profile? profile = await resourceDbContext.Profiles.FirstOrDefaultAsync(p => p.AuthId == userId);
+            if (profile == null)
+            {
+                return BadRequest(new { error_message = "No such profile was found" });
+            }
+            UserAddress? address = await resourceDbContext.UserAddresses.Include(a => a.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(a => a.User.AuthId == userId && a.Id.ToString() == addressGuid);
+            if (address == null)
+            {
+                return BadRequest(new { error_message = "No such address was found" });
+            }
+            IList<CartItem>? products = await resourceDbContext.CartItems.Include(ci => ci.Product).Include(ci => ci.User).Where(p => p.User.AuthId == userId && p.Product.Seller.Id.ToString() == sellerId).ToListAsync();
+            if (products == null)
+            {
+                return BadRequest(new { error_message = "No product were found" });
+            }
+
+            List<Order> orders = new();
+            foreach (var item in products)
+            {
+                IList<ProductAddress> productAddresses = await resourceDbContext.ProductAddresses.Where(pa => pa.Product == item.Product).ToListAsync();
+                int quantity = item.Quantity;
+                int productStock = await resourceDbContext.ProductAddresses.Where(pa => pa.Product == item.Product).SumAsync(pa => pa.Quantity);
+                if (productStock < quantity)
+                {
+                    return BadRequest(new { error_message = "There is not enough of product" });
+                }
+                foreach (ProductAddress productAddress in productAddresses)
+                {
+                    int quantityToTake = Math.Min(quantity, productAddress.Quantity);
+                    quantity -= quantityToTake;
+                    orders.Add(new()
+                    {
+                        CustomerAddressCopy = address.Normalize(profile.PhoneNumber),
+                        WarehouseAddressCopy = productAddress.Address.Normalize(),
+                        OrderTime = DateTime.Now,
+                        Product = item.Product,
+                        User = profile,
+                        Quantity = quantityToTake,
+                        OrderStatus = (int)OrderStatus.Unverified
+                    });
+                    if (quantity == 0)
+                    {
+                        break;
+                    }
+                }
+            }
+            await resourceDbContext.Orders.AddRangeAsync(orders);
+            resourceDbContext.CartItems.RemoveRange(products);
+            await resourceDbContext.SaveChangesAsync();
+
+            return Ok(orders);
+        }
+
         /// <summary>
         /// Change status of your order
         /// </summary>

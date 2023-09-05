@@ -7,5 +7,6 @@
         public string Name { get; set; }
         public bool AllowProducts { get; set; }
         public string ImageUrl { get; set; }
+        public bool IsSearchable { get; set; }
     }
 }
