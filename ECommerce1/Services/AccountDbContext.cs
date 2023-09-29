@@ -19,7 +19,7 @@ namespace ECommerce1.Services
 
             builder.Entity<AuthUser>(e =>
             {
-                e.Property(x => x.LastEmailVerificationAttemptTime).IsRequired();
+                e.Property(x => x.LastEmailVerificationAttemptTime).HasColumnType("datetime2");
             });
 
             builder.Entity<RefreshToken>(e =>

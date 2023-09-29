@@ -384,7 +384,7 @@ namespace ECommerce1.Services
 
                 e.Property(e => e.BoostedUntil)
                 .HasColumnType("datetime2")
-                .HasDefaultValueSql("0001-01-01");
+                .HasDefaultValueSql("\'0001-01-01\'");
             });
 
             builder.Entity<Product>(e =>
