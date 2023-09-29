@@ -17,6 +17,11 @@ namespace ECommerce1.Services
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<AuthUser>(e =>
+            {
+                e.Property(x => x.LastEmailVerificationAttemptTime).IsRequired();
+            });
+
             builder.Entity<RefreshToken>(e =>
             {
                 e.HasKey(x => x.Token);

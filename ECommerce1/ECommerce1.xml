@@ -493,6 +493,36 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:ECommerce1.Controllers.QuestionProductController.GetQAByProduct(System.String)">
+            <summary>
+            Get all questions for specified product
+            </summary>
+            <param name="id">Product ID</param>
+            <returns>List of questions</returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.QuestionProductController.DeleteQuestion(System.String)">
+            <summary>
+            Delete question by id
+            </summary>
+            <param name="id">Id of question</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.QuestionProductController.AddQuestion(System.String,System.String)">
+            <summary>
+            Add question to product
+            </summary>
+            <param name="id">Id of product</param>
+            <param name="question">Question</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.QuestionProductController.AddAnswer(System.String,System.String)">
+            <summary>
+            Answer question
+            </summary>
+            <param name="id">Id of question</param>
+            <param name="answer">Answer</param>
+            <returns></returns>
+        </member>
         <member name="M:ECommerce1.Controllers.RecentlyViewedController.GetRecentlyViewed">
             <summary>
             Get all recently viewed items
@@ -504,6 +534,18 @@
             Remove item from recently viewed list
             </summary>
             <param name="guid">Product's ID, not RecentlyViewedItem's ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.RecommendationController.GetRecentlyViewedUser">
+            <summary>
+            Get recommendations for a user
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.RecommendationController.GetRecentlyViewed">
+            <summary>
+            Get general recommendations
+            </summary>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.ReviewController.GetByProductId(System.String,System.Int32,System.Int32)">
@@ -541,6 +583,13 @@
             As a seller, add profile/company picture
             </summary>
             <param name="picture"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECommerce1.Controllers.SellerController.BoostSelf(System.DateTime)">
+            <summary>
+            Boost self
+            </summary>
+            <param name="untilDateTime"></param>
             <returns></returns>
         </member>
         <member name="M:ECommerce1.Controllers.WarehouseController.GetAddresses">
@@ -676,6 +725,11 @@
         <member name="P:ECommerce1.Models.Category.ChildCategories">
             <summary>
             The child categories of this category if AllowProducts is false
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Category.IsSearchable">
+            <summary>
+            Is this category searchable
             </summary>
         </member>
         <member name="T:ECommerce1.Models.City">
@@ -833,6 +887,11 @@
             Buyers that recently viewed this product
             </summary>
         </member>
+        <member name="P:ECommerce1.Models.Product.QuestionProducts">
+            <summary>
+            Questions asked about this product
+            </summary>
+        </member>
         <member name="P:ECommerce1.Models.ProductAddress.Quantity">
             <summary>
             Quantity of the product in this address
@@ -916,6 +975,16 @@
         <member name="P:ECommerce1.Models.Profile.RecentlyViewedItems">
             <summary>
             Recently viewed items of the buyer.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.Addresses">
+            <summary>
+            Address list of the buyer.
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.Profile.QuestionProducts">
+            <summary>
+            Questions of the buyer.
             </summary>
         </member>
         <member name="T:ECommerce1.Models.RefreshToken">
@@ -1405,6 +1474,11 @@
         <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.Quantity">
             <summary>
             Whether in stock or not
+            </summary>
+        </member>
+        <member name="P:ECommerce1.Models.ViewModels.ProductsProductViewModel.IsBoosted">
+            <summary>
+            Whether the product is boosted or not
             </summary>
         </member>
         <member name="T:ECommerce1.Models.ViewModels.SellerCredentials">
