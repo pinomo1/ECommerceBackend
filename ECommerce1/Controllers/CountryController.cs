@@ -8,14 +8,8 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CountryController : ControllerBase
+    public class CountryController(ResourceDbContext resourceDbContext) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-
-        public CountryController(ResourceDbContext resourceDbContext)
-        {
-            this.resourceDbContext = resourceDbContext;
-        }
 
         /// <summary>
         /// Get all countries

@@ -10,15 +10,8 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AddressController : ControllerBase
+    public class AddressController(ResourceDbContext resourceDbContext, IConfiguration configuration) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-        private readonly IConfiguration configuration;
-        public AddressController(ResourceDbContext resourceDbContext, IConfiguration configuration)
-        {
-            this.resourceDbContext = resourceDbContext;
-            this.configuration = configuration;
-        }
 
 
         /// <summary>

@@ -4,13 +4,9 @@ using Microsoft.Extensions.Options;
 
 namespace ECommerce1.Services
 {
-    public class RoleGenerator
+    public class RoleGenerator(IOptions<RoleGeneratorOptions> options)
     {
-        public RoleGeneratorOptions Options { get; }
-        public RoleGenerator(IOptions<RoleGeneratorOptions> options)
-        {
-            Options = options.Value;
-        }
+        public RoleGeneratorOptions Options { get; } = options.Value;
 
         public async Task<bool> AddDefaultRoles(RoleManager<IdentityRole> roleManager)
         {

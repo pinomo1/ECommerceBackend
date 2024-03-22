@@ -11,16 +11,8 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProfileController : ControllerBase
+    public class ProfileController(ResourceDbContext resourceDbContext, IConfiguration configuration) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-        private readonly IConfiguration configuration;
-
-        public ProfileController(ResourceDbContext resourceDbContext, IConfiguration configuration)
-        {
-            this.resourceDbContext = resourceDbContext;
-            this.configuration = configuration;
-        }
 
         /// <summary>
         /// Return any authorized user's info

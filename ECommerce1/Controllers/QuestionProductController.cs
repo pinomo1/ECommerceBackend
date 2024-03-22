@@ -14,15 +14,9 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class QuestionProductController : ControllerBase
+    public class QuestionProductController(ResourceDbContext resourceDbContext,
+        BlobWorker blobWorker) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-
-        public QuestionProductController(ResourceDbContext resourceDbContext,
-            BlobWorker blobWorker)
-        {
-            this.resourceDbContext = resourceDbContext;
-        }
 
         /// <summary>
         /// Get all questions for specified product

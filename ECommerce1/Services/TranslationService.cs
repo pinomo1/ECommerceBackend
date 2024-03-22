@@ -6,15 +6,8 @@ using System.ComponentModel;
 namespace ECommerce1.Services
 {
 
-    public class TranslationService
+    public class TranslationService(ResourceDbContext resourceDbContext)
     {
-        private readonly ResourceDbContext resourceDbContext;
-
-        public TranslationService(ResourceDbContext resourceDbContext)
-        {
-            this.resourceDbContext = resourceDbContext;
-        }
-
         public async Task AddTranslation(TranslatedObjectType objType, string objId, string locale, string translation)
         {
             bool hasDefault = await resourceDbContext.Translations.AnyAsync(t => t.ObjectId == objId && t.ObjectType == objType && t.IsDefault);

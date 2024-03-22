@@ -12,14 +12,9 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CartController : ControllerBase
+    public class CartController(ResourceDbContext resourceDbContext) : ControllerBase
     {
         private const int maxProductInCart = 99;
-        private readonly ResourceDbContext resourceDbContext;
-        public CartController(ResourceDbContext resourceDbContext)
-        {
-            this.resourceDbContext = resourceDbContext;
-        }
 
         /// <summary>
         /// Return maximum quantity of certain product in the cart
@@ -41,7 +36,7 @@ namespace ECommerce1.Controllers
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ThenInclude(ci => ci.ProductPhotos).ToListAsync();
-            List<CartItemViewModel> cartItemViewModels = new();
+            List<CartItemViewModel> cartItemViewModels = [];
 
             foreach (CartItem cartItem in cartItems)
             {
@@ -72,7 +67,7 @@ namespace ECommerce1.Controllers
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<CartItem> cartItems = await resourceDbContext.CartItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ThenInclude(ci => ci.ProductPhotos).ToListAsync();
-            List<CartItemViewModel> cartItemViewModels = new();
+            List<CartItemViewModel> cartItemViewModels = [];
             
             foreach (CartItem cartItem in cartItems)
             {
@@ -84,7 +79,7 @@ namespace ECommerce1.Controllers
                 cartItemViewModels.Add(cartItemViewModel);
             }
 
-            List<CartItemsGroupedBySeller> cartItemsGroupedBySellers = new();
+            List<CartItemsGroupedBySeller> cartItemsGroupedBySellers = [];
             foreach (CartItemViewModel cartItemViewModel in cartItemViewModels)
             {
                 Seller? seller = await resourceDbContext.Sellers.FirstOrDefaultAsync(s => s.Id == cartItemViewModel.Product.Seller.Id);
@@ -96,10 +91,10 @@ namespace ECommerce1.Controllers
                 if (cartItemsGroupedBySeller.Seller == null)
                 {
                     cartItemsGroupedBySeller.Seller = seller;
-                    cartItemsGroupedBySeller.CartItems = new List<CartItemViewModel>
-                    {
+                    cartItemsGroupedBySeller.CartItems =
+                    [
                         cartItemViewModel
-                    };
+                    ];
                     cartItemsGroupedBySellers.Add(cartItemsGroupedBySeller);
                 }
                 else
@@ -183,7 +178,7 @@ namespace ECommerce1.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> DeleteSelected(IList<string> guids)
         {
-            List<Product> products = new();
+            List<Product> products = [];
             foreach (string guid in guids)
             {
                 Product? product = await resourceDbContext.Products.FirstOrDefaultAsync(p => p.Id.ToString() == guid);

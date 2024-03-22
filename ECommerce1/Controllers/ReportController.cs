@@ -10,16 +10,9 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReportController : ControllerBase
+    public class ReportController(ResourceDbContext resourceDbContext, IEmailSender _emailSender) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-        public readonly IEmailSender emailSender;
-
-        public ReportController(ResourceDbContext resourceDbContext, IEmailSender _emailSender)
-        {
-            this.resourceDbContext = resourceDbContext;
-            this.emailSender = _emailSender;
-        }
+        public readonly IEmailSender emailSender = _emailSender;
 
         [HttpPost("report")]
         public async Task<IActionResult> ReportSomething(string? ReporterEmail, string? ReporterName, ReportType ReportType, string? ReportedItemId, string? ReportText)

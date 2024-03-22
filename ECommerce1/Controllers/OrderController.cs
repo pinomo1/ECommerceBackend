@@ -13,15 +13,9 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
+    public class OrderController(ResourceDbContext resourceDbContext) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
 
-        public OrderController(ResourceDbContext resourceDbContext)
-        {
-            this.resourceDbContext = resourceDbContext;
-        }
-        
         /// <summary>
         /// Return order's states
         /// </summary>
@@ -31,7 +25,7 @@ namespace ECommerce1.Controllers
         {
             IDictionary<int, string> names = Enum.GetNames(typeof(OrderStatus)).ToList().Select((s, i) => new { s, i }).ToDictionary(x => x.i + 1, x => x.s);
 
-            List<TempStruct111> tsList = new();
+            List<TempStruct111> tsList = [];
 
             foreach (var item in names)
             {
@@ -161,7 +155,7 @@ namespace ECommerce1.Controllers
                 return BadRequest(new { error_message = "There is not enough of product" });
             }
 
-            List<Order> orders = new();
+            List<Order> orders = [];
 
             foreach (ProductAddress productAddress in productAddresses)
             {
@@ -214,7 +208,7 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "No product were found" });
             }
-            List<Order> orders = new();
+            List<Order> orders = [];
 
             foreach (var item in products)
             {
@@ -285,7 +279,7 @@ namespace ECommerce1.Controllers
             {
                 return BadRequest(new { error_message = "No product were found" });
             }
-            List<Order> orders = new();
+            List<Order> orders = [];
 
             foreach (var item in products)
             {
@@ -345,7 +339,7 @@ namespace ECommerce1.Controllers
                 return BadRequest(new { error_message = "No product were found" });
             }
 
-            List<Order> orders = new();
+            List<Order> orders = [];
             foreach (var item in products)
             {
                 IList<ProductAddress> productAddresses = await resourceDbContext.ProductAddresses.Where(pa => pa.Product == item.Product).ToListAsync();

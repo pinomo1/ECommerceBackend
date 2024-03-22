@@ -8,14 +8,8 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CityController : ControllerBase
+    public class CityController(ResourceDbContext resourceDbContext) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-
-        public CityController(ResourceDbContext resourceDbContext)
-        {
-            this.resourceDbContext = resourceDbContext;
-        }
 
         /// <summary>
         /// Get all cities

@@ -11,15 +11,10 @@ using System;
 
 namespace ECommerce1.Services
 {
-    public class BlobWorker
+    public partial class BlobWorker(BlobServiceClient blobServiceClient, IConfiguration configuration)
     {
-        public BlobServiceClient BlobServiceClient { get; set; }
-        public IConfiguration Configuration { get; set; }
-        public BlobWorker(BlobServiceClient blobServiceClient, IConfiguration configuration)
-        {
-            BlobServiceClient = blobServiceClient;
-            Configuration = configuration;
-        }
+        public BlobServiceClient BlobServiceClient { get; set; } = blobServiceClient;
+        public IConfiguration Configuration { get; set; } = configuration;
 
         public async Task<string> AddPublicationPhoto(IFormFile? file)
         {
@@ -58,7 +53,7 @@ namespace ECommerce1.Services
             {
                 try
                 {
-                    List<string> references = new();
+                    List<string> references = [];
                     string containerPublicationPhoto = "uploads";
                     var containerClientPhoto = BlobServiceClient.GetBlobContainerClient(containerPublicationPhoto);
                     string newName;
@@ -78,17 +73,17 @@ namespace ECommerce1.Services
                     }
                     if (references.Count < 1)
                     {
-                        await this.RemovePublications(references.ToArray());
-                        return Enumerable.Empty<string>();
+                        await this.RemovePublications([.. references]);
+                        return [];
                     }
                     return references;
                 }
                 catch (Exception)
                 {
-                    return Enumerable.Empty<string>();
+                    return [];
                 }
             }
-            return Enumerable.Empty<string>();
+            return [];
         }
         public async Task RemovePublications(string[] references)
         {
@@ -144,7 +139,7 @@ namespace ECommerce1.Services
         {
             IImageEncoder? encoder = null;
             extension = extension.Replace(".", "");
-            var isSupported = Regex.IsMatch(extension, "jpe?g|png|gif", RegexOptions.IgnoreCase);
+            var isSupported = PhotoFileExtensionRegex().IsMatch(extension);
             if (isSupported)
             {
                 switch (extension)
@@ -163,5 +158,8 @@ namespace ECommerce1.Services
             }
             return encoder;
         }
+
+        [GeneratedRegex("jpe?g|png|gif", RegexOptions.IgnoreCase, "en-GB")]
+        private static partial Regex PhotoFileExtensionRegex();
     }
 }

@@ -13,18 +13,9 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SellerController : ControllerBase
+    public class SellerController(ResourceDbContext resourceDbContext, IConfiguration configuration, BlobWorker blobWorker) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-        private readonly IConfiguration configuration;
-        public BlobWorker BlobWorker { get; set; }
-
-        public SellerController(ResourceDbContext resourceDbContext, IConfiguration configuration, BlobWorker blobWorker)
-        {
-            this.resourceDbContext = resourceDbContext;
-            this.configuration = configuration;
-            BlobWorker = blobWorker;
-        }
+        public BlobWorker BlobWorker { get; set; } = blobWorker;
 
         /// <summary>
         /// Find sellers by title

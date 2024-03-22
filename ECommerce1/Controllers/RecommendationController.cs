@@ -10,17 +10,9 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RecommendationController : Controller
+    public class RecommendationController(ResourceDbContext resourceDbContext, IConfiguration configuration) : Controller
     {
         const int MAX_RECOMMENDED_PRODUCTS = 20;
-
-        private readonly ResourceDbContext resourceDbContext;
-        private readonly IConfiguration configuration;
-        public RecommendationController(ResourceDbContext resourceDbContext, IConfiguration configuration)
-        {
-            this.resourceDbContext = resourceDbContext;
-            this.configuration = configuration;
-        }
 
         /// <summary>
         /// Get recommendations for a user
@@ -35,7 +27,7 @@ namespace ECommerce1.Controllers
 
             List<Category> viewedCategories = await resourceDbContext.Categories.Where(c => recentlyViewedItems.Any(item => item.Product.Category.Id == c.Id)).Include(c => c.Products).ToListAsync();
 
-            List<Product> recommendedProducts = new();
+            List<Product> recommendedProducts = [];
             if (viewedCategories.Count == 0)
             {
                 return Ok(recommendedProducts);

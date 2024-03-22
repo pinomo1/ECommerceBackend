@@ -14,20 +14,12 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
+    public class ProductController(ResourceDbContext resourceDbContext,
+        IValidator<AddProductViewModel> productssValidator,
+        BlobWorker blobWorker) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-        public IValidator<AddProductViewModel> ProductsValidator { get; set; }
-        public BlobWorker BlobWorker { get; set; }
-
-        public ProductController(ResourceDbContext resourceDbContext,
-            IValidator<AddProductViewModel> productssValidator,
-            BlobWorker blobWorker)
-        {
-            this.resourceDbContext = resourceDbContext;
-            ProductsValidator = productssValidator;
-            BlobWorker = blobWorker;
-        }
+        public IValidator<AddProductViewModel> ProductsValidator { get; set; } = productssValidator;
+        public BlobWorker BlobWorker { get; set; } = blobWorker;
 
         /// <summary>
         /// Returns elements of ProductSorting enum
@@ -38,7 +30,7 @@ namespace ECommerce1.Controllers
         {
             IDictionary<int, string> names = Enum.GetNames(typeof(ProductSorting)).ToList().Select((s, i) => new { s, i }).ToDictionary(x => x.i + 1, x => x.s);
             
-            List<TempStruct111> tsList = new();
+            List<TempStruct111> tsList = [];
 
             foreach (var item in names)
             {
@@ -309,12 +301,12 @@ namespace ECommerce1.Controllers
 
             if (category == null)
             {
-                return new List<ProductsProductViewModel>();
+                return [];
             }
 
             if (category.IsSearchable == false)
             {
-                return new List<ProductsProductViewModel>();
+                return [];
             }
 
             IList<ProductsProductViewModel> unorderedProducts = await resourceDbContext.Products
@@ -340,7 +332,7 @@ namespace ECommerce1.Controllers
 
             foreach (Category subcategory in category.ChildCategories)
             {
-                unorderedProducts = unorderedProducts.Concat(await GetSubcategoriesAndProducts(subcategory.Id.ToString(), fromPrice, toPrice, inStock, title)).ToList();
+                unorderedProducts = [.. unorderedProducts, .. await GetSubcategoriesAndProducts(subcategory.Id.ToString(), fromPrice, toPrice, inStock, title)];
             }
 
             return unorderedProducts;
@@ -397,9 +389,9 @@ namespace ECommerce1.Controllers
             }
             */
 
-            IList<ProductsProductViewModel> unorderedProducts = new List<ProductsProductViewModel>();
+            IList<ProductsProductViewModel> unorderedProducts = [];
 
-            unorderedProducts = unorderedProducts.Concat(await GetSubcategoriesAndProducts(guid, fromPrice, toPrice, inStock, title)).ToList();
+            unorderedProducts = [.. unorderedProducts, .. await GetSubcategoriesAndProducts(guid, fromPrice, toPrice, inStock, title)];
 
             int totalCount = unorderedProducts.Count;
             int totalPages = (int)Math.Ceiling((double)totalCount / onPage);
@@ -487,18 +479,11 @@ namespace ECommerce1.Controllers
         /// <summary>
         /// Class for preparing products
         /// </summary>
-        class ProductPreparation
+        class ProductPreparation(decimal min, decimal max, IEnumerable<ProductsProductViewModel> prods)
         {
-            public decimal MinPrice { get; set; }
-            public decimal MaxPrice { get; set; }
-            public IEnumerable<ProductsProductViewModel> Products { get; set; }
-
-            public ProductPreparation(decimal min, decimal max, IEnumerable<ProductsProductViewModel> prods)
-            {
-                MinPrice = min;
-                MaxPrice = max;
-                Products = prods;
-            }
+            public decimal MinPrice { get; set; } = min;
+            public decimal MaxPrice { get; set; } = max;
+            public IEnumerable<ProductsProductViewModel> Products { get; set; } = prods;
         }
 
         /// <summary>
@@ -540,7 +525,7 @@ namespace ECommerce1.Controllers
                 return BadRequest(new { error_message = "Photos has not been uploaded" });
             }
             
-            List<ProductPhoto> productPhotos = new();
+            List<ProductPhoto> productPhotos = [];
             foreach (string reference in references)
             {
                 productPhotos.Add(new ProductPhoto()
@@ -702,7 +687,7 @@ namespace ECommerce1.Controllers
             string[] urls = prod.ProductPhotos.Select(p => p.Url).ToArray();
             await BlobWorker.RemovePublications(urls);
 
-            List<ProductPhoto> productPhotos = new();
+            List<ProductPhoto> productPhotos = [];
             foreach (string reference in references)
             {
                 productPhotos.Add(new ProductPhoto()
@@ -740,7 +725,7 @@ namespace ECommerce1.Controllers
                 return BadRequest(new {error_message = "Not your product"});
             }
 
-            Dictionary<int, int> SellingDict = new();
+            Dictionary<int, int> SellingDict = [];
 
             for (int i = 0; i < 14; i++)
             {

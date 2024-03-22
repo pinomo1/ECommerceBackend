@@ -4,16 +4,9 @@ using SendGrid.Helpers.Mail;
 
 namespace ECommerce1.Services
 {
-    public class SendGridEmailSender : IEmailSender
+    public class SendGridEmailSender(ISendGridClient sendGridClient, ILogger<SendGridEmailSender> logger) : IEmailSender
     {
-        private readonly ISendGridClient sendGridClient;
-        private readonly ILogger logger;
-
-        public SendGridEmailSender(ISendGridClient sendGridClient, ILogger<SendGridEmailSender> logger)
-        {
-            this.sendGridClient = sendGridClient;
-            this.logger = logger;
-        }
+        private readonly ILogger logger = logger;
 
         public async Task SendEmailAsync(string toEmail, string subject, string message)
         {

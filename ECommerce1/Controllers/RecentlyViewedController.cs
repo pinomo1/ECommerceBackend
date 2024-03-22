@@ -10,15 +10,8 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RecentlyViewedController : Controller
+    public class RecentlyViewedController(ResourceDbContext resourceDbContext, IConfiguration configuration) : Controller
     {
-        private readonly ResourceDbContext resourceDbContext;
-        private readonly IConfiguration configuration;
-        public RecentlyViewedController(ResourceDbContext resourceDbContext, IConfiguration configuration)
-        {
-            this.resourceDbContext = resourceDbContext;
-            this.configuration = configuration;
-        }
 
         /// <summary>
         /// Get all recently viewed items
@@ -30,7 +23,7 @@ namespace ECommerce1.Controllers
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<RecentlyViewedItem> recentlyViewedItems = await resourceDbContext.RecentlyViewedItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ToListAsync();
-            List<ProductsProductViewModel> favItemsViewModel = new();
+            List<ProductsProductViewModel> favItemsViewModel = [];
             foreach (var item in recentlyViewedItems)
             {
                 Product p = item.Product;
@@ -57,7 +50,7 @@ namespace ECommerce1.Controllers
         /// </summary>
         /// <param name="guid">Product's ID, not RecentlyViewedItem's ID</param>
         /// <returns></returns>
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("delete/{guid}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> RemoveFromRecentlyViewed(string guid)
         {

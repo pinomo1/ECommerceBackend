@@ -13,17 +13,10 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReviewController : ControllerBase
+    public class ReviewController(ResourceDbContext resourceDbContext,
+        BlobWorker blobWorker) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-        public BlobWorker BlobWorker { get; set; }
-
-        public ReviewController(ResourceDbContext resourceDbContext,
-            BlobWorker blobWorker)
-        {
-            this.resourceDbContext = resourceDbContext;
-            BlobWorker = blobWorker;
-        }
+        public BlobWorker BlobWorker { get; set; } = blobWorker;
 
         /// <summary>
         /// Get all reviews for specified product
@@ -103,7 +96,7 @@ namespace ECommerce1.Controllers
             }
 
             IEnumerable<string> references = await BlobWorker.AddPublicationPhotos(review.Photos);
-            List<ReviewPhoto> productPhotos = new();
+            List<ReviewPhoto> productPhotos = [];
             foreach (string reference in references)
             {
                 productPhotos.Add(new ReviewPhoto()

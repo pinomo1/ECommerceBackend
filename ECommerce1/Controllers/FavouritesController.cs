@@ -10,13 +10,8 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FavouritesController : ControllerBase
+    public class FavouritesController(ResourceDbContext resourceDbContext) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-        public FavouritesController(ResourceDbContext resourceDbContext)
-        {
-            this.resourceDbContext = resourceDbContext;
-        }
 
         /// <summary>
         /// Get all favourite items
@@ -28,7 +23,7 @@ namespace ECommerce1.Controllers
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<FavouriteItem> favItems = await resourceDbContext.FavouriteItems.Where(ci => ci.User.AuthId == userId).Include(ci => ci.Product).ToListAsync();
-            List<ProductsProductViewModel> favItemsViewModel = new();
+            List<ProductsProductViewModel> favItemsViewModel = [];
             foreach (var item in favItems)
             {
                 Product p = item.Product;
@@ -87,7 +82,7 @@ namespace ECommerce1.Controllers
         /// </summary>
         /// <param name="guid">Product's ID, not FavouriteItem's</param>
         /// <returns></returns>
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("delete/{guid}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> RemoveFromFavourites(string guid)
         {

@@ -8,14 +8,9 @@ using System.Security.Claims;
 
 namespace ECommerce1.Services
 {
-    public class TokenGenerator
+    public class TokenGenerator(IOptions<TokenGeneratorOptions> options)
     {
-        public TokenGeneratorOptions Options { get; }
-
-        public TokenGenerator(IOptions<TokenGeneratorOptions> options)
-        {
-            Options = options.Value;
-        }
+        public TokenGeneratorOptions Options { get; } = options.Value;
 
         public string GenerateRefreshToken()
         {
@@ -30,9 +25,9 @@ namespace ECommerce1.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Role, role)
+                    new(ClaimTypes.NameIdentifier, user.Id),
+                    new(ClaimTypes.Name, user.UserName),
+                    new(ClaimTypes.Role, role)
                 }),
                 Expires = DateTime.UtcNow.Add(Options.AccessExpiration),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

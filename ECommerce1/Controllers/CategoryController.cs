@@ -11,18 +11,10 @@ namespace ECommerce1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategoryController(ResourceDbContext resourceDbContext, BlobWorker blobWorker, TranslationService translationService) : ControllerBase
     {
-        private readonly ResourceDbContext resourceDbContext;
-        public BlobWorker BlobWorker { get; set; }
-        public TranslationService TranslationService { get; set; }
-
-        public CategoryController(ResourceDbContext resourceDbContext, BlobWorker blobWorker, TranslationService translationService)
-        {
-            this.resourceDbContext = resourceDbContext;
-            BlobWorker = blobWorker;
-            TranslationService = translationService;
-        }
+        public BlobWorker BlobWorker { get; set; } = blobWorker;
+        public TranslationService TranslationService { get; set; } = translationService;
 
         /// <summary>
         /// Adds main category (main category is a category that has no parent category)
@@ -112,7 +104,7 @@ namespace ECommerce1.Controllers
         [NonAction]
         private async Task<List<Category>> TranslateCategories(List<Category> categories)
         {
-            List<Category> translatedCategories = new();
+            List<Category> translatedCategories = [];
             foreach (var category in categories)
             {
                 translatedCategories.Add(await TranslateCategory(category));

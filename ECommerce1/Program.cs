@@ -53,7 +53,7 @@ builder.Services.AddSendGrid(options =>
     options.ApiKey = builder.Configuration.GetValue<string>("SendGridApiKey")
                      ?? throw new Exception("The 'SendGridApiKey' is not configured")
 );
-services.AddJwtAuthentication("3c66ae61-d405-4d24-8622-096087df7d22", new List<string>() { "User", "Seller", "Admin" });
+services.AddJwtAuthentication("3c66ae61-d405-4d24-8622-096087df7d22", ["User", "Seller", "Admin"]);
 services.AddScoped<IValidator<AddProductViewModel>, ProductValidator>();
 services.AddScoped<IValidator<UserCredentials>, UserRegistrationValidator>();
 services.AddScoped<IValidator<StaffCredentials>, StaffRegistrationValidator>();
